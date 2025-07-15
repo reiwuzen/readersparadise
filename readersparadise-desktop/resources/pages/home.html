@@ -1,0 +1,41 @@
+<div class="home-screen" id="home-html">
+  <!-- ☰ Hamburger Icon -->
+  <div class="navbar">
+    <span class="hamburger" onclick="toggleSidebar()">☰</span>
+    <h2>📚 ReadersParadise</h2>
+    <div class="switch">
+      <select class="theme-picker" id="theme-picker" onchange="changeTheme(this.value)">
+        <option value="light">🌞 Light</option>
+        <option value="dark">🌙 Dark</option>
+        <option value="pink">🌸 Pink</option>
+        <option value="vermilion">🔥 Vermilion</option>
+        <option value="custom">🎨 Custom</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar hidden">
+    <div class="side-bar">
+      <div class="hamburger" onclick="toggleSidebar()" id="hamburgertoggle">☰</div> <!-- Moved here too -->
+      <img src="../icons/logo.gif" alt="Logo" class="logo" id="logo">
+    </div>
+    <ul>
+      <li onclick="loadPage('source_select')">🔍 Select Sources</li>
+      <li onclick="alert('Library coming soon')">📂 My Library</li>
+      <li onclick="alert('Settings not yet built')">⚙️ Settings</li>
+      <li onclick="loadPage('welcome')">🏠 Back to Welcome</li>
+      <li onclick="alert('Not implemented yet')">❓ Help</li>
+    </ul>
+  </div>
+
+  <!-- Overlay -->
+  <div id="overlay" class="hidden"></div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <p>Welcome back! What do you want to read today? 📖</p>
+    <button onclick="loadPage('source_select')">Start Searching ��</button>
+  </div>
+  
+</div>

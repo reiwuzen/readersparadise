@@ -1,0 +1,259 @@
+/* -----------------------------------------------------------
+🌐 Global Fixes & Root Variables
+----------------------------------------------------------- */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden; /* 🚫 No horizontal scroll */
+  scroll-behavior: smooth;
+}
+
+:root {
+  --accent-color: #88cfe3f4;
+  --bg-color: #ffffff;
+  --box-shad: 0 4px 12px rgba(0, 0, 0, 0.792);
+  --navbar-color: #5da6df;
+  --sidebar-bg: #1e1e2f;
+  --sidebar-hover: #33334d;
+  --sidebar-text: #eee;
+  --text-color: #111111;
+}
+
+/* -----------------------------------------------------------
+🖋️ Typography & Base
+----------------------------------------------------------- */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* -----------------------------------------------------------
+📦 Layout: Page Container
+----------------------------------------------------------- */
+.page {
+  align-items: center;
+  background: var(--bg-color);
+  border-radius: 10px;
+  box-shadow: var(--box-shad);
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+  justify-content: center;
+  margin: 2rem auto;
+  max-height: 100vh;
+  max-width: 90vw;
+  overflow: hidden;
+  padding: 2rem;
+  width: 100%;
+}
+
+/* -----------------------------------------------------------
+🧩 Component: Buttons
+----------------------------------------------------------- */
+button {
+  background: var(--accent-color);
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  margin: 1rem;
+  padding: 0.7rem 1.2rem;
+}
+
+button:hover {
+  background: #005a9e;
+}
+
+/* -----------------------------------------------------------
+🧭 Navbar & Theme Picker
+----------------------------------------------------------- */
+.navbar {
+  align-items: center;
+  background-color: var(--navbar-color);
+  border-radius: 8px 8px 0 0;
+  color: var(--sidebar-text);
+  display: flex;
+  justify-content: space-between;
+  max-width: 95vw;
+  padding: 0.8rem 1.5rem;
+  padding-right: 2.5rem;
+  width: 100%;
+}
+
+.theme-picker {
+  appearance: none;
+  background-color: var(--accent-color);
+  background-image: url("data:image/svg+xml,%3Csvg fill='white' viewBox='0 0 24 24' width='16' height='16'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-position: right 0.6rem center;
+  background-repeat: no-repeat;
+  background-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-size: 0.95rem;
+  min-width: 120px;
+  padding: 0.4rem 1.8rem 0.4rem 0.8rem;
+}
+
+/* -----------------------------------------------------------
+🍔 Hamburger Menu
+----------------------------------------------------------- */
+.hamburger {
+  cursor: pointer;
+  font-size: 1.5rem;
+  margin-right: 1rem;
+}
+
+/* Sidebar Hamburger (inside sidebar) */
+#hamburgertoggle {
+  transform: translateX(1.9rem);
+}
+
+/* -----------------------------------------------------------
+📚 Sidebar
+----------------------------------------------------------- */
+.sidebar {
+  background: var(--sidebar-bg);
+  box-shadow: var(--box-shad);
+  color: var(--sidebar-text);
+  height: 100%;
+  left: 0;
+  padding-top: 2rem;
+  position: fixed;
+  top: 0;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
+  width: 220px;
+  z-index: 999;
+}
+
+.sidebar:not(.hidden) {
+  transform: translateX(0);
+}
+
+.sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar li {
+  cursor: pointer;
+  padding: 1rem;
+  transition: background 0.2s;
+}
+
+.sidebar li:hover {
+  background-color: var(--sidebar-hover);
+}
+
+.side-bar .logo {
+  height: auto;
+  width: 100%;
+}
+
+.side-bar button + #logo {
+  margin-left: none;
+  padding-left: none;
+  width: 100%;
+  /* transform: translateX(-1rem); */
+}
+
+/* -----------------------------------------------------------
+🧪 Switch
+----------------------------------------------------------- */
+.switch {
+  display: inline-block;
+  height: 26px;
+  margin-right: 4rem;
+  position: relative;
+  width: 48px;
+}
+
+.switch input {
+  height: 0;
+  opacity: 0;
+  width: 0;
+}
+
+/* -----------------------------------------------------------
+🏠 Page: Home Screen
+----------------------------------------------------------- */
+.home-screen {
+  height: 100vh;
+  overflow-x: hidden;
+  width: 100vw;
+}
+
+.content {
+  padding: 2rem;
+}
+
+/* -----------------------------------------------------------
+🫧 Overlay
+----------------------------------------------------------- */
+#overlay {
+  background: rgba(0, 0, 0, 0.3);
+  display: none;
+  height: 100vh;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  z-index: 998;
+}
+
+#overlay.show {
+  display: block;
+}
+
+/* -----------------------------------------------------------
+🌙 Theme: Dark
+----------------------------------------------------------- */
+body.dark {
+  --accent-color: #5a6068;
+  --bg-color: #0d1117;
+  --box-shad: 0 4px 12px rgba(255, 255, 255, 0.623);
+  --navbar-color: #5a779f4f;
+  --sidebar-bg: #010409;
+  --sidebar-hover: #21262d;
+  --sidebar-text: #c9d1d9;
+  --text-color: #c9d1d9;
+}
+
+/* -----------------------------------------------------------
+🌸 Theme: Pink
+----------------------------------------------------------- */
+body.pink {
+  --accent-color: #ff69b4;
+  --bg-color: #ffe0f0;
+  --box-shad: 0 4px 12px rgba(192, 42, 127, 0.345);
+  --navbar-color: #ff99cc;
+  --sidebar-bg: #ffe6f0;
+  --sidebar-hover: #ffb6c1;
+  --sidebar-text: #660033;
+  --text-color: #660033;
+}
+
+/* -----------------------------------------------------------
+🔥 Theme: Vermilion
+----------------------------------------------------------- */
+body.vermilion {
+  --accent-color: #e48077;
+  --bg-color: #fff3f0;
+  --box-shad: 0 4px 12px rgba(192, 130, 42, 0.797);
+  --navbar-color: #e34234;
+  --sidebar-bg: #ffe5e0;
+  --sidebar-hover: #ff5c5c;
+  --sidebar-text: #7a1f1f;
+  --text-color: #7a1f1f;
+}
