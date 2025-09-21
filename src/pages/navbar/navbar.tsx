@@ -2,11 +2,11 @@ import { useState } from "react";
 import "../../styles/navbar/navbar.scss";
 import selectAndList, { type ImageFile } from "../../../helper/fs";
 type NavbarProps = {
-  setImages: React.Dispatch<React.SetStateAction<ImageFile[]>>
-}
-const Navbar = ({setImages}: NavbarProps) => {
+  setImages: React.Dispatch<React.SetStateAction<ImageFile[]>>;
+};
+const Navbar = ({ setImages }: NavbarProps) => {
   const [sideBar, setSideBar] = useState(false);
-  
+
   const ToggleNavbarSideBar = () => {
     setSideBar(!sideBar);
   };
@@ -16,10 +16,14 @@ const Navbar = ({setImages}: NavbarProps) => {
       {
         <div className={`navbarSideBar ${sideBar ? "open" : "closed"} `}>
           <ul className="navbarSideBarList">
-            <li>Home</li>
-            <li>Library</li>
-            <li>Downloads</li>
-            <li>Settings</li>
+            <li onClick={() => (window as any).openTab("home")}>Home</li>
+            <li onClick={() => (window as any).openTab("library")}>Library</li>
+            <li onClick={() => (window as any).openTab("downloads")}>
+              Downloads
+            </li>
+            <li onClick={() => (window as any).openTab("settings")}>
+              Settings
+            </li>
           </ul>
         </div>
       }

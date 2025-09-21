@@ -50,6 +50,8 @@
   }
 
   button {
+    height: 4rem;
+    width: 15rem;
     &:hover {
       transform: scale(1.02);
       box-shadow: 0 0 0.2rem 0.1rem var(--box-shadow-color, aqua);
