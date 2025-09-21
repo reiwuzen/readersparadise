@@ -15,32 +15,37 @@
     
     cursor: pointer;
     height: 80%;
-}
-.tab .tabName{
-    color: white;
+
+    .tabName{
+        color: white;
+    }
+
+    button{
+        border: none;
+        background-color: inherit;
+        width: 0.8rem;
+        height: 0.8rem;
+        border-radius: 3rem;
+        justify-self: center;
+        align-self: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    
+        
+    }
 }
 .active{
+
     background-color: aqua;
     /* border-bottom: 2px solid; */
     /* border-color: rgb(0, 0, 0); */
+    button{
+        &:hover{
+        background-color: rgba(255, 255, 255, 0.674);
+    }
 }
-.tab button{
-    border: none;
-    background-color: inherit;
-    width: 0.8rem;
-    height: 0.8rem;
-    border-radius: 3rem;
-    justify-self: center;
-    align-self: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-
-    
-}
-.active.tab button:hover{
-    background-color: rgba(255, 255, 255, 0.674);
 }
 @media (max-width: 800px){
     .tab{

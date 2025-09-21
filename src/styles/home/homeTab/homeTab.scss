@@ -3,51 +3,55 @@
     height: 100%;
     display: flex;
     
-}
-.homeTab > .homeTabSideBar{
-    width: 30%;
-    height: inherit;
-    background-color: blue;
-}
-.homeTab > .homeTabMainContent{
-    width: 70%;
-    height: inherit;
-    display: flex;
-    flex-direction: column;
-}
-.homeTab > .homeTabMainContent > .homeTabImageContent{
-    width: 70vw;
-    height: 70vh;
-    border-bottom: 1px solid black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: auto;
-}
-.homeTab > .homeTabMainContent > .homeTabImageContent .homeTabImage, .homeTab > .homeTabMainContent > .homeTabImageContent img {
-    
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  
-    
-}
-.homeTab > .homeTabMainContent > .homeTabButtonBar{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
+    .homeTabSideBar{
+        width: 30%;
+        height: inherit;
+        background-color: blue;
+    }
+    .homeTabMainContent{
+        width: 70%;
+        height: inherit;
+        display: flex;
+        flex-direction: column;
 
-}
-.homeTab > .homeTabMainContent > .homeTabButtonBar p{
-    padding: 0 1rem 0;
-}
-.homeTab > .homeTabMainContent > .homeTabButtonBar button{
-    padding: 0 1rem 0;
-    border: none;
-    background-color: rgb(180, 215, 215);
-    border-radius: 1rem;
-    cursor: pointer;
+        .homeTabImageContent{
+            width: 70vw;
+            height: 70vh;
+            border-bottom: 1px solid black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+
+            .homeTabImage, img {
+                
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+              
+                
+            }
+        }
+
+        .homeTabButtonBar{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        
+            p{
+                padding: 0 1rem 0;
+            }
+
+            button{
+                padding: 0 1rem 0;
+                border: none;
+                background-color: rgb(180, 215, 215);
+                border-radius: 1rem;
+                cursor: pointer;
+            }
+        }
+    }
 }
 @media (max-width: 800px) {
     .homeTab > .homeTabSideBar{
