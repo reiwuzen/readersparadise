@@ -1,52 +1,84 @@
-.storageBox{
-    position: relative;
-    width: 80%;
-    height: 80%;
-    box-sizing: border-box;
-    box-shadow: 0 0 1rem 1rem var(--box-shadow-color, aqua);
-    border-radius: 0.4rem;
-}
-.storageBox h3{
+.storageBox {
+  position: relative;
+  width: 80%;
+  height: 80%;
+  box-sizing: border-box;
+  border-radius: 0.4rem;
+  animation: bg 8s linear infinite;
+  &::after,
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: inherit;
+    background: linear-gradient(90deg, cyan, violet, turquoise, aqua);
+    background-size: 300% 300%;
+    animation: borderGlow 8s linear infinite;
+    z-index: -1;
+    filter: blur(12px);
+  }
+  h3 {
     font-size: 5rem;
     font-weight: 500;
     color: aqua;
     margin: 4rem 0rem 2rem;
-}
-.storageBox #b{
+  }
+  #b {
     position: absolute;
     cursor: pointer;
     border: none;
     background-color: azure;
     border-color: var(--box-shadow-color, aqua);
-    height: 4rem;
-    width: 15rem;
     border-radius: 0.4rem;
     transition: 0.3s transform ease-in-out, 0.3s box-shadow ease-in-out;
     bottom: 3rem;
     left: 4rem;
-}
-.storageBox #n{
+  }
+  #n {
     position: absolute;
     cursor: pointer;
     border: none;
     background-color: azure;
     border-color: var(--box-shadow-color, aqua);
-    height: 4rem;
-    width: 15rem;
     border-radius: 0.4rem;
     transition: 0.3s transform ease-in-out, 0.3s box-shadow ease-in-out;
     bottom: 3rem;
     right: 4rem;
-}
-.storageBox button:hover{
-    transform: scale(1.02);
-    box-shadow: 0 0 0.2rem 0.1rem var(--box-shadow-color, aqua);
-    animation: pulse 0.8s ease-in-out;
+  }
+  button {
+    height: 4rem;
+    width: 15rem;
+    &:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 0.2rem 0.1rem var(--box-shadow-color, aqua);
+      animation: pulse 0.8s ease-in-out;
+    }
+  }
 }
 @keyframes pulse {
-  0% { transform: scale(1); }
-  25% {transform: scale(1.025);}
-  50% { transform: scale(1.05); }
-  75% {transform: scale(1.025);}
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.025);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  75% {
+    transform: scale(1.025);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@media (max-width: 800px) {
+  .storageBox {
+    width: 70%;
+    height: 70%;
+    button {
+      height: 4rem;
+      width: 8rem;
+    }
+  }
 }

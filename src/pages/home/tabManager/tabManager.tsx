@@ -1,18 +1,33 @@
 import { useState } from "react";
 import '../../../styles/home/tabManager/tabManager.scss'
 import HomeTab from "../homeTab/homeTab";
+import SettingsTab from "../settings/settings";
+import BrowserTab from "../browser/browser";
 import Tab from "./l1/tab";
 import { ImageFile } from "../../../../helper/fs";
+export type TabType = "home" | "library" | "browser" | "settings";
+type TabItem = {
+  id: number;
+  name: string;
+  type: TabType;
+};
 type TabManagerProps = {
-  images: ImageFile[]
+  images: ImageFile[],
 }
 const TabManager = ({images}:TabManagerProps) => {
-  const [tabs, setTabs] = useState([{ id: 1, name: "Home" }]);
+  const [tabs, setTabs] = useState<TabItem[]>([
+    { id: 1, name: "Home", type: "home" },
+  ]);
   const [activeTab, setActiveTab] = useState(1);
 
-  const addTab = () => {
+  const addTab = (type: TabType) => {
     const newId = Date.now();
-    setTabs([...tabs, { id: newId, name: `Home` }]);
+    const newTab: TabItem = {
+      id: newId,
+      name: type[0].toUpperCase() + type.slice(1),
+      type,
+    };
+    setTabs([...tabs, newTab]);
     setActiveTab(newId);
   };
 
@@ -28,6 +43,25 @@ const TabManager = ({images}:TabManagerProps) => {
       setActiveTab(newTabs[newTabs.length - 1].id);
     }
   };
+  // 🔥 render correct content for each tab
+  const renderContent = (tab: TabItem) => {
+    switch (tab.type) {
+      case "home":
+        return <HomeTab images={images} />;
+      case "library":
+        return <div>📚 Library</div>;
+      case "browser":
+        return <BrowserTab />;
+      case "settings":
+        return <SettingsTab />;
+        default:
+          return <div>Unknown tab</div>;
+        }
+      };
+      {/* 🔥 expose openTab for Navbar (imperative way) */}
+      {/* You can later refactor this with forwardRef if needed */}
+      {(window as any).openTab = addTab}
+  const active = tabs.find((t) => t.id === activeTab);
 
   return (
     <div className="tabManager">
@@ -41,12 +75,12 @@ const TabManager = ({images}:TabManagerProps) => {
             onClose={() => closeTab(tab.id)}
           />
         ))}
-        <button className="addTabBtn" onClick={addTab}>
+        <button className="addTabBtn" onClick={() => addTab("home")}>
           +
         </button>
       </div>
       <div className="tabContent">
-        <HomeTab images={images} />
+        {active && renderContent(active)}
       </div>
     </div>
   );
