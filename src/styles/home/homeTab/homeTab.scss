@@ -5,19 +5,19 @@
     
     .homeTabSideBar{
         width: 30%;
-        height: inherit;
+        height: 100%;
         background-color: blue;
     }
     .homeTabMainContent{
         width: 70%;
-        height: inherit;
+        height: 100%;
         display: flex;
         flex-direction: column;
 
         .homeTabImageContent{
             width: 70vw;
             height: 70vh;
-            border-bottom: 1px solid black;
+            // border-bottom: 1px solid black;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -28,7 +28,6 @@
                 width: 100%;
                 height: 100%;
                 object-fit: contain;
-              
                 
             }
         }
@@ -38,7 +37,7 @@
             align-items: center;
             justify-content: center;
             flex: 1;
-        
+            background-color: aquamarine;
             p{
                 padding: 0 1rem 0;
             }
@@ -53,9 +52,12 @@
         }
     }
 }
-@media (max-width: 800px) {
-    .homeTab > .homeTabSideBar{
-    width: 250px;
-    height: inherit;
-}
+@media (max-width: 800px ) or (max-height: 600px) {
+    .homeTab {
+        height: 100%;
+        .homeTabSideBar{
+            width: 250px;
+            height: 100%;
+        }
+    }
 }
