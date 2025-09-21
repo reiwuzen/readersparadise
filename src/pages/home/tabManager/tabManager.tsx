@@ -2,6 +2,7 @@ import { useState } from "react";
 import '../../../styles/home/tabManager/tabManager.scss'
 import HomeTab from "../homeTab/homeTab";
 import SettingsTab from "../settings/settings";
+import BrowserTab from "../browser/browser";
 import Tab from "./l1/tab";
 import { ImageFile } from "../../../../helper/fs";
 export type TabType = "home" | "library" | "browser" | "settings";
@@ -50,7 +51,7 @@ const TabManager = ({images}:TabManagerProps) => {
       case "library":
         return <div>📚 Library</div>;
       case "browser":
-        return <div>⬇️ Downloads</div>;
+        return <BrowserTab />;
       case "settings":
         return <SettingsTab />;
         default:

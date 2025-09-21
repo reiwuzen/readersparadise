@@ -4,7 +4,8 @@
   padding: 0;
 }
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  // font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Great Vibes', cursive;
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
@@ -37,6 +38,7 @@
   align-items: center;
   text-align: center;
   z-index: 0;
+  
 }
 
 @keyframes gradientShift {
