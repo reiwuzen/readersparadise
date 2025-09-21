@@ -2,11 +2,11 @@ import { useState } from "react";
 import "../../styles/navbar/navbar.scss";
 import selectAndList, { type ImageFile } from "../../../helper/fs";
 type NavbarProps = {
-  setImages: React.Dispatch<React.SetStateAction<ImageFile[]>>
-}
-const Navbar = ({setImages}: NavbarProps) => {
+  setImages: React.Dispatch<React.SetStateAction<ImageFile[]>>;
+};
+const Navbar = ({ setImages }: NavbarProps) => {
   const [sideBar, setSideBar] = useState(false);
-  
+
   const ToggleNavbarSideBar = () => {
     setSideBar(!sideBar);
   };
@@ -16,10 +16,14 @@ const Navbar = ({setImages}: NavbarProps) => {
       {
         <div className={`navbarSideBar ${sideBar ? "open" : "closed"} `}>
           <ul className="navbarSideBarList">
-            <li>Home</li>
-            <li>Library</li>
-            <li>Downloads</li>
-            <li>Settings</li>
+            <li onClick={() => {(window as any).openTab("home");setSideBar(!sideBar);}}>Home</li>
+            <li onClick={() => {(window as any).openTab("library");setSideBar(!sideBar);}}>Library</li>
+            <li onClick={() => {(window as any).openTab("browser");setSideBar(!sideBar);}}>
+              Browser
+            </li>
+            <li onClick={() => {(window as any).openTab("settings");setSideBar(!sideBar);}}>
+              Settings
+            </li>
           </ul>
         </div>
       }
@@ -41,9 +45,9 @@ const Navbar = ({setImages}: NavbarProps) => {
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
         onClick={ToggleNavbarSideBar}
       >
         <line x1="3" y1="6" x2="21" y2="6" />

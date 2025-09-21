@@ -11,8 +11,12 @@ const HomeTab = ({ images }: { images: ImageFile[] }) => {
 
   // Load current image as Blob URL
   useEffect(() => {
+    if (!images || images.length === 0) {
+    setCurrentImageUrl(null);
+    return;
+  }
     const loadCurrentImage = async () => {
-      const imagePath = images[currentIndex].path;
+      const imagePath =  images[currentIndex].path;
       try {
         const bytes: number[] = await invoke("read_image_bytes", {
           path: imagePath,

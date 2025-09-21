@@ -1,1 +1,31 @@
-.settingsTab{ width: 100%;height: 100%;display: flex;}
+.settingsTab {
+  width: 100%;
+  height: 100%;
+  display: flex;
+
+  .settingsTabSideBar{
+    width: 30%;
+    height: 100%;
+    background-color: aquamarine;
+  }
+  .settingsTabMain{
+    width: 70%;
+    height: 100%;
+    animation: bg-settings 8s linear infinite ;
+  }
+}
+@keyframes bg-settings{
+    from {
+    background-color: rgba(226, 247, 255, 0.984);
+  }
+  to {
+    background-color: rgba(135, 218, 243, 0.285);
+  }
+}
+@media (max-width: 800px){
+    .settingsTab{
+        .settingsTabSideBar{
+            width: 250px;
+        }
+    }
+}
