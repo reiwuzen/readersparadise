@@ -1,56 +1,101 @@
-.tab{
+.tab {
+  display: flex;
+  align-self: flex-end;
+  align-items: center;
+  justify-self: flex-end;
+  justify-content: space-between;
+  text-align: center;
+  min-width: 10rem;
+  width: auto;
+  max-width: 10rem;
+  text-overflow: ellipsis;
+  background-color: none;
+  border-radius: 1rem 1rem 0rem 0rem;
+  padding: 0 0.5rem 0;
+
+  cursor: pointer;
+  height: 80%;
+
+  .tabName {
+    color: white;
+  }
+
+  button {
+    display: none;
+    border: none;
+    background-color: inherit;
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 3rem;
+    justify-self: center;
+    align-self: center;
     display: flex;
-    align-self: flex-end;
     align-items: center;
-    justify-self: flex-end;
-    justify-content: space-between;
-    text-align: center;
-    min-width: 10rem;
-    width: auto;
-    max-width: 10rem;
-    text-overflow: ellipsis;
-    background-color: none;
-    border-radius: 1rem 1rem 0rem 0rem;
-    padding: 0 0.5rem 0;
-    
+    justify-content: center;
     cursor: pointer;
-    height: 80%;
-
-    .tabName{
-        color: white;
-    }
-
-    button{
-        border: none;
-        background-color: inherit;
-        width: 0.8rem;
-        height: 0.8rem;
-        border-radius: 3rem;
-        justify-self: center;
-        align-self: center;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-    
-        
-    }
-}
-.active{
-
-    background-color: aqua;
-    /* border-bottom: 2px solid; */
-    /* border-color: rgb(0, 0, 0); */
-    button{
-        &:hover{
+  }
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.276);
+    button {
+      display: block;
+      background-color: rgba(255, 255, 255, 0);
+      &:hover {
         background-color: rgba(255, 255, 255, 0.674);
+      }
     }
+  }
 }
-}
-@media (max-width: 800px){
-    .tab{
-        min-width: 100px;
-        width: auto;
-        max-width: 100px;
+.active.tab {
+  background: linear-gradient(
+    lightpink,
+    aqua,
+    aquamarine,
+    rgb(203, 235, 255),
+    turquoise,
+    pink
+  );
+  background-size: 400% 400%;
+  animation: tabGradientShift 8s linear infinite;
+  /* border-bottom: 2px solid; */
+  /* border-color: rgb(0, 0, 0); */
+  button {
+    display: block;
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.674);
     }
+  }
+}
+@media (max-width: 800px) {
+  .tab {
+    min-width: 100px;
+    width: auto;
+    max-width: 100px;
+  }
+}
+@keyframes tabGradientShift {
+  0% {
+    background-position: 50% 50%;
+  }
+  12% {
+    background-position: 80% 50%;
+  }
+  25% {
+    background-position: 80% 30%;
+  }
+  50% {
+    background-position: 80% 10%;
+  }
+  63% {
+    background-position: 50% 10%;
+  }
+  75% {
+    background-position: 10% 10%;
+  }
+  87% {
+    background-position: 10% 50%;
+  }
+
+  100% {
+    background-position: 10% 80%;
+  }
 }

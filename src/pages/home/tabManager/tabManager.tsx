@@ -4,7 +4,7 @@ import HomeTab from "../homeTab/homeTab";
 import SettingsTab from "../settings/settings";
 import Tab from "./l1/tab";
 import { ImageFile } from "../../../../helper/fs";
-export type TabType = "home" | "library" | "downloads" | "settings";
+export type TabType = "home" | "library" | "browser" | "settings";
 type TabItem = {
   id: number;
   name: string;
@@ -49,7 +49,7 @@ const TabManager = ({images}:TabManagerProps) => {
         return <HomeTab images={images} />;
       case "library":
         return <div>📚 Library</div>;
-      case "downloads":
+      case "browser":
         return <div>⬇️ Downloads</div>;
       case "settings":
         return <SettingsTab />;

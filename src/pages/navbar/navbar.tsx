@@ -16,12 +16,12 @@ const Navbar = ({ setImages }: NavbarProps) => {
       {
         <div className={`navbarSideBar ${sideBar ? "open" : "closed"} `}>
           <ul className="navbarSideBarList">
-            <li onClick={() => (window as any).openTab("home")}>Home</li>
-            <li onClick={() => (window as any).openTab("library")}>Library</li>
-            <li onClick={() => (window as any).openTab("downloads")}>
-              Downloads
+            <li onClick={() => {(window as any).openTab("home");setSideBar(!sideBar);}}>Home</li>
+            <li onClick={() => {(window as any).openTab("library");setSideBar(!sideBar);}}>Library</li>
+            <li onClick={() => {(window as any).openTab("browser");setSideBar(!sideBar);}}>
+              Browser
             </li>
-            <li onClick={() => (window as any).openTab("settings")}>
+            <li onClick={() => {(window as any).openTab("settings");setSideBar(!sideBar);}}>
               Settings
             </li>
           </ul>
