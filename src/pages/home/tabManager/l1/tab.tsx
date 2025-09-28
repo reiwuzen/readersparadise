@@ -5,6 +5,9 @@ type TabProps = {
   isActive?: boolean;
   onClick?: () => void;
   onClose?: () => void;
+  // type: string,
+  // listed: boolean,
+  
 };
 
 const Tab = ({ name, isActive = false, onClick, onClose }: TabProps) => {
@@ -18,7 +21,8 @@ const Tab = ({ name, isActive = false, onClick, onClose }: TabProps) => {
       {onClose && (
         <button
           className="closeBtn"
-          onClick={(e) => {
+          onClick={
+            (e) => {
             e.stopPropagation(); // prevent switching tab when closing
             onClose();
           }}

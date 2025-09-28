@@ -3,9 +3,11 @@ import { invoke } from "@tauri-apps/api/core";
 import { ImageFile } from "../../../../helper/fs";
 import "../../../styles/home/homeTab/homeTab.scss";
 
+
 const HomeTab = ({ images }: { images: ImageFile[] }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
+
 
   const len = images.length;
 

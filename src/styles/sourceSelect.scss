@@ -25,6 +25,71 @@
     margin: 4rem 0rem 2rem;
   }
 
+  .sources {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 20rem 0;
+  width: 30rem;
+  max-height: 16rem;
+  overflow-y: auto;
+
+  > li {
+    padding: 0 0 0 8px;
+    display: flex;
+    width: 8rem;
+    height: 2rem;
+    list-style: none;
+    gap: 0.5rem;
+    justify-content: flex-start;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+    }
+
+    // hide native checkbox
+    > .sources-list {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      background: transparent;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: #fff;
+      }
+
+      &:checked {
+        background-color: #4cafef; // highlight color
+        border-color: #4cafef;
+
+        &::after {
+          content: "✔";
+          font-size: 0.75rem;
+          color: #fff;
+        }
+      }
+    }
+
+    > .sources-label {
+      cursor: pointer;
+      color: white;
+      font-size: 0.9rem;
+      user-select: none;
+    }
+  }
+}
+
+
   #b {
     position: absolute;
     cursor: pointer;
@@ -63,6 +128,12 @@
   .sourceSelectBox {
     width: 70%;
     height: 70%;
+    h2{
+      font-size: 4rem;
+    }
+    .sources{
+      margin: 0 6.48rem 0;
+    }
     button {
       height: 4rem;
       width: 8rem;

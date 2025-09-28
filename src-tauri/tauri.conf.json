@@ -9,6 +9,7 @@
     "beforeBuildCommand": "pnpm build",
     "frontendDist": "../dist"
   },
+
   "app": {
     "windows": [
       {
@@ -18,7 +19,15 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": null,
+      "capabilities": [
+        {
+          "identifier": "webview-create",
+          "description": "Allow certain webviews to create new webview windows",
+          "permissions": ["core:webview:allow-create-webview-window","core:window:allow-close","core:window:allow-show","core:window:default","core:event:allow-listen", "core:event:default"],
+          "webviews": ["*"]
+        }
+      ]
     }
   },
   "bundle": {

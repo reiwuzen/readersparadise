@@ -1,25 +1,34 @@
-import { Webview } from "@tauri-apps/api/webview";
-import { Window } from "@tauri-apps/api/window";
-type BrowserTabProps = {};
+// import { useEffect } from "react";
+// import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import "../../../styles/home/browser/browser.scss";
+import EmbdBrowser from "../embdBrowser/embdBrowser";
+import useSourceStore from "../../../../helper/store";
+type BrowserTabProps = {
+  innerTabId: string;
+  qActive: boolean;
+  qListed: boolean;
+};
 
-const BrowserTab = ({}: BrowserTabProps) => {
-  const appWindow = new Window("uniqueLabel");
-  appWindow.once("tauri://created", async function () {
-    const webview = new Webview(appWindow, "theUniqueLabel", {
-      url: "hentairead.com/genre/manga/",
+const BrowserTab = ({ innerTabId, qActive, qListed }: BrowserTabProps) => {
+  const { selected } = useSourceStore();
+  console.log(selected);
 
-      // create a webview with specific logical position and size
-      x: 0,
-      y: 0,
-      width: 800,
-      height: 600,
-    });
-  });
   return (
     <div className="browserTab">
-      <div className="browserTabSideBar"></div>
-      <div className="browserTabMain"></div>
+      <div className="browserTabSideBar">
+        <ul>
+          {[...selected]
+            .sort((a, b) => a.localeCompare(b, "en", { sensitivity: "base" }))
+            .map((src) => (
+              <li key={src}>{src}</li>
+            ))}
+        </ul>
+      </div>
+      <div className="browserTabMain">
+        <EmbdBrowser id={innerTabId} isActive={qActive} isListed={qListed} />
+      </div>
     </div>
   );
 };
+
 export default BrowserTab;
