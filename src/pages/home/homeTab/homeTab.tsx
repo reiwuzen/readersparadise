@@ -43,7 +43,7 @@ const HomeTab = ({ images }: { images: ImageFile[] }) => {
 
   return (
     <div className="homeTab">
-      <div className="homeTabSideBar"></div>
+      
       <div className="homeTabMainContent">
         <div className="homeTabImageContent">
           {currentImageUrl ? (
@@ -59,7 +59,7 @@ const HomeTab = ({ images }: { images: ImageFile[] }) => {
             
           </div>
         </div>
-        <div className="homeTabButtonBar">
+        {/* <div className="homeTabButtonBar">
           {len === 0 ? (
             <p>NO ^ content yet</p>
           ) : (
@@ -71,7 +71,7 @@ const HomeTab = ({ images }: { images: ImageFile[] }) => {
               <button onClick={nextImage}>Next Page ▶</button>
             </>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

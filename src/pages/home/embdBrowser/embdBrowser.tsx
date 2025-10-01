@@ -22,9 +22,9 @@ const EmbdBrowser = ({ id, isActive, isListed }: EmbdBrowserProps) => {
         console.log(`the width & height of container is ${width} & ${height}`);
         const x = Math.round(rect.x);
         const y = Math.round(rect.y);
-        let ad = "uwdsdasda";
+        // let ad = "uwdsdasda";
         
-        const webview = new WebviewWindow(`${ad}`, {
+        const webview = new WebviewWindow(`${id}`, {
             url: "https://github.com/tauri-apps/tauri",
             x: x,
             y: y,

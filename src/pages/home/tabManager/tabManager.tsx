@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "../../../styles/home/tabManager/tabManager.scss";
-import HomeTab from "../homeTab/homeTab";
+// import HomeTab from "../homeTab/homeTab";
 import SettingsTab from "../settings/settings";
 import BrowserTab from "../browser/browser";
 import Tab from "./l1/tab";
 import { ImageFile } from "../../../../helper/fs";
-export type TabType = "home" | "library" | "browser" | "settings";
+export type TabType =  "library" | "browser" | "settings";
 type TabItem = {
   id: string;
   name: string;
@@ -17,7 +17,7 @@ type TabManagerProps = {
 };
 const TabManager = ({ images }: TabManagerProps) => {
   const [tabs, setTabs] = useState<TabItem[]>([
-    { id: '1', name: "Home", type: "home", listed: true },
+    { id: '1', name: "Library", type: "library", listed: true },
   ]);
 
   const [activeTab, setActiveTab] = useState('1');
@@ -57,8 +57,8 @@ const TabManager = ({ images }: TabManagerProps) => {
   // 🔥 render correct content for each tab
   const renderContent = (tab: TabItem) => {
     switch (tab.type) {
-      case "home":
-        return <HomeTab images={images} />;
+      // case "home":
+      //   return <HomeTab images={images} />;
       case "library":
         return <div>📚 Library</div>;
       case "browser":
@@ -94,7 +94,7 @@ const TabManager = ({ images }: TabManagerProps) => {
             // listed={tab.listed!}
           />
         ))}
-        <button className="addTabBtn" onClick={() => addTab("home")}>
+        <button className="addTabBtn" onClick={() => addTab("library")}>
           +
         </button>
       </div>
