@@ -1,12 +1,13 @@
 import { CSSProperties, useState } from "react";
 import "./style.scss";
+import { useTabs } from "./useTabs";
 type MenuItem = {
   label?: string;
   action?: () => void;
   separator?: boolean;
   // optional, for dividers
 };
-import { TabType } from "../../pages/home/tabManager/tabManager";
+import { TabType } from "../store/useTabsStore";
 type MenuState = {
   x: number;
   y: number;
@@ -15,6 +16,7 @@ type MenuState = {
 } | null;
 
 export const useContextMenu = () => {
+  const { addTab } = useTabs();
   const [menu, setMenu] = useState<MenuState>(null);
   // call this to open a menu
   const preDef = (tab?: TabType): MenuItem[] => {
@@ -23,7 +25,7 @@ export const useContextMenu = () => {
     if (tab !== undefined) {
       items.push({
         label: "Open In NewTab",
-        action: () => (window as any).openTab(tab),
+        action: () => addTab(tab),
       });
     }
 

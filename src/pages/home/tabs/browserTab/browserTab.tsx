@@ -2,7 +2,7 @@
 // import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import "./browserTab.scss";
 import EmbdBrowser from "./embdBrowser/embdBrowser";
-import useSourceStore from "../../../../hooks/store";
+import useSourceStore from "../../../../store/useSourceStore";
 type BrowserTabProps = {
   innerTabId: string;
   qActive: boolean;

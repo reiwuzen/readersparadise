@@ -3,29 +3,63 @@
   height: 100%;
   display: flex;
 
-  .settingsTabSideBar{
-    width: 30%;
+  .settingsTabSideBar {
+    width: 24%;
     height: 100%;
     background-color: aquamarine;
+    > ul {
+      list-style: none;
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      overflow-y: auto;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      > li {
+        cursor: pointer;
+        font-size: 28px;
+        font-weight: 600;
+        height: 30px;
+        width: 88%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        // align-self: center;
+        // justify-self: center;
+        padding: 10px 10px 10px;
+        border-radius: 10px;
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.377);
+        }
+        &.active {
+          background-color: rgba(255, 255, 255, 0.728);
+          font-weight: 700;
+        }
+      }
+    }
   }
-  .settingsTabMain{
-    width: 70%;
+  .settingsTabMain {
+    width: 76%;
     height: 100%;
-    animation: bg-settings 8s linear infinite ;
+    animation: bg-settings 8s linear infinite;
   }
 }
-@keyframes bg-settings{
-    from {
+@keyframes bg-settings {
+  from {
     background-color: rgba(226, 247, 255, 0.984);
   }
   to {
     background-color: rgba(135, 218, 243, 0.285);
   }
 }
-@media (max-width: 800px){
-    .settingsTab{
-        .settingsTabSideBar{
-            width: 250px;
-        }
+@media (max-width: 800px) {
+  .settingsTab {
+    .settingsTabSideBar {
+      width: 250px;
     }
+  }
 }

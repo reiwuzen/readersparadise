@@ -1,12 +1,14 @@
 // import { useState } from "react";
-import "./navbar.scss";
+import "./Navbar.scss";
 import selectAndList, { type ImageFile } from "../../../helper/fs";
 import { useState } from "react";
-import { useContextMenu } from "../ContextMenu/customMenu";
+import { useContextMenu } from "../../hooks/useContextMenu";
+import { useTabs } from "../../hooks/useTabs";
 type NavbarProps = {
   setImages: React.Dispatch<React.SetStateAction<ImageFile[]>>;
 };
 const Navbar = ({ setImages }: NavbarProps) => {
+  const { activateTab } = useTabs();
   const [loggedIn, setLoggedIn] = useState<Boolean>(false);
   const { openContextMenu, renderContextMenu } = useContextMenu();
   // const [sideBar, setSideBar] = useState(false);
@@ -20,7 +22,8 @@ const Navbar = ({ setImages }: NavbarProps) => {
       <ul className="menubar">
         <li
           onClick={() => {
-            (window as any).onActiveTab("library", "Library");
+            console.log("Library clicked");
+            activateTab("library", "Library");
           }}
           onContextMenu={(e) => openContextMenu(e, "library")}
         >
@@ -40,9 +43,9 @@ const Navbar = ({ setImages }: NavbarProps) => {
         </li>
         <li
           onClick={() => {
-            (window as any).onActiveTab("browser", "Discover");
+            activateTab("discover", "Discover");
           }}
-          onContextMenu={(e) => openContextMenu(e, "browser")}
+          onContextMenu={(e) => openContextMenu(e, "discover")}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -80,7 +83,7 @@ const Navbar = ({ setImages }: NavbarProps) => {
         </li>
         <li
           onClick={() => {
-            (window as any).onActiveTab("settings", "Settings");
+            activateTab("settings", "Settings");
           }}
           onContextMenu={(e) => openContextMenu(e, "settings")}
         >
