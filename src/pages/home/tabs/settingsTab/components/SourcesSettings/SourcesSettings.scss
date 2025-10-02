@@ -1,0 +1,15 @@
+.SourcesSettings{
+    height: 100%;
+    width: 100%;
+    .sourcesManagementSettings{
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        >li{
+            cursor: pointer;
+            &:hover{
+                background-color: rgba(255, 255, 255, 0.416);
+            }
+        }
+    }
+}

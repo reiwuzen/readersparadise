@@ -1,9 +1,10 @@
+@import '../../styles/variables.scss';
 .navbar{
     position: relative;
     height: 100%;
     width: 6%;
     max-width: 78px;
-    background-color: var(--nav-N-tab-color,aqua);
+    background-color: var($hover1,aqua);
     flex-shrink: 0;
     z-index: 5;
     display: flex;
@@ -34,14 +35,14 @@
             border-radius: 10px;
             transition: background-color 0.2s ease;
             &:hover{
-                background-color: rgba(255, 255, 255, 0.454);
+                background-color: $hover2;
             }
             h3{
-                color: white;
+                color: $navbar-text;
                 font-size: 15px;
             }
             .menubarIcons{
-                color: white;
+                color: $navbar-text;
                 align-self: center;
                 justify-self: center;
             }
@@ -51,7 +52,7 @@
         margin: 0 0 10px;
         li{
             h3{
-                color: white;
+                color: $navbar-text;
             }
         }
     }
@@ -113,10 +114,10 @@
 @media (max-height: 600px) , (max-width: 800px){
     .navbar {
         width: 10%;
-        .menubar{
-            li{
+        // .menubar{
+        //     li{
                 
-            }
-        }
+        //     }
+        // }
     }
 }

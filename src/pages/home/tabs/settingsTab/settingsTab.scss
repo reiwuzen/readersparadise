@@ -1,3 +1,4 @@
+@import '../../../../styles/variables.scss';
 .settingsTab {
   width: 100%;
   height: 100%;
@@ -6,7 +7,7 @@
   .settingsTabSideBar {
     width: 24%;
     height: 100%;
-    background-color: aquamarine;
+    background-color: $sidebar-bg;
     > ul {
       list-style: none;
       height: 100%;
@@ -33,10 +34,10 @@
         padding: 10px 10px 10px;
         border-radius: 10px;
         &:hover {
-          background-color: rgba(255, 255, 255, 0.377);
+          background-color: $hover1;
         }
         &.active {
-          background-color: rgba(255, 255, 255, 0.728);
+          background-color: $hover4;
           font-weight: 700;
         }
       }
@@ -46,6 +47,10 @@
     width: 76%;
     height: 100%;
     animation: bg-settings 8s linear infinite;
+    >div{
+      width: 100%;
+      height: 100%;
+    }
   }
 }
 @keyframes bg-settings {
