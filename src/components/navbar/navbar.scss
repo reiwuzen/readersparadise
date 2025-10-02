@@ -1,10 +1,11 @@
-@import '../../styles/variables.scss';
+@use "@/styles/variables" as vars;
+// @import '../../styles/variables.scss';
 .navbar{
     position: relative;
     height: 100%;
     width: 6%;
     max-width: 78px;
-    background-color: var($hover1,aqua);
+    background-color: var(vars.$hover1,aqua);
     flex-shrink: 0;
     z-index: 5;
     display: flex;
@@ -12,13 +13,6 @@
     overflow: hidden;
     justify-content: space-between;
     align-items: center;
-    // flex-wrap: wrap;
-    /* box-shadow: 0 0px 0.2rem 0rem aquamarine; */
-    // h3{
-    //     margin: 1.3% 0 0 0;
-    //     font-size: 150%;
-    //     color: aliceblue;
-    // }
     .menubar{
         display: flex;
         flex-direction: column;
@@ -35,14 +29,14 @@
             border-radius: 10px;
             transition: background-color 0.2s ease;
             &:hover{
-                background-color: $hover2;
+                background-color: vars.$hover2;
             }
             h3{
-                color: $navbar-text;
+                color: vars.$navbar-text;
                 font-size: 15px;
             }
             .menubarIcons{
-                color: $navbar-text;
+                color: vars.$navbar-text;
                 align-self: center;
                 justify-self: center;
             }
@@ -52,7 +46,7 @@
         margin: 0 0 10px;
         li{
             h3{
-                color: $navbar-text;
+                color: vars.$navbar-text;
             }
         }
     }

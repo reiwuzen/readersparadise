@@ -1,5 +1,5 @@
 import "./tabManager.scss";
-import { useTabs } from "../../../hooks/useTabs";
+import { useTabs } from "@/hooks/useTabs";
 import LibraryTab from "../tabs/libraryTab/libraryTab";
 import SettingsTab from "../tabs/settingsTab/settingsTab";
 import BrowserTab from "../tabs/browserTab/browserTab";

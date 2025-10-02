@@ -1,4 +1,4 @@
-@import '../../../../styles/variables.scss';
+@use "@/styles/variables" as vars;
 .settingsTab {
   width: 100%;
   height: 100%;
@@ -7,7 +7,7 @@
   .settingsTabSideBar {
     width: 24%;
     height: 100%;
-    background-color: $sidebar-bg;
+    background-color: vars.$sidebar-bg;
     > ul {
       list-style: none;
       height: 100%;
@@ -34,10 +34,10 @@
         padding: 10px 10px 10px;
         border-radius: 10px;
         &:hover {
-          background-color: $hover1;
+          background-color: vars.$hover1;
         }
         &.active {
-          background-color: $hover4;
+          background-color: vars.$hover4;
           font-weight: 700;
         }
       }

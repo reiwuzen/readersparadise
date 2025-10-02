@@ -1,4 +1,4 @@
-@import '../../../../../styles/variables.scss';
+@use "@/styles/variables" as vars;
 .tab {
   display: flex;
   align-self: flex-end;
@@ -18,7 +18,7 @@
   height: 80%;
 
   .tabName {
-    color: $tabName
+    color: vars.$tabName
   }
 
   button {
@@ -47,7 +47,7 @@
   }
 }
 .active.tab {
-  background: $activeTab;
+  background: vars.$activeTab;
   background-size: 400% 400%;
   animation: tabGradientShift 8s linear infinite;
   /* border-bottom: 2px solid; */
@@ -55,7 +55,7 @@
   button {
     display: block;
     &:hover {
-      background-color: $hover3;
+      background-color: vars.$hover3;
     }
   }
 }
