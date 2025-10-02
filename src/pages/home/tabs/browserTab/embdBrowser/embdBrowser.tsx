@@ -1,4 +1,4 @@
-import "../../../styles/home/embdBrowser/embdBrowser.scss";
+import "./embdBrowser.scss";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 // import { PhysicalPosition, PhysicalSize } from "@tauri-apps/api/window";
 import { useEffect, useRef } from "react";

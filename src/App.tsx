@@ -2,22 +2,22 @@
 // import reactLogo from "./assets/react.svg";
 // import { invoke } from "@tauri-apps/api/core";
 import "./App.scss";
-import Welcome from "./pages/welcome";
-import SourceSelect from "./pages/sourceSelect";
-import Storage from "./pages/storage";
-import Home from "./pages/home";
+import Welcome from "./pages/welcome/welcome";
+import SourceSelect from "./pages/sourceSelect/sourceSelect";
+import Storage from "./pages/storage/storage";
+import Home from "./pages/home/home";
 import { Component, useState } from "react";
 const steps = [
   { key: "welcome", Component: Welcome },
   { key: "sources", Component: SourceSelect },
-  {key: "storage", Component: Storage}
+  { key: "storage", Component: Storage },
 ];
 function App() {
   const [index, setIndex] = useState(0);
-  const [finished, setFinished] =useState(false);
-  
-  if (finished){
-    return(
+  const [finished, setFinished] = useState(false);
+
+  if (finished) {
+    return (
       <main className="container">
         <Home />
       </main>
@@ -45,6 +45,5 @@ function App() {
     </main>
   );
 }
-
 
 export default App;

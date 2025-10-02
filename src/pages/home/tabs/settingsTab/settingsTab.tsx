@@ -1,4 +1,4 @@
-import "../../../styles/home/settings/settings.scss";
+import "./settingsTab.scss";
 const SettingsTab = () => {
   return (
   <div className="settingsTab">

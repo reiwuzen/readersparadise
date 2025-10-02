@@ -1,4 +1,4 @@
-import "../../../../styles/home/tabManager/l1/tab.scss";
+import "./tab.scss";
 
 type TabProps = {
   name: string;

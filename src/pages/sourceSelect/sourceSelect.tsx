@@ -1,5 +1,5 @@
-import "../styles/sourceSelect.scss";
-import useSourceStore from "../../helper/store";
+import "./sourceSelect.scss";
+import useSourceStore from "../../hooks/store";
 
 type SourceSelectProps = {
   onBack: () => void;

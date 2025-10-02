@@ -1,8 +1,8 @@
 // import { useEffect } from "react";
 // import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
-import "../../../styles/home/browser/browser.scss";
-import EmbdBrowser from "../embdBrowser/embdBrowser";
-import useSourceStore from "../../../../helper/store";
+import "./browserTab.scss";
+import EmbdBrowser from "./embdBrowser/embdBrowser";
+import useSourceStore from "../../../../hooks/store";
 type BrowserTabProps = {
   innerTabId: string;
   qActive: boolean;
