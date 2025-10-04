@@ -19,9 +19,13 @@ const InnerSearchTabs = ({ tab, type }: InnerSearchTabsProps) => {
     </div>
   );
   const recentTab = (
-    <div className={`innerSearchTabs `} id='recentTab'>
+    <div className={`innerSearchTabs `} id='recentTab' onClick={tab.onClick}>
       {tab.name}
-    <button >×</button>
+    <button onClick={
+            (e) => {
+            e.stopPropagation(); // prevent switching tab when closing
+            tab.onClose!();
+          }}>×</button>
     </div>
   );
   

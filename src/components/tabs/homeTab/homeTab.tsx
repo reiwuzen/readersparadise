@@ -1,24 +1,22 @@
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { ImageFile } from "../../../../../helper/fs";
+import { ImageFile } from "../../../../helper/fs";
 import "./homeTab.scss";
-
 
 const HomeTab = ({ images }: { images: ImageFile[] }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
-
 
   const len = images.length;
 
   // Load current image as Blob URL
   useEffect(() => {
     if (!images || images.length === 0) {
-    setCurrentImageUrl(null);
-    return;
-  }
+      setCurrentImageUrl(null);
+      return;
+    }
     const loadCurrentImage = async () => {
-      const imagePath =  images[currentIndex].path;
+      const imagePath = images[currentIndex].path;
       try {
         const bytes: number[] = await invoke("read_image_bytes", {
           path: imagePath,
@@ -43,7 +41,6 @@ const HomeTab = ({ images }: { images: ImageFile[] }) => {
 
   return (
     <div className="homeTab">
-      
       <div className="homeTabMainContent">
         <div className="homeTabImageContent">
           {currentImageUrl ? (
@@ -55,9 +52,7 @@ const HomeTab = ({ images }: { images: ImageFile[] }) => {
           ) : (
             <p>Loading...</p>
           )}
-          <div className="homeTabImageMode">
-            
-          </div>
+          <div className="homeTabImageMode"></div>
         </div>
         {/* <div className="homeTabButtonBar">
           {len === 0 ? (

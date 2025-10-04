@@ -2,14 +2,14 @@
 // import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import "./discoverTab.scss";
 import EmbdBrowser from "./embdBrowser/embdBrowser";
-import useSourceStore from "../../../../store/useSourceStore";
+import useSourceStore from "../../../store/useSourceStore";
 type BrowserTabProps = {
   innerTabId: string;
   qActive: boolean;
   qListed: boolean;
 };
 
-const DiscoverTab= ({ innerTabId, qActive, qListed }: BrowserTabProps) => {
+const DiscoverTab = ({ innerTabId, qActive, qListed }: BrowserTabProps) => {
   console.log("Render DiscoverTab", { innerTabId, qActive, qListed });
   const { selected } = useSourceStore();
   console.log(selected);

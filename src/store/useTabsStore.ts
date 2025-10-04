@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import LibraryTab from "@/pages/home/tabs/libraryTab/libraryTab";
-import DiscoverTab from "@/pages/home/tabs/discoverTab/discoverTab"
-import SettingsTab from "@/pages/home/tabs/settingsTab/settingsTab";
+import LibraryTab from "@/components/tabs/libraryTab/libraryTab";
+import DiscoverTab from "@/components/tabs/discoverTab/discoverTab";
+import SettingsTab from "@/components/tabs/settingsTab/settingsTab";
 
 export type TabType = "library" | "discover" | "settings";
 
@@ -17,6 +17,8 @@ export type TabItem<Props = any> = {
 type TabsState = {
   tabs: TabItem[];
   recentTabs: TabItem[];
+  openRecentTabs: (id: string) => void;
+  closeRecentTabs?: (id: string) => void;
   activeTabId: string;
   addTab: (type: TabType) => void;
   closeTab: (id: string) => void;
@@ -41,6 +43,31 @@ export const useTabsStore = create<TabsState>((set, get) => ({
     },
   ],
   recentTabs: [],
+  openRecentTabs: (id) => {
+    set((state) => {
+      const chosenRecentTab = state.recentTabs.find((t) => t.id === id);
+      if (!chosenRecentTab) return state;
+      const updatedChosenRecentTab = { ...chosenRecentTab, listed: true };
+      const filteredRecentTabs = state.recentTabs.filter((t) => t.id !== id);
+      return {
+        tabs: [...state.tabs, updatedChosenRecentTab],
+        recentTabs: filteredRecentTabs,
+        activeTabId: id,
+      };
+    });
+  },
+  closeRecentTabs: (id) => {
+    set((state) => {
+      // const chosenRecentTab = state.tabs.find((t) => t.id === id);
+      // if (!chosenRecentTab) return state;
+      // const updatedChosenTab = {...chosenRecentTab, listed: false};
+      const filteredRecentTabs = state.recentTabs.filter((t) => t.id !== id);
+      if (!filteredRecentTabs) return state;
+      return {
+        recentTabs: filteredRecentTabs,
+      };
+    });
+  },
   activeTabId: "1",
 
   addTab: (type) => {
@@ -93,7 +120,11 @@ export const useTabsStore = create<TabsState>((set, get) => ({
         newActiveId = filtered[filtered.length - 1].id;
       }
 
-      return { tabs: filtered, activeTabId: newActiveId, recentTabs: updatedRecent };
+      return {
+        tabs: filtered,
+        activeTabId: newActiveId,
+        recentTabs: updatedRecent,
+      };
     });
   },
 
@@ -106,7 +137,10 @@ export const useTabsStore = create<TabsState>((set, get) => ({
               type: tabType,
               name: tabName,
               tabContent: TAB_COMPONENTS[tabType],
-              tabProps: (tabType === "discover")? { innerTabId: t.id, qActive: true, qListed: true } : t.tabProps ?? {},
+              tabProps:
+                tabType === "discover"
+                  ? { innerTabId: t.id, qActive: true, qListed: true }
+                  : t.tabProps ?? {},
             }
           : t
       ),

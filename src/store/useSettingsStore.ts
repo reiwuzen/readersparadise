@@ -1,15 +1,15 @@
 import { create } from "zustand";
 
-import GeneralSettings from "@/pages/home/tabs/settingsTab/components/GeneralSettings/GeneralSettings";
-import StorageSettings from "@/pages/home/tabs/settingsTab/components/StorageSettings/StorageSettings";
-import SourcesSettings from "@/pages/home/tabs/settingsTab/components/SourcesSettings/SourcesSettings";
-import AccountSettings from "@/pages/home/tabs/settingsTab/components/AccountSettings/AccountSettings";
-import ReaderSettings from "@/pages/home/tabs/settingsTab/components/ReaderSettings/ReaderSettings";
-import NetworkSettings from "@/pages/home/tabs/settingsTab/components/NetworkSettings/NetworkSettings";
-import DeveloperSettings from "@/pages/home/tabs/settingsTab/components/DeveloperSettings/DeveloperSettings";
-import PrivacySettings from "@/pages/home/tabs/settingsTab/components/PrivacySettings/PrivacySettings";
-import BackupSettings from "@/pages/home/tabs/settingsTab/components/BackupSettings/BackupSettings";
-import AdvancedSettings from "@/pages/home/tabs/settingsTab/components/AdvancedSettings/AdvancedSettings";
+import GeneralSettings from "@/components/tabs/settingsTab/components/GeneralSettings/GeneralSettings";
+import StorageSettings from "@/components/tabs/settingsTab/components/StorageSettings/StorageSettings";
+import SourcesSettings from "@/components/tabs/settingsTab/components/SourcesSettings/SourcesSettings";
+import AccountSettings from "@/components/tabs/settingsTab/components/AccountSettings/AccountSettings";
+import ReaderSettings from "@/components/tabs/settingsTab/components/ReaderSettings/ReaderSettings";
+import NetworkSettings from "@/components/tabs/settingsTab/components/NetworkSettings/NetworkSettings";
+import DeveloperSettings from "@/components/tabs/settingsTab/components/DeveloperSettings/DeveloperSettings";
+import PrivacySettings from "@/components/tabs/settingsTab/components/PrivacySettings/PrivacySettings";
+import BackupSettings from "@/components/tabs/settingsTab/components/BackupSettings/BackupSettings";
+import AdvancedSettings from "@/components/tabs/settingsTab/components/AdvancedSettings/AdvancedSettings";
 
 // ---- Types ---- //
 export type SettingsItemName =
@@ -24,17 +24,7 @@ export type SettingsItemName =
   | "Backup And Restore"
   | "Advanced";
 
-export type ItemId =
-  | "0"
-  | "1"
-  | "2"
-  | "3"
-  | "4"
-  | "5"
-  | "6"
-  | "7"
-  | "8"
-  | "9";
+export type ItemId = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 
 export type SettingsItem = {
   title: SettingsItemName;
@@ -61,7 +51,10 @@ export type SettingsState = {
 };
 
 // ---- Component Map ---- //
-const SETTINGS_ITEMS_COMPONENTS: Record<SettingsItemName, React.ComponentType<any>> = {
+const SETTINGS_ITEMS_COMPONENTS: Record<
+  SettingsItemName,
+  React.ComponentType<any>
+> = {
   General: GeneralSettings,
   Storage: StorageSettings,
   Sources: SourcesSettings,
@@ -76,12 +69,14 @@ const SETTINGS_ITEMS_COMPONENTS: Record<SettingsItemName, React.ComponentType<an
 
 // ---- Zustand Store ---- //
 export const useSettingsStore = create<SettingsState>((set) => ({
-  items: Object.entries(SETTINGS_ITEMS_COMPONENTS).map(([title, content], index) => ({
-    title: title as SettingsItemName,
-    content,
-    isItemActive: index === 0,
-    itemId: String(index) as ItemId,
-  })),
+  items: Object.entries(SETTINGS_ITEMS_COMPONENTS).map(
+    ([title, content], index) => ({
+      title: title as SettingsItemName,
+      content,
+      isItemActive: index === 0,
+      itemId: String(index) as ItemId,
+    })
+  ),
 
   setItemActive: (itemId) =>
     set((state) => ({

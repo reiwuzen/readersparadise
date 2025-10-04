@@ -13,6 +13,8 @@ const TabManager = ({ images }: TabManagerProps) => {
   const {
     tabs,
     recentTabs,
+    openRecentTabs,
+    closeRecentTabs,
     activeTab,
     activeTabId,
     setActiveTabId,
@@ -25,22 +27,28 @@ const TabManager = ({ images }: TabManagerProps) => {
   return (
     <div className="tabManager">
       <div className="tabBar">
-        <button className="prevBtn" onClick={()=>{
-          toast.message("Comming Soon!",{
-            action: {
-              label: "close",
-              onClick: () => {}
-            }
-          })
-        }}>{`<`}</button>
-        <button className="nextBtn" onClick={()=>{
-          toast.message("Comming Soon!",{
-            action: {
-              label: "close",
-              onClick: () => {}
-            }
-          })
-        }}>{`>`}</button>
+        <button
+          className="prevBtn"
+          onClick={() => {
+            toast.message("Comming Soon!", {
+              action: {
+                label: "close",
+                onClick: () => {},
+              },
+            });
+          }}
+        >{`<`}</button>
+        <button
+          className="nextBtn"
+          onClick={() => {
+            toast.message("Comming Soon!", {
+              action: {
+                label: "close",
+                onClick: () => {},
+              },
+            });
+          }}
+        >{`>`}</button>
         <div
           className="searchTabsBtn"
           onClick={isOpen ? close : open}
@@ -53,61 +61,68 @@ const TabManager = ({ images }: TabManagerProps) => {
               ref={dropdownRef}
             >
               <div className="searchTab">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  role="img"
+                  aria-label="Search icon"
+                  fill="currentColor"
+                  className="searchIcon"
+                >
+                  <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5 1.5-1.5-5-5zM4 9.5C4 6.46 6.46 4 9.5 4S15 6.46 15 9.5 12.54 15 9.5 15 4 12.54 4 9.5z" />
+                </svg>
 
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                role="img"
-                aria-label="Search icon"
-                fill="currentColor"
-                className="searchIcon"
-              >
-                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5 1.5-1.5-5-5zM4 9.5C4 6.46 6.46 4 9.5 4S15 6.46 15 9.5 12.54 15 9.5 15 4 12.54 4 9.5z" />
-              </svg>
-
-              <input
-                type="search"
-                name="searchInput"
-                id="searchInput"
-                placeholder="Search tabs"
-                ref={inputRef}
-              />
+                <input
+                  type="search"
+                  name="searchInput"
+                  id="searchInput"
+                  placeholder="Search tabs"
+                  ref={inputRef}
+                />
               </div>
               <div id="sep"></div>
               <div className="inSearchTabs">
-              <ul className="openTabs">
-                <h3>Open tabs</h3>
-                {tabs.map((tab) => (
-                  <li key={tab.id}>
-                    <InnerSearchTabs
-                      tab={{
-                        name: tab.name,
-                        isActive: tab.id === activeTabId,
-                        onClick: () => setActiveTabId(tab.id),
-                        onClose: () => closeTab(tab.id),
-                      }}
-                    />
-                  </li>
-                ))}
-              </ul>
-              <ul className="recentTabs">
-                <h3>Recent tabs</h3>
-                {recentTabs.map((tab) => (
-                  <li key={tab.id}>
-                    <InnerSearchTabs
-                      tab={{
-                        name: tab.name,
-                        isActive: false,
-                        onClick: () => {},
-                        onClose: () => {},
-                      }}
-                      type="recent"
-                    />
-                  </li>
-                ))}
-              </ul>
+                <ul className="openTabs">
+                  <h3>Open tabs</h3>
+                  {tabs.map((tab) => (
+                    <li key={tab.id}>
+                      <InnerSearchTabs
+                        tab={{
+                          name: tab.name,
+                          isActive: tab.id === activeTabId,
+                          onClick: () => setActiveTabId(tab.id),
+                          onClose: () => closeTab(tab.id),
+                        }}
+                      />
+                    </li>
+                  ))}
+                </ul>
+                <ul className="recentTabs">
+                  <h3>Recent tabs</h3>
+                  {recentTabs.map((tab) => (
+                    <li key={tab.id}>
+                      <InnerSearchTabs
+                        tab={{
+                          name: tab.name,
+                          isActive: false,
+                          onClick: () => {
+                            openRecentTabs!(tab.id);
+                            // toast.message("Under Development", {
+                            //   action: {
+                            //     label: "close",
+                            //     onClick: () => {},
+                            //   },
+                            // });
+                          },
+                          onClose: () => {closeRecentTabs!(tab.id)},
+                        }}
+                        type="recent"
+                      />
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           }
