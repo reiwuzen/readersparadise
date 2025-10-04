@@ -13,7 +13,7 @@ export type TabProps = {
 const Tab = ({ name, isActive = false, onClick, onClose }: TabProps) => {
   return (
     <div
-      className={`tab ${isActive ? "active" : ""}`}
+      className={`tab ${isActive ? "activeTab" : ""}`}
       aria-label={`${name}`}
       onClick={onClick}
     >
