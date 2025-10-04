@@ -4,7 +4,7 @@ export const useSearchTabs = () => {
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const divRef = useRef<HTMLDivElement | null>(null);
 
   const open = () => {
     setIsOpen(true);
@@ -20,7 +20,7 @@ export const useSearchTabs = () => {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(target) &&
-        !buttonRef.current?.contains(target)
+        !divRef.current?.contains(target)
       ) {
         close();
       }
@@ -35,5 +35,5 @@ export const useSearchTabs = () => {
     };
   }, [isOpen]);
 
-  return { isOpen, inputRef, dropdownRef, buttonRef, open, close };
+  return { isOpen, inputRef, dropdownRef, divRef, open, close };
 };

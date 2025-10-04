@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import LibraryTab from "@/pages/home/tabs/libraryTab/libraryTab";
-import DiscoverTab from "@/pages/home/tabs/browserTab/discoverTab";
+import DiscoverTab from "@/pages/home/tabs/discoverTab/discoverTab"
 import SettingsTab from "@/pages/home/tabs/settingsTab/settingsTab";
 
 export type TabType = "library" | "discover" | "settings";
