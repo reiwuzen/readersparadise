@@ -25,15 +25,11 @@
     display: none;
     border: none;
     background-color: inherit;
-    width: 0.8rem;
-    height: 0.8rem;
-    border-radius: 3rem;
-    justify-self: center;
-    align-self: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 35px;
     cursor: pointer;
+    color: white;
   }
   &:hover {
     background-color: rgba(255, 255, 255, 0.276);
@@ -46,16 +42,18 @@
     }
   }
 }
-.active.tab {
+.active {
   background: vars.$activeTab;
   background-size: 400% 400%;
   animation: tabGradientShift 8s linear infinite;
   /* border-bottom: 2px solid; */
   /* border-color: rgb(0, 0, 0); */
-  button {
-    display: block;
-    &:hover {
-      background-color: vars.$hover3;
+  &:hover{
+    button {
+      &:hover {
+        display: inline;
+        background-color: vars.$hover3;
+      }
     }
   }
 }

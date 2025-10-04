@@ -1,6 +1,6 @@
 // import { useEffect } from "react";
 // import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
-import "./browserTab.scss";
+import "./discoverTab.scss";
 import EmbdBrowser from "./embdBrowser/embdBrowser";
 import useSourceStore from "../../../../store/useSourceStore";
 type BrowserTabProps = {
@@ -9,7 +9,8 @@ type BrowserTabProps = {
   qListed: boolean;
 };
 
-const BrowserTab = ({ innerTabId, qActive, qListed }: BrowserTabProps) => {
+const DiscoverTab= ({ innerTabId, qActive, qListed }: BrowserTabProps) => {
+  console.log("Render DiscoverTab", { innerTabId, qActive, qListed });
   const { selected } = useSourceStore();
   console.log(selected);
 
@@ -31,4 +32,4 @@ const BrowserTab = ({ innerTabId, qActive, qListed }: BrowserTabProps) => {
   );
 };
 
-export default BrowserTab;
+export default DiscoverTab;

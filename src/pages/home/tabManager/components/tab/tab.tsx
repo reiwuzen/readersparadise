@@ -1,6 +1,6 @@
 import "./tab.scss";
 
-type TabProps = {
+export type TabProps = {
   name: string;
   isActive?: boolean;
   onClick?: () => void;
