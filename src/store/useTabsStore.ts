@@ -2,8 +2,9 @@ import { create } from "zustand";
 import LibraryTab from "@/components/tabs/libraryTab/libraryTab";
 import DiscoverTab from "@/components/tabs/discoverTab/discoverTab";
 import SettingsTab from "@/components/tabs/settingsTab/settingsTab";
+import Reader from "@/components/reader/Reader";
 
-export type TabType = "library" | "discover" | "settings";
+export type TabType = "library" | "discover" | "settings" | 'reader';
 
 export type TabItem<Props = any> = {
   id: string;
@@ -30,6 +31,7 @@ const TAB_COMPONENTS: Record<TabType, React.ComponentType<any>> = {
   library: LibraryTab,
   discover: DiscoverTab,
   settings: SettingsTab,
+  reader: Reader,
 };
 
 export const useTabsStore = create<TabsState>((set, get) => ({

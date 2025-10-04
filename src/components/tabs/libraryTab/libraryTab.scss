@@ -1,0 +1,20 @@
+.libraryTab{
+    height: 610px;
+    width: 100%;
+    .recentReads{
+        height: 30%;
+    }
+    .all{
+        height: 70%;
+        >h3{
+            font-size: 30px;
+            text-align: left;
+            padding: 20px 20px 20px;
+        }
+        >.insideAll{
+            padding: 10px 16px 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+    }
+}

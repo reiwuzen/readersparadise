@@ -5,7 +5,7 @@ import { toast } from "sonner";
 export type MangaFolder = {
   name: string;
   path: string;
-  cover?: Uint8Array;
+  cover?: string; // now always base64 string if exists
   images: string[];
 };
 
@@ -15,21 +15,29 @@ type ImportState = {
   clearMangas: () => void;
 };
 
-export const useImportStore = create<ImportState>((set, get) => ({
+const uint8ArrayToBase64 = (data: Uint8Array, mime = "image/jpeg"): string => {
+  let binary = "";
+  const len = data.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(data[i]);
+  }
+  return `data:${mime};base64,` + window.btoa(binary);
+};
+
+export const useImportStore = create<ImportState>((set) => ({
   mangas: [],
 
-  // Open folder picker, get folder data from Rust, and add it to store
   importMangaFolder: async () => {
     try {
       const result = await invoke<MangaFolder>("open_folder_and_list_items");
 
-      // Convert cover (Vec<u8>) into Uint8Array if present
       const coverBytes = result.cover ? new Uint8Array(result.cover as any) : undefined;
+      const coverBase64 = coverBytes ? uint8ArrayToBase64(coverBytes) : undefined;
 
       const newManga: MangaFolder = {
         name: result.name,
         path: result.path,
-        cover: coverBytes,
+        cover: coverBase64,
         images: result.images,
       };
 
@@ -37,9 +45,7 @@ export const useImportStore = create<ImportState>((set, get) => ({
         mangas: [...state.mangas, newManga],
       }));
     } catch (error) {
-        toast.error(`Failed to import folder: ${error}`,{
-            duration: 1000
-        })
+      toast.error(`Failed to import folder: ${error}`, { duration: 1000 });
       console.error("Failed to import folder:", error);
     }
   },

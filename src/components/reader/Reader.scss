@@ -1,0 +1,14 @@
+.reader{
+    height: 610px;
+    width: 100%;
+    position: relative;
+    .readerOptions{
+        position: absolute;
+
+    }
+    >img{
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
+    }
+}

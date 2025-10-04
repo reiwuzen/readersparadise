@@ -18,7 +18,10 @@
   height: 80%;
 
   .tabName {
-    color: vars.$tabName
+    color: vars.$tabName;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   button {
