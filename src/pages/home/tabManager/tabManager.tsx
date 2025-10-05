@@ -162,7 +162,7 @@ const TabManager = ({ images }: TabManagerProps) => {
             return <TabComponent {...(activeTab.tabProps || {})} />;
           })()
         ) : (
-          <div>No active tab</div>
+          <div>Welcome Screen</div>
         )}
       </div>
     </div>

@@ -9,13 +9,16 @@ export type MangaFolder = {
   path: string;
   cover?: string; // base64 cover
   images: string[]; // now file paths, not bytes
-  base64Images: string[]; // for visible pages only
-  currentIndex: number;
-  mid : number;
+  base64ByTab: Record<string, string[]>; // per-tab visible pages
+  indexByTab: Record<string, number>; // per-tab page index
+  mid: number;
 };
 
 // Converts Uint8Array → base64
-const uint8ArrayToBase64 = async (data: Uint8Array<ArrayBuffer>, mime = "image/jpeg"): Promise<string> => {
+const uint8ArrayToBase64 = async (
+  data: Uint8Array<ArrayBuffer>,
+  mime = "image/jpeg"
+): Promise<string> => {
   // const clean = new Uint8Array(data.buffer.slice(0));
   const blob = new Blob([data], { type: mime });
   return new Promise((resolve, reject) => {
@@ -32,20 +35,34 @@ const readImageBytes = async (path: string) => {
 
 type ImportState = {
   mangas: MangaFolder[];
-  setCurrentIndex : (bookName: string, currentIndex: number ,mode: 'prev' | 'next') => void; 
+  setCurrentIndex: (
+    bookName: string,
+    currentIndex: number,
+    mode: "prev" | "next"
+  ) => void;
   importMangaFolder: () => Promise<void>;
   clearMangas: () => void;
-  loadPageBatch: (mangaName: string, currentPageIndex: number) => Promise<void>;
+  loadPageBatch: (
+    mangaName: string,
+    currentPageIndex: number,
+    tabId: string
+  ) => Promise<void>;
 };
 export const useImportStore = create<ImportState>((set, get) => ({
   mangas: [],
-  setCurrentIndex : (bookName, currentIndex,mode ) => {
-    const {mangas} = get();
-    const updatedCurrentBook = (mode === "prev") ?
-    (mangas.map((m) => m.name === bookName ? {...m, currentIndex : currentIndex -1} : m) ) : ( mangas.map((m) => m.name === bookName ? {...m, currentIndex : currentIndex +1} : m))
+  setCurrentIndex: (bookName, currentIndex, mode) => {
+    const { mangas } = get();
+    const updatedCurrentBook =
+      mode === "prev"
+        ? mangas.map((m) =>
+            m.name === bookName ? { ...m, currentIndex: currentIndex - 1 } : m
+          )
+        : mangas.map((m) =>
+            m.name === bookName ? { ...m, currentIndex: currentIndex + 1 } : m
+          );
     set({
       mangas: updatedCurrentBook,
-    })
+    });
   },
   importMangaFolder: async () => {
     try {
@@ -53,8 +70,12 @@ export const useImportStore = create<ImportState>((set, get) => ({
       const result = await invoke<any>("open_folder_and_list_items");
 
       // Handle cover bytes if present
-      const coverBytes = result.cover ? new Uint8Array(result.cover) : undefined;
-      const coverBase64 = coverBytes ? await uint8ArrayToBase64(coverBytes) : undefined;
+      const coverBytes = result.cover
+        ? new Uint8Array(result.cover)
+        : undefined;
+      const coverBase64 = coverBytes
+        ? await uint8ArrayToBase64(coverBytes)
+        : undefined;
 
       const images: string[] = result.images; // file paths directly
 
@@ -63,8 +84,8 @@ export const useImportStore = create<ImportState>((set, get) => ({
         path: result.path,
         cover: coverBase64,
         images,
-        base64Images: [],
-        currentIndex: 0,
+        base64ByTab: {},
+        indexByTab: {},
         mid: mid,
       };
 
@@ -76,44 +97,56 @@ export const useImportStore = create<ImportState>((set, get) => ({
     }
   },
 
-  loadPageBatch: async (mangaName, currentPageIndex) => {
+  loadPageBatch: async (mangaName, currentPageIndex, tabId) => {
     const { mangas } = get();
     const manga = mangas.find((m) => m.name === mangaName);
     if (!manga) return;
-
-
+    const safeIndex = Number.isFinite(currentPageIndex) ? currentPageIndex : 0;
     // Number of "null" placeholders at the start
-    const numNull = Math.max(0, mid - currentPageIndex);
+    const numNull = Math.max(0, mid - safeIndex);
 
     // Prepare base array with "null" strings
     const base = new Array(window_size).fill("null");
 
     // Compute the starting index in manga.images to fill the base array
-    const startIndex = Math.max(currentPageIndex - (mid - numNull), 0);
+    const startIndex = Math.max(safeIndex - (mid - numNull), 0);
     
     // Fill base array with real images, respecting bounds
-    for (let i = numNull, j = startIndex; i < window_size && j < manga.images.length; i++, j++) {
-        base[i] = manga.images[j]; // temporarily store path; can convert to base64 below
+    for (
+      let i = numNull, j = startIndex;
+      i < window_size && j < manga.images.length;
+      i++, j++
+    ) {
+      base[i] = manga.images[j]; // temporarily store path; can convert to base64 below
     }
+  
 
     try {
-        // Convert filled paths to base64, ignoring "null"
-        const base64s = await Promise.all(
-            base.map(async (imgPath) => {
-                if (imgPath === "null") return "null";
-                const bytes = await readImageBytes(imgPath);
-                return await uint8ArrayToBase64(bytes);
-            })
-        );
+      // Convert filled paths to base64, ignoring "null"
+      const base64s = await Promise.all(
+        base.map(async (imgPath) => {
+          if (imgPath === "null") return "null";
+          const bytes = await readImageBytes(imgPath);
+          return await uint8ArrayToBase64(bytes);
+        })
+      );
 
       const updatedManga = {
         ...manga,
-        base64Images: base64s,
-        currentIndex: currentPageIndex,
+        base64ByTab: {
+          ...manga.base64ByTab,
+          [tabId]: base64s,
+        },
+        indexByTab: {
+          ...manga.indexByTab,
+          [tabId]: currentPageIndex,
+        },
       };
 
       set((state) => ({
-        mangas: state.mangas.map((m) => (m.name === mangaName ? updatedManga : m)),
+        mangas: state.mangas.map((m) =>
+          m.name === mangaName ? updatedManga : m
+        ),
       }));
     } catch (err) {
       console.error("Error loading image batch:", err);

@@ -10,7 +10,7 @@ export type InnerSearchTabsProps = {
 const InnerSearchTabs = ({ tab, type }: InnerSearchTabsProps) => {
   const openTab =(
     <div className={`innerSearchTabs  ${tab.isActive ? 'yesActive' : 'notActive'}`} id='openTab' onClick={tab.onClick}>
-      {tab.name}
+      <span onClick={tab.onClick}>{tab.name}</span>
     <button onClick={
             (e) => {
             e.stopPropagation(); // prevent switching tab when closing
@@ -19,8 +19,10 @@ const InnerSearchTabs = ({ tab, type }: InnerSearchTabsProps) => {
     </div>
   );
   const recentTab = (
-    <div className={`innerSearchTabs `} id='recentTab' onClick={tab.onClick}>
-      {tab.name}
+    <div className={`innerSearchTabs `} id='recentTab' >
+      <span onClick={tab.onClick}>
+        {tab.name}
+        </span>
     <button onClick={
             (e) => {
             e.stopPropagation(); // prevent switching tab when closing

@@ -106,7 +106,7 @@ export const useTabsStore = create<TabsState>((set, get) => ({
 
   closeTab: (id) => {
     set((state) => {
-      if (state.tabs.length === 1) return state;
+      // if (state.tabs.length === 1) return state;
 
       const closedTab = state.tabs.find((t) => t.id === id);
       if (!closedTab) return state;
@@ -151,7 +151,7 @@ export const useTabsStore = create<TabsState>((set, get) => ({
           : t
       ),
     }));
-    console.log("from activate tab")
+    // console.log("from activate tab")
   },
 
   setActiveTabId: (id) => set({ activeTabId: id }),

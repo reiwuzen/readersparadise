@@ -176,7 +176,7 @@
 
   .tabContent {
     // flex: 1;
-    height: 610px;
+    height: calc(100% - 40px);
     width: 100%;
     background-color: aqua;
   }

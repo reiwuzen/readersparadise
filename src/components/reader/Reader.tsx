@@ -1,20 +1,22 @@
 import "./Reader.scss";
 import { useRef, useEffect, useState } from "react";
 import { useReader } from "@/hooks/useReader";
+import { useTabs } from "@/hooks/useTabs";
 // import { toast } from 'sonner';
 
 const Reader = () => {
   const [open, setOpen] = useState<boolean>(false);
   const readerRef = useRef<HTMLDivElement>(null);
-  const { currentBook } = useReader();
-  let k = currentBook?.pageIndex;
+  const {activeTabId} =useTabs();
+  const { readers } = useReader();
+  let k = readers[activeTabId]?.pageIndex
   let l = k!+1;
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!currentBook) return;
-      if (e.key === "ArrowRight") currentBook.nextPage();
-      else if (e.key === "ArrowLeft") currentBook.prevPage();
+      if (!readers[activeTabId]) return;
+      if (e.key === "ArrowRight") readers[activeTabId]?.nextPage();
+      else if (e.key === "ArrowLeft") readers[activeTabId]?.prevPage();
     };
 
     document.addEventListener("keydown", handleKeyDown);
@@ -23,7 +25,7 @@ const Reader = () => {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [currentBook]); // re-run if currentBook changes
+  }, [readers[activeTabId]]); // re-run if currentBook changes
 
   return (
     <div className="reader" ref={readerRef}>
@@ -34,19 +36,19 @@ const Reader = () => {
        <div id="ro">
 
           <div id="ro0">Current Page : {l}</div>
-          <div id="ro1">Name : {currentBook?.name}</div>
+          <div id="ro1">Name : {readers[activeTabId]?.name}</div>
           <div id="ro2">
           <div id="ro2-0" onClick={()=>{
-            currentBook?.prevPage()
+            readers[activeTabId]?.prevPage()
           }}>Prev Page</div>
           <div id="ro2-1" onClick={()=>{
-            currentBook?.nextPage()
+            readers[activeTabId]?.nextPage()
           }}>Next Page</div>
           </div>
        </div>
         
       </div>
-      <img src={currentBook?.currentPage} alt={currentBook?.name} />
+      <img src={readers[activeTabId]?.currentPage} alt={readers[activeTabId]?.name} />
     </div>
   );
 };
