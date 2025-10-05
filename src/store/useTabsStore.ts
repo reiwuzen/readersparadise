@@ -3,6 +3,7 @@ import LibraryTab from "@/components/tabs/libraryTab/libraryTab";
 import DiscoverTab from "@/components/tabs/discoverTab/discoverTab";
 import SettingsTab from "@/components/tabs/settingsTab/settingsTab";
 import Reader from "@/components/reader/Reader";
+import { toast } from "sonner";
 
 export type TabType = "library" | "discover" | "settings" | 'reader';
 
@@ -131,6 +132,7 @@ export const useTabsStore = create<TabsState>((set, get) => ({
   },
 
   activateTab: (tabType, tabName) => {
+    // toast(`${tabType} && ${tabName}`)
     set((state) => ({
       tabs: state.tabs.map((t) =>
         t.id === state.activeTabId
@@ -147,6 +149,7 @@ export const useTabsStore = create<TabsState>((set, get) => ({
           : t
       ),
     }));
+    console.log("from activate tab")
   },
 
   setActiveTabId: (id) => set({ activeTabId: id }),

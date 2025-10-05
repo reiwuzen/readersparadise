@@ -27,7 +27,7 @@
         {
           "identifier": "webview-create",
           "description": "Allow certain webviews to create new webview windows",
-          "permissions": ["core:webview:allow-create-webview-window","core:window:allow-close","core:window:allow-show","core:window:default","core:event:allow-listen", "core:event:default"],
+          "permissions": ["core:webview:allow-create-webview-window","core:window:allow-close","core:window:allow-show","core:window:default","core:event:allow-listen", "core:event:default", "fs:allow-read-file", "fs:default"],
           "webviews": ["*"]
         }
       ]

@@ -1,5 +1,5 @@
 .libraryTab{
-    height: 610px;
+    height: 100%;
     width: 100%;
     .recentReads{
         height: 30%;
@@ -16,5 +16,10 @@
             display: flex;
             flex-wrap: wrap;
         }
+    }
+}
+@media(max-width:800px), (max-height:600px){
+    .libraryTab{
+        height: 568px;
     }
 }

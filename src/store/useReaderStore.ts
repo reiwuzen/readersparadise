@@ -1,12 +1,16 @@
 import { create } from "zustand";
 import Reader from "@/components/reader/Reader";
-import { MangaFolder } from "./useImportStore";
+import { useImportStore } from "./useImportStore";
 import { useTabsStore } from "./useTabsStore";
-
+import { toast } from "sonner";
+export let window_size = 5;
+export let mid = Math.floor(window_size / 2);
+//useReaderStore.ts
 type CurrentBook = {
   name: string;
   pages: string[];
-  openPage?: string;
+  base64Images: string[];
+  currentPage: string;
   pageIndex: number;
   prevPage: () => void;
   nextPage: () => void;
@@ -15,55 +19,101 @@ type CurrentBook = {
 type ReaderState = {
   currentBook?: CurrentBook;
   readerContent: React.ComponentType<any>;
-  openReader: (bookName: string, mangas: MangaFolder[]) => void;
+  openReader: (bookName: string) => void;
 };
 
 export const useReaderStore = create<ReaderState>((set, get) => ({
-  currentBook: undefined,
   readerContent: Reader,
+  currentBook: undefined,
 
-  openReader: (bookName, mangas) => {
-    const {activateTab} = useTabsStore.getState();
-    const chosenBook = mangas.find((b) => b.name === bookName);
-    if (!chosenBook) return;
+  openReader: async (bookName) => {
+    const { activateTab } = useTabsStore.getState();
 
-    // Initialize at first page (index 0)
-    const pages = chosenBook.images;
+    const { mangas, loadPageBatch } = useImportStore.getState();
+
+    const chosen = mangas.find((m) => m.name === bookName);
+
+    if (!chosen) return;
+
+    await loadPageBatch(chosen.name, chosen.currentIndex);
+
+    // Update after batch load
+    const updated = useImportStore
+      .getState()
+      .mangas.find((m) => m.name === chosen.name);
+    if (!updated) return;
 
     set({
       currentBook: {
-        name: chosenBook.name,
-        pages,
-        openPage: chosenBook.images[0],
-        pageIndex: 0,
-        prevPage: () => {
+        name: updated.name,
+        pages: updated.images,
+        base64Images: updated.base64Images,
+        currentPage: updated.base64Images[mid],
+        pageIndex: updated.currentIndex,
+        prevPage: async () => {
           const { currentBook } = get();
           if (!currentBook) return;
+          if( updated.currentIndex === 0) return toast.error(`First Page`,{
+            description: "Can't go to prev Page"
+          })
           const newIndex = Math.max(currentBook.pageIndex - 1, 0);
+
+          // Wait for batch to load
+          await useImportStore
+            .getState()
+            .loadPageBatch(currentBook.name, newIndex);
+
+          // Get the updated book state from the store
+          const updatedBook = useImportStore
+            .getState()
+            .mangas.find((m) => m.name === currentBook.name);
+          if (!updatedBook) return;
+
           set({
-            currentBook: { ...currentBook, pageIndex: newIndex },
+            currentBook: {
+              ...currentBook,
+              pageIndex: newIndex,
+              base64Images: updatedBook.base64Images,
+              currentPage: updatedBook.base64Images[mid],
+            },
           });
+          console.log("prevPage", newIndex)
         },
-        nextPage: () => {
+
+        nextPage: async () => {
           const { currentBook } = get();
           if (!currentBook) return;
+          if (currentBook.pageIndex+1 === currentBook.pages.length) return toast.error(`Last Page`,{
+            description: "Can't go to next Page"
+          })
           const newIndex = Math.min(
             currentBook.pageIndex + 1,
             currentBook.pages.length - 1
           );
+
+          await useImportStore
+            .getState()
+            .loadPageBatch(currentBook.name, newIndex);
+
+          const updatedBook = useImportStore
+            .getState()
+            .mangas.find((m) => m.name === currentBook.name);
+          if (!updatedBook) return;
+
           set({
-            currentBook: { ...currentBook, pageIndex: newIndex },
+            currentBook: {
+              ...currentBook,
+              pageIndex: newIndex,
+              base64Images: updatedBook.base64Images,
+              currentPage: updatedBook.base64Images[mid],
+            },
           });
+          console.log("nextPage", newIndex)
         },
       },
     });
-    const readerName = `Reader-${chosenBook.name}`;
-    activateTab('reader', readerName);
-    // 👇 if you want: open a new tab programmatically
-    // useTabsStore.getState().addTab({
-    //   id: `reader-${chosenBook.name}`,
-    //   name: chosenBook.name,
-    //   content: <Reader />,
-    // });
+
+    activateTab("reader", `Reader-${chosen.name}`);
+    console.log("open reader");
   },
 }));

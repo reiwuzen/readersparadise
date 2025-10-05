@@ -12,8 +12,8 @@ const LibraryTab = () => {
       <div className="all">
         <h3>ALL</h3>
         <div className="insideAll">
-        {mangas && mangas.map((book) => (
-          <Card cardName={book.name} cover={book.cover!} />
+        {mangas && mangas.map((book, i) => (
+          <Card key={i} cardName={book.name} cover={book.cover!} />
         ))}
         </div>
       </div>
