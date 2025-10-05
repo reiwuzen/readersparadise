@@ -32,13 +32,21 @@ const readImageBytes = async (path: string) => {
 
 type ImportState = {
   mangas: MangaFolder[];
+  setCurrentIndex : (bookName: string, currentIndex: number ,mode: 'prev' | 'next') => void; 
   importMangaFolder: () => Promise<void>;
   clearMangas: () => void;
   loadPageBatch: (mangaName: string, currentPageIndex: number) => Promise<void>;
 };
 export const useImportStore = create<ImportState>((set, get) => ({
   mangas: [],
-
+  setCurrentIndex : (bookName, currentIndex,mode ) => {
+    const {mangas} = get();
+    const updatedCurrentBook = (mode === "prev") ?
+    (mangas.map((m) => m.name === bookName ? {...m, currentIndex : currentIndex -1} : m) ) : ( mangas.map((m) => m.name === bookName ? {...m, currentIndex : currentIndex +1} : m))
+    set({
+      mangas: updatedCurrentBook,
+    })
+  },
   importMangaFolder: async () => {
     try {
       // result now returns { name, path, cover: Option<Vec<u8>>, images: Vec<String> }

@@ -51,13 +51,14 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
         currentPage: updated.base64Images[mid],
         pageIndex: updated.currentIndex,
         prevPage: async () => {
+          const {setCurrentIndex} = useImportStore.getState();
           const { currentBook } = get();
           if (!currentBook) return;
-          if( updated.currentIndex === 0) return toast.error(`First Page`,{
+          if( currentBook.pageIndex === 0) return toast.error(`First Page`,{
             description: "Can't go to prev Page"
           })
+          setCurrentIndex(currentBook.name, currentBook.pageIndex, 'prev');
           const newIndex = Math.max(currentBook.pageIndex - 1, 0);
-
           // Wait for batch to load
           await useImportStore
             .getState()
@@ -82,7 +83,9 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
 
         nextPage: async () => {
           const { currentBook } = get();
+          const {setCurrentIndex} = useImportStore.getState();
           if (!currentBook) return;
+          setCurrentIndex(currentBook.name, currentBook.pageIndex, 'next');
           if (currentBook.pageIndex+1 === currentBook.pages.length) return toast.error(`Last Page`,{
             description: "Can't go to next Page"
           })
