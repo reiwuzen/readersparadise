@@ -1,0 +1,13 @@
+
+.about{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .inAbout{
+        height: 90%;
+        width: 60%;
+        background-color: rgb(82, 82, 82);
+    }
+}

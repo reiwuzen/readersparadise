@@ -9,7 +9,7 @@
   min-width: 1rem;
   width: 10rem;
   max-width: 10rem;
-  text-overflow: ellipsis;
+  // text-overflow: ellipsis;
   background-color: none;
   border-radius: 1rem 1rem 0rem 0rem;
   padding: 0 0.5rem 0;
@@ -22,6 +22,8 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: flex;
+    justify-content: flex-start;
     width: 90%;
   }
 

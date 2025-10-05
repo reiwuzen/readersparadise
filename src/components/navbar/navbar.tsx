@@ -103,7 +103,7 @@ const Navbar = ({ setImages }: NavbarProps) => {
         <li onClick={async () => {
           await importMangaFolder();
           activateTab("library", "Library");
-        }}>
+        }} onContextMenu={(e) => openContextMenu(e, "library")}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -124,14 +124,7 @@ const Navbar = ({ setImages }: NavbarProps) => {
 
           <h3>Import</h3>
         </li>
-        <li onContextMenu={(e) => openContextMenu(e)} onClick={()=>{
-          toast.message("Comming Soon!",{
-            action: {
-              label: "close",
-              onClick: () => {}
-            }
-          })
-        }}>
+        <li onContextMenu={(e) => openContextMenu(e, 'about')} onClick={()=>activateTab("about", "About")}>
           <svg
             className="menubarIcons"
             xmlns="http://www.w3.org/2000/svg"

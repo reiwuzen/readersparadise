@@ -21,7 +21,7 @@ export const useContextMenu = () => {
   // call this to open a menu
   const preDef = (tab?: TabType): MenuItem[] => {
     const items: MenuItem[] = [];
-
+    
     if (tab !== undefined) {
       items.push({
         label: "Open In NewTab",
