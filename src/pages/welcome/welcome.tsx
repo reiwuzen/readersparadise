@@ -14,4 +14,8 @@ const Welcome = ({ onNext }: WelcomeProps) => {
   );
 };
 export default Welcome;
-export { type WelcomeProps };
+export { type WelcomeProps }; 
+
+
+
+
