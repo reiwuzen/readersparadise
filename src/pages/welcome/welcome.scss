@@ -1,3 +1,4 @@
+
 .welcomeBox {
   position: relative;
   width: 60%;
@@ -9,13 +10,15 @@
   align-items: center;
   flex-direction: column;
   animation: bg 8s linear infinite;
+  background-image: url(work5.jpg);
+  background-size: cover;
   &::after,
   &::before {
     content: "";
     position: absolute;
     inset: -6px;
     border-radius: inherit;
-    background: linear-gradient(90deg, cyan, violet, turquoise, aqua);
+    background: linear-gradient(90deg, rgb(150, 234, 240), violet, turquoise, aqua);
     background-size: 300% 300%;
     animation: borderGlow 8s linear infinite;
     z-index: -1;
@@ -23,7 +26,7 @@
   }
   > * {
     z-index: 3;
-  }
+  } 
   h3 {
     font-size: 5rem;
     font-weight: 500;
@@ -56,7 +59,7 @@
       animation: borderGlow 8s linear infinite;
       z-index: -1;
       filter: blur(12px);
-      opacity: 0;
+      opacity: 1;
       transition: opacity 0.3s ease-in-out;
     }
     &:hover::before,

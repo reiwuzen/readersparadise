@@ -16,5 +16,5 @@ const Storage = ({ onBack, onNext }: StorageProps) => {
       </button>
     </div>
   );
-};
+}; 
 export default Storage;

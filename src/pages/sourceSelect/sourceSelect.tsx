@@ -8,7 +8,7 @@ type SourceSelectProps = {
 
 const SourceSelect = ({ onBack, onNext }: SourceSelectProps) => {
   const { selected, toggleSource } = useSourceStore();
-  const sources = ["Hentai2Read", "HentaiRead", "Hitomi", "N-Hentai"];
+  const sources = ["Hentai2Read", "HentaiRead", "Hitomi", "N-Hentai", "Anime"];
   return (
     <div className="sourceSelectBox">
       <h2>Select Sources</h2>
@@ -22,7 +22,7 @@ const SourceSelect = ({ onBack, onNext }: SourceSelectProps) => {
                 type="checkbox"
                 id={src}
                 className="sources-list"
-                checked={selected.includes(src)}
+                checked={selected.includes(src)} 
                 onChange={() => toggleSource(src)}
               />
               <label htmlFor={src} className="sources-label">
