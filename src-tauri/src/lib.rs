@@ -2,6 +2,7 @@
 pub mod cmd;
 pub mod book;
 pub mod import;
+pub mod full_import;
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
@@ -21,7 +22,7 @@ pub fn run() {
             import::register_fs_scope,
             import::select_and_register_folder,
             import::import_selected_folder,
-            
+            import::import_book,
             ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

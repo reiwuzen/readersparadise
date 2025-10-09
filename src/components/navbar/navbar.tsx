@@ -6,11 +6,12 @@ import { useContextMenu } from "../../hooks/useContextMenu";
 import { useTabs } from "../../hooks/useTabs";
 import { useImport } from "@/hooks/useImport";
 import { toast } from "sonner";
+import { invoke } from "@tauri-apps/api/core";
 type NavbarProps = {
   setImages: React.Dispatch<React.SetStateAction<ImageFile[]>>;
 };
 const Navbar = ({ setImages }: NavbarProps) => {
-  const { importMangaFolder} = useImport();
+  const { importMangaFolder } = useImport();
   const { activateTab, tabs, addTab } = useTabs();
   const [loggedIn, setLoggedIn] = useState<Boolean>(false);
   const { openContextMenu, renderContextMenu } = useContextMenu();
@@ -19,9 +20,9 @@ const Navbar = ({ setImages }: NavbarProps) => {
       <ul className="menubar">
         <li
           onClick={() => {
-            (tabs.length !== 0)?
-            activateTab("library", "Library"):
-            addTab("library");
+            tabs.length !== 0
+              ? activateTab("library", "Library")
+              : addTab("library");
           }}
           onContextMenu={(e) => openContextMenu(e, "library")}
         >
@@ -41,9 +42,9 @@ const Navbar = ({ setImages }: NavbarProps) => {
         </li>
         <li
           onClick={() => {
-            (tabs.length !== 0)?
-            activateTab("discover", "Discover"):
-            addTab('discover');
+            tabs.length !== 0
+              ? activateTab("discover", "Discover")
+              : addTab("discover");
           }}
           onContextMenu={(e) => openContextMenu(e, "discover")}
         >
@@ -64,9 +65,9 @@ const Navbar = ({ setImages }: NavbarProps) => {
         </li>
         <li
           onClick={() => {
-            (tabs.length !== 0)?
-            activateTab("settings", "Settings"):
-            addTab('settings');
+            tabs.length !== 0
+              ? activateTab("settings", "Settings")
+              : addTab("settings");
           }}
           onContextMenu={(e) => openContextMenu(e, "settings")}
         >
@@ -105,11 +106,29 @@ const Navbar = ({ setImages }: NavbarProps) => {
           </svg>
           <h3>Settings</h3>
         </li>
-        <li onClick={async () => {
-          await importMangaFolder();
-          (tabs.length !== 0)?
-          activateTab("library", "Library") : addTab('library');
-        }} onContextMenu={(e) => openContextMenu(e, "library")}>
+        <li
+          onClick={async () => {
+            try {
+              const imported = await invoke<{
+                path: string;
+                type: string;
+                timestamp: string;
+              }>("import_book", {
+                type: "internal", // or "external"
+                mode: null, // optional
+              });
+
+              console.log("✅ Imported successfully:", imported);
+            } catch (err) {
+              console.error("❌ Import failed:", err);
+            }
+            // await importMangaFolder();
+            tabs.length !== 0
+              ? activateTab("library", "Library")
+              : addTab("library");
+          }}
+          onContextMenu={(e) => openContextMenu(e, "library")}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -130,7 +149,12 @@ const Navbar = ({ setImages }: NavbarProps) => {
 
           <h3>Import</h3>
         </li>
-        <li onContextMenu={(e) => openContextMenu(e, 'about')} onClick={()=>(tabs.length !== 0)?activateTab("about", "About"): addTab('about') }>
+        <li
+          onContextMenu={(e) => openContextMenu(e, "about")}
+          onClick={() =>
+            tabs.length !== 0 ? activateTab("about", "About") : addTab("about")
+          }
+        >
           <svg
             className="menubarIcons"
             xmlns="http://www.w3.org/2000/svg"
