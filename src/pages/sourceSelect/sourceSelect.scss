@@ -5,6 +5,7 @@
 
   animation: bg 8s linear infinite;
   border-radius: 0.4rem;
+  background-image: url(work1.jpg);
   &::after,
   &::before {
     content: "";
@@ -21,78 +22,89 @@
   h2 {
     font-size: 5rem; 
     font-weight: 500;
-    color: aqua;
+    color: rgb(255, 255, 255);
     margin: 4rem 0rem 2rem;
+    font-family: ui-monospace;
   }
 
   .sources {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 0;
-  padding-top: 10px;
-  width: 70rem;
-  height: 20rem;
-  overflow-y: auto;
-  align-content: space-around;
-  justify-content: center;
-  
-
-  > li {
-    padding: 0 0 0 8px;
     display: flex;
-    // width: 8rem;
+    flex-wrap: wrap;
+    margin: 0;
+    padding-top: 10px;
+    width: 70rem;
+    height: 23rem;
+    overflow-y: auto;
+    align-content: space-around;
+    justify-content: center;
+    display: grid;
+    font-family:'Times New Roman', Times, serif;
+    
+    
+    > li {
+      padding: 0 0 0 8px;
+      &:has(input:checked){
+        .sources-label{
+          color:   rgb(75, 167, 243);
+          font-weight: 900;
+        }
+        background: url(work2.jpg);
+        // background-position: 55% 50%;
+      }
+    display: flex;
+    width: 12rem;
     height: 2rem;
     list-style: none;
-    gap: 0.5rem;
-    justify-content: space-evenly;
+    gap: 1rem;
+    justify-content: start;
     align-items: center;
     cursor: pointer;
     position: relative;
+    
 
     &:hover {
       background-color: rgba(255, 255, 255, 0.15);
       border-radius: 6px;
     }
 
-     // hide native checkbox
+
+
+
     > .sources-list {
       appearance: none;
       -webkit-appearance: none;
       width: 1rem;
       height: 1rem;
-      border: 2px solid #ccc;
+      border: 2px solid #ffffff;
       border-radius: 4px;
       background: transparent;
       display: grid;
       place-items: center;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.5s ease, color 1s;
 
       &:hover {
-        border-color: #fff;
+        border-color: #ffffff;
       }
 
       &:checked {
         background-color: #4cafef; // highlight color
         border-color: #4cafef;
-        background-image: url(photo.jpg);
-        height: 50px;
-        width: 100px;
-        background-size: cover;
+
 
         &::after {
           content: "✔";
           font-size: 0.75rem;
-          color: #000000;
+          color: #ffffff;
+
           
         }
       }
     }
-
     > .sources-label {
       cursor: pointer;
-      color: white;
-      font-size: 0.9rem;
+      color: rgb(255, 255, 255);
+      font-size: 17px;
       user-select: none;
     }
   }
@@ -136,16 +148,21 @@
 @media (max-width: 800px) {
   .sourceSelectBox {
     width: 70%;
-    height: 70%;
+    height: 80%;
     h2{
       font-size: 4rem;
     }
     .sources{
       margin: 0 6.48rem 0;
+      height: auto;
+      width: auto;
+      gap: 0.5rem;
     }
     button {
-      height: 4rem;
+      height: 4rem; 
       width: 8rem;
     }
+    
+    
   }
 }
