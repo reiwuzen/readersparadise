@@ -3,6 +3,7 @@ use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_fs::FsExt;
 use serde::{Deserialize, Serialize};
 use std::{fs, path::PathBuf};
+use tokio::sync::oneshot;
 use crate::book::current_time_string;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -12,15 +13,28 @@ pub struct Imported {
     timestamp: String,
 }
 
+/// Async wrapper for picking folders
+pub async fn pick_folder_async(app: AppHandle) -> Result<PathBuf, String> {
+    let (tx, rx) = oneshot::channel();
+
+    app.dialog().file().pick_folder(move |response| {
+        let folder_path = match response {
+            Some(fp) => fp.as_path().map(|p| p.to_path_buf()),
+            None => None,
+        };
+        let _ = tx.send(folder_path);
+    });
+
+    match rx.await.map_err(|_| "Folder selection cancelled".to_string())? {
+        Some(path) => Ok(path),
+        None => Err("No folder selected".to_string()),
+    }
+}
+
 #[command]
-//main function
-pub fn import_book(app: AppHandle, r#type: &str, mode: Option<&str>) -> Result<Imported, String> {
-    // 1️⃣ Open folder picker dialog
-    let folder = app.dialog().file().blocking_pick_folder();
-    let folder_path: PathBuf = match folder {
-        Some(file_path) => file_path.as_path().ok_or("Failed to import the selected Folder")?.to_path_buf(),
-        None => return Err("No folder selected".into()),
-    };
+pub async fn import_book(app: AppHandle, r#type: &str, mode: Option<&str>) -> Result<Imported, String> {
+    // 1️⃣ Pick folder asynchronously
+    let folder_path = pick_folder_async(app.clone()).await?;
 
     if !folder_path.exists() {
         return Err("Folder does not exist".into());
@@ -40,13 +54,13 @@ pub fn import_book(app: AppHandle, r#type: &str, mode: Option<&str>) -> Result<I
         timestamp: current_time_string(),
     };
 
-    // 4️⃣ Save record persistently in imported.json
+    // 4️⃣ Save record persistently
     save_imported_record(&app, &imported)?;
 
     Ok(imported)
 }
 
-// ---------- File System Scope Registration ---------- //
+/// Register FS scope
 #[command]
 pub fn register_fs_scope(app: AppHandle, path: String) -> Result<(), String> {
     app.fs_scope()
@@ -80,7 +94,7 @@ pub fn import_selected_folder(app: AppHandle, source_path: &str) -> Result<Strin
         .map_err(|e| format!("Failed to get app data dir: {}", e))?
         .to_path_buf();
 
-    let imported_dir = app_dir.join("data").join("imported");
+    let imported_dir = app_dir.join("imported");
     if !imported_dir.exists() {
         fs::create_dir_all(&imported_dir)
             .map_err(|e| format!("Failed to create Imported folder: {}", e))?;
