@@ -13,7 +13,7 @@ const SourceSelect = ({ onBack, onNext }: SourceSelectProps) => {
     <div className="sourceSelectBox">
       <h2>Select Sources</h2>
 
-      <ul className="sources">
+      <ul className="sources"> 
         {[...sources]
           .sort((a, b) => a.localeCompare(b, "en", { sensitivity: "base" }))
           .map((src) => (

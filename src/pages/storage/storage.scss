@@ -5,6 +5,7 @@
   box-sizing: border-box;
   border-radius: 0.4rem;
   animation: bg 8s linear infinite;
+  background-image: url(work9.jpg);
   &::after,
   &::before {
     content: "";
@@ -18,7 +19,7 @@
     filter: blur(12px); 
   }
   h3 {
-    font-size: 5rem;
+    font-size: 5rem; 
     font-weight: 500;
     color: aqua;
     margin: 4rem 0rem 2rem;
