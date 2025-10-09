@@ -102,7 +102,7 @@
           .openTabs,
           .recentTabs {
             position: relative;
-            > h3 {
+             h3 {
               padding: 10px 10px 10px;
               position: sticky;
               top: 0.01px;
@@ -178,7 +178,7 @@
     // flex: 1;
     height: calc(100% - 40px);
     width: 100%;
-    background-color: aqua;
+    background-color: rgba(46, 46, 46, 0.607);
   }
 }
 @media (max-width: 800px) or (max-height: 600px) {

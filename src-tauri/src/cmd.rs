@@ -1,9 +1,15 @@
 //cmd.rs
 #[allow(unused_imports)]
+use tauri::Manager;
+use tauri::AppHandle;
 use tauri::command;
-use std::fs;
-use std::path::{Path, PathBuf};
 use tauri_plugin_dialog::DialogExt;
+use base64::{engine::general_purpose, Engine as _};
+use std::{collections::HashMap, fs, path::PathBuf, sync::Mutex};
+use once_cell::sync::Lazy;
+use tauri_plugin_fs::FsExt;
+
+static CACHE: Lazy<Mutex<HashMap<String, String>>> = Lazy::new(|| Mutex::new(HashMap::new()));
 
 #[derive(serde::Serialize)]
 pub struct MangaFolder {
@@ -13,11 +19,21 @@ pub struct MangaFolder {
     pub images: Vec<String>, // list of image paths
 }
 
+
 #[command]
-pub fn read_image_bytes(path: String) -> Result<Vec<u8>, String> {
-    let path_buf = PathBuf::from(path);
-    fs::read(path_buf).map_err(|e| format!("Failed to read image: {}", e))
+pub fn read_image_base64(path: String) -> Result<String, String> {
+    if let Some(cached) = CACHE.lock().unwrap().get(&path) {
+        return Ok(cached.clone());
+    }
+
+    let bytes = fs::read(PathBuf::from(&path)).map_err(|e| format!("Failed to read image: {}", e))?;
+    let encoded = general_purpose::STANDARD.encode(bytes);
+    
+    CACHE.lock().unwrap().insert(path.clone(), encoded.clone());
+    Ok(encoded)
 }
+
+
 #[command]
 pub async fn open_folder_and_list_items(app: tauri::AppHandle) -> Result<MangaFolder, String> {
     // open system folder picker

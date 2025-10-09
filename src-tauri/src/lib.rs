@@ -1,5 +1,7 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-mod cmd;
+pub mod cmd;
+pub mod book;
+pub mod import;
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
@@ -15,7 +17,11 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             greet,
             cmd::open_folder_and_list_items,
-            cmd::read_image_bytes,
+            cmd::read_image_base64,
+            import::register_fs_scope,
+            import::select_and_register_folder,
+            import::import_selected_folder,
+            
             ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

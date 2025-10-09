@@ -1,0 +1,26 @@
+[
+  {
+    "path": "xyz",
+    "type": "external",
+    "timestamp": "22:00",
+    "bookStore": [
+      {
+        "path": "/RP-book-${name}",
+        "book": {
+          "name": "RP-book-${name}",
+          "chapterNum": "path.dir.length",
+          "chapters": [
+            {
+                "path":"./RP-book-${name}-chapter-${index}",
+                "chapter": {
+                    "chapterName": "RP-book-${name}-chapter-${index}",
+                    "chapterPages": ["./RP-book-${name}-chapter-${index}/001.jpg", "....", "./RP-book-${name}-chapter-${index}/100.jpg"] ,
+                    "chapterPagesNum" : "chapterPages.length"
+                }
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

@@ -11,7 +11,7 @@ type NavbarProps = {
 };
 const Navbar = ({ setImages }: NavbarProps) => {
   const { importMangaFolder} = useImport();
-  const { activateTab } = useTabs();
+  const { activateTab, tabs, addTab } = useTabs();
   const [loggedIn, setLoggedIn] = useState<Boolean>(false);
   const { openContextMenu, renderContextMenu } = useContextMenu();
   return (
@@ -19,8 +19,9 @@ const Navbar = ({ setImages }: NavbarProps) => {
       <ul className="menubar">
         <li
           onClick={() => {
-            console.log("Library clicked");
-            activateTab("library", "Library");
+            (tabs.length !== 0)?
+            activateTab("library", "Library"):
+            addTab("library");
           }}
           onContextMenu={(e) => openContextMenu(e, "library")}
         >
@@ -40,7 +41,9 @@ const Navbar = ({ setImages }: NavbarProps) => {
         </li>
         <li
           onClick={() => {
-            activateTab("discover", "Discover");
+            (tabs.length !== 0)?
+            activateTab("discover", "Discover"):
+            addTab('discover');
           }}
           onContextMenu={(e) => openContextMenu(e, "discover")}
         >
@@ -61,7 +64,9 @@ const Navbar = ({ setImages }: NavbarProps) => {
         </li>
         <li
           onClick={() => {
-            activateTab("settings", "Settings");
+            (tabs.length !== 0)?
+            activateTab("settings", "Settings"):
+            addTab('settings');
           }}
           onContextMenu={(e) => openContextMenu(e, "settings")}
         >
@@ -102,7 +107,8 @@ const Navbar = ({ setImages }: NavbarProps) => {
         </li>
         <li onClick={async () => {
           await importMangaFolder();
-          activateTab("library", "Library");
+          (tabs.length !== 0)?
+          activateTab("library", "Library") : addTab('library');
         }} onContextMenu={(e) => openContextMenu(e, "library")}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -124,7 +130,7 @@ const Navbar = ({ setImages }: NavbarProps) => {
 
           <h3>Import</h3>
         </li>
-        <li onContextMenu={(e) => openContextMenu(e, 'about')} onClick={()=>activateTab("about", "About")}>
+        <li onContextMenu={(e) => openContextMenu(e, 'about')} onClick={()=>(tabs.length !== 0)?activateTab("about", "About"): addTab('about') }>
           <svg
             className="menubarIcons"
             xmlns="http://www.w3.org/2000/svg"

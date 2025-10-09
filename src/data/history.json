@@ -1,0 +1,35 @@
+[
+    {
+        "path": "xyz",
+        "type" : "external",
+        "timestamp" : "22:00"
+    }
+    ,
+    {
+        "path": "xyz1",
+        "type" : "external",
+        "timestamp" : "22:00"
+    },
+    {
+        "path": "xyz2",
+        "type" : "external",
+        "timestamp" : "22:00"
+    }
+    ,
+    {
+        "path": "xyz3",
+        "type" : "external",
+        "timestamp" : "22:00"
+    },
+    {
+        "path": "xyz4",
+        "type" : "external",
+        "timestamp" : "22:00"
+    }
+    ,
+    {
+        "path": "xyz5",
+        "type" : "external",
+        "timestamp" : "22:00"
+    }
+]

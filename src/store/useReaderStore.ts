@@ -30,6 +30,7 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
 
   openReader: async (tabId, bookName) => {
 
+    
     const { activateTab } = useTabsStore.getState();
     const { mangas, loadPageBatch } = useImportStore.getState();
 
@@ -37,7 +38,7 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
 
     if (!chosen) return;
     const startIndex = chosen.indexByTab[tabId] ?? 0;
-    await loadPageBatch(chosen.name, startIndex, tabId);
+    await loadPageBatch(chosen.name, startIndex, tabId,  []);
 
     const updated = useImportStore
       .getState()
@@ -45,6 +46,7 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
     if (!updated) return;
 
     const makePageHandler = (dir: "prev" | "next") => async () => {
+    
       const { readers } = get();
       const reader = readers[tabId];
       if (!reader) return;
@@ -67,8 +69,10 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
           : Math.min(reader.pageIndex + 1, reader.pages.length - 1);
 
       setCurrentIndex(reader.name, reader.pageIndex, dir);
-      await useImportStore.getState().loadPageBatch(reader.name, newIndex, tabId);
-
+    
+      
+      await useImportStore.getState().loadPageBatch(reader.name, newIndex, tabId, reader.base64Images);
+   
       const updatedBook = useImportStore
         .getState()
         .mangas.find((m) => m.name === reader.name);
@@ -85,6 +89,7 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
           },
         },
       }));
+   
     };
 
     set((state) => ({
@@ -103,6 +108,5 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
     }));
 
     activateTab("reader", `Reader-${chosen.name}`);
-    console.log("open reader in tab", tabId);
   },
 }));
