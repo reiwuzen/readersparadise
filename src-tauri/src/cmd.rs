@@ -1,13 +1,13 @@
 //cmd.rs
 #[allow(unused_imports)]
 use tauri::Manager;
-use tauri::AppHandle;
+// use tauri::AppHandle;
 use tauri::command;
 use tauri_plugin_dialog::DialogExt;
 use base64::{engine::general_purpose, Engine as _};
 use std::{collections::HashMap, fs, path::PathBuf, sync::Mutex};
 use once_cell::sync::Lazy;
-use tauri_plugin_fs::FsExt;
+// use tauri_plugin_fs::FsExt;
 
 static CACHE: Lazy<Mutex<HashMap<String, String>>> = Lazy::new(|| Mutex::new(HashMap::new()));
 

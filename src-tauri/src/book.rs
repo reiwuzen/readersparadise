@@ -1,6 +1,6 @@
 use chrono;
 use serde::{Deserialize, Serialize};
-use std::{fs, io::Write, path::PathBuf};
+use std::{fs, path::PathBuf};
 use tauri::{command, AppHandle, Manager};
 use uuid::Uuid;
 
@@ -71,7 +71,7 @@ pub fn build_library(base_path: &str, r#type: &str) -> Option<Library> {
         if !book_path.is_dir() { continue; }
 
         let book_name = book_path.file_name()?.to_string_lossy().to_string();
-        if !book_name.starts_with("RP-book-") { continue; }
+        // if !book_name.starts_with("RP-book-") { continue; }
 
         let mut chapters = vec![];
         for chapter_entry in fs::read_dir(&book_path).ok()? {
@@ -80,8 +80,8 @@ pub fn build_library(base_path: &str, r#type: &str) -> Option<Library> {
             if !chapter_path.is_dir() { continue; }
 
             let chapter_name = chapter_path.file_name()?.to_string_lossy().to_string();
-            let expected_prefix = format!("RP-book-{}-chapter-", book_name.trim_start_matches("RP-book-"));
-            if !chapter_name.starts_with(&expected_prefix) { continue; }
+            // let expected_prefix = format!("RP-book-{}-chapter-", book_name.trim_start_matches("RP-book-"));
+            // if !chapter_name.starts_with(&expected_prefix) { continue; }
 
             let mut pages = vec![];
             for page_entry in fs::read_dir(&chapter_path).ok()? {
