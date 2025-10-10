@@ -1,98 +1,143 @@
 import "./embdBrowser.scss";
-import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
-// import { PhysicalPosition, PhysicalSize } from "@tauri-apps/api/window";
+import { WebviewWindow, getAllWebviewWindows } from "@tauri-apps/api/webviewWindow";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { useEffect, useRef } from "react";
 import { PhysicalPosition, PhysicalSize } from "@tauri-apps/api/dpi";
-type EmbdBrowserProps = { 
+import { useEffect, useRef } from "react";
+import { useTabs } from "@/hooks/useTabs";
+
+type EmbdBrowserProps = {
   id: string;
-   isActive: boolean;
-    isListed: boolean;
-    url?: string;
-   };
-const EmbdBrowser = ({ id, isActive, isListed, url }: EmbdBrowserProps) => {
-  const mainWindow = getCurrentWindow();
+  url?: string;
+};
+
+const EmbdBrowser = ({ id, url }: EmbdBrowserProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const webviewRef = useRef<WebviewWindow | null>(null);
+  const mainWindow = getCurrentWindow();
+  const { tabs, activeTabId } = useTabs();
+
+  const webviewId = useRef(`embd-${id}`); // stable id per tab
+  const hasCreated = useRef(false);
+  const destroyOnNext = useRef(false);
+
+  /** 🧩 Create webview only when tab is truly registered */
   useEffect(() => {
-    if (!containerRef.current) return;
-    requestAnimationFrame(() => {
+    const tabExists = tabs.some((t) => t.id === id);
+    if (!tabExists || hasCreated.current || !containerRef.current) return;
+    hasCreated.current = true;
+
+    let isUnmounted = false;
+
+    (async () => {
+      // Prevent duplicate handles
+      const existing = await getAllWebviewWindows();
+      if (existing.find((w) => w.label === webviewId.current)) return;
+
       const rect = containerRef.current!.getBoundingClientRect();
-      const width = containerRef.current!.clientWidth;
-      const height = containerRef.current!.clientHeight;
-      console.log(`the width & height of container is ${width} & ${height}`);
-      const x = Math.round(rect.x);
-      const y = Math.round(rect.y);
-      const webview = new WebviewWindow(`${id}`, {
-        url: url ??"https://github.com/reiwuzen/readersparadise",
-        x: x - 1,
-        y: y + 22,
-        width: width - 10,
-        height: height - 8,
-        alwaysOnTop: true,
-        skipTaskbar: true,
-        resizable: false,
-        contentProtected: true,
-        focus: false,
+      const mainPos = await mainWindow.innerPosition();
+      const scale = window.devicePixelRatio || 1;
+
+      const x = Math.round(rect.left * scale + mainPos.x);
+      const y = Math.round(rect.top * scale + mainPos.y);
+      const width = Math.round(rect.width * scale);
+      const height = Math.round(rect.height * scale);
+
+      const webview = new WebviewWindow(webviewId.current, {
+        url: url ?? "https://google.com",
+        x,
+        y,
+        width,
+        height,
+        parent: mainWindow,
         decorations: false,
         transparent: true,
-        parent: mainWindow,
+        skipTaskbar: true,
+        resizable: false,
+        focus: false,
       });
-      webviewRef.current = webview;
-      webview.once("tauri://window-created", () => {
-        console.log("Webview created!");
-      });
-      webview.once("tauri://error", (e) => {
-        console.error("Webview creation error", e);
-      });
-    });
-    return () => {
-      webviewRef.current?.close().catch(console.error);
-    };
-  }, [id]);
-  useEffect(() => {
-    const webview = webviewRef.current;
-    if (!webview) return;
-    if (!isListed) {
-      console.log("webview is already closed");
-      webview.close().catch(console.error);
-    } else if (isListed) {
-      if (isActive) webview.show();
-      else if (!isActive) webview.hide();
-    }
-  }, [isActive, isListed]);
-  
-  useEffect(() => {
-    if (!webviewRef.current || !containerRef.current) return;
 
-    const updateBounds = () => {
+      webviewRef.current = webview;
+
+      webview.once("tauri://window-created", async () => {
+        if (isUnmounted || destroyOnNext.current) {
+          console.log("🧹 Immediately closing orphaned webview", webviewId.current);
+          await webview.close().catch(() => {});
+          return;
+        }
+        console.log(`✅ Webview ${webviewId.current} created`);
+      });
+
+      webview.once("tauri://error", (e) => {
+        console.error("❌ Webview creation error", e);
+      });
+    })();
+
+    return () => {
+      isUnmounted = true;
+      const current = webviewRef.current;
+      if (current) current.close().catch(() => {});
+      else destroyOnNext.current = true;
+    };
+  }, [tabs, id, url]);
+
+  /** 🧩 Visibility sync */
+  useEffect(() => {
+    const syncVisibility = async () => {
+      const webview = webviewRef.current;
+      if (!webview) return;
+
+      const isListed = tabs.some((t) => t.id === id);
+      const isActive = activeTabId === id;
+
+      if (!isListed) {
+        console.log("🧩 Closing", id);
+        try {
+          await webview.close();
+          webviewRef.current = null;
+        } catch (e) {
+          console.warn("⚠️ Webview close failed:", e);
+        }
+      } else {
+        try {
+          if (isActive) await webview.show();
+          else await webview.hide();
+        } catch {}
+      }
+    };
+
+    syncVisibility();
+  }, [tabs, activeTabId, id]);
+
+  /** 🧩 Window movement sync */
+  useEffect(() => {
+    const updateBounds = async () => {
       if (!containerRef.current || !webviewRef.current) return;
 
       const rect = containerRef.current.getBoundingClientRect();
+      const mainPos = await mainWindow.innerPosition();
+      const scale = window.devicePixelRatio || 1;
 
-      webviewRef.current.setSize(new PhysicalSize(
-        Math.round(rect.width),
-        Math.round(rect.height)
-      ));
+      const x = Math.round(rect.left * scale + mainPos.x);
+      const y = Math.round(rect.top * scale + mainPos.y);
+      const w = Math.round(rect.width * scale);
+      const h = Math.round(rect.height * scale);
 
-      webviewRef.current.setPosition(new PhysicalPosition(
-        Math.round(rect.x),
-        Math.round(rect.y)
-      ));
+      try {
+        await webviewRef.current.setSize(new PhysicalSize(w, h));
+        await webviewRef.current.setPosition(new PhysicalPosition(x, y));
+      } catch {}
     };
 
     const unlistenResize = mainWindow.onResized(updateBounds);
     const unlistenMoved = mainWindow.onMoved(updateBounds);
 
     return () => {
-      unlistenResize.then(f => f());
-      unlistenMoved.then(f => f());
+      unlistenResize.then((f) => f());
+      unlistenMoved.then((f) => f());
     };
   }, []);
-  return (
-    <div className="embdBrowser" ref={containerRef}>
-      hello
-    </div>
-  );
+
+  return <div className="embdBrowser" ref={containerRef}></div>;
 };
+
 export default EmbdBrowser;

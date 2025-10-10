@@ -182,7 +182,7 @@ fn save_imported_record(app: &AppHandle, imported: &Imported) -> Result<(), Stri
     fs::create_dir_all(&data_dir)
         .map_err(|e| format!("Failed to create data dir: {}", e))?;
 
-    let imported_json_path = data_dir.join("imported.json");
+    let imported_json_path = data_dir.join("imported/imported.json");
 
     // Load existing records
     let mut imports: Vec<Imported> = if imported_json_path.exists() {

@@ -7,7 +7,7 @@ import About from "@/components/about/About";
 import { toast } from "sonner";
 
 export type TabType = "library" | "discover" | "settings" | 'reader' | 'about' ;
-
+const initialActiveTabId =crypto.randomUUID();
 export type TabItem<Props = any> = {
   id: string;
   name: string;
@@ -40,7 +40,7 @@ const TAB_COMPONENTS: Record<TabType, React.ComponentType<any>> = {
 export const useTabsStore = create<TabsState>((set, get) => ({
   tabs: [
     {
-      id: "1",
+      id: initialActiveTabId,
       name: "Library",
       type: "library",
       listed: true,
@@ -73,7 +73,7 @@ export const useTabsStore = create<TabsState>((set, get) => ({
       };
     });
   },
-  activeTabId: "1",
+  activeTabId: initialActiveTabId,
 
   addTab: (type) => {
     const newId = crypto.randomUUID();
