@@ -10,7 +10,8 @@
 
   .tabBar {
     max-width: 100%;
-    background-color: var(--nav-N-tab-color);
+    background-color: var(--bg-opace-1-color);
+    // opacity: 0.29;
     gap: 0.2rem;
     display: flex;
     height: 40px;
@@ -26,24 +27,24 @@
       align-items: center;
       justify-content: center;
 
-      color: white;
+      color: var(--active-text-color, white);
       width: 2rem;
       height: 2rem;
-      background-color: rgba(0, 0, 0, 0);
+      background-color: var(--tp);
 
       &:hover {
-        background-color: rgba(255, 255, 255, 0.3);
+        background-color: var(--hover1);
       }
     }
     .searchTabsBtn {
       position: relative;
       align-self: center;
-      background-color: vars.$hover2;
+      background-color: var(--hover2);
       border-radius: 10px;
       height: 30px;
       width: 30px;
       &:hover {
-        background-color: rgba(229, 229, 236, 0.324);
+        background-color: var(--hover1);
       }
       .searchTabs {
         position: absolute;
@@ -53,10 +54,10 @@
         max-height: 2030%;
         top: 116%;
         left: -234%;
-        background-color: rgba(83, 83, 83, 0.856);
-        border: 1px solid rgba(0, 0, 0, 0.1);
+        background-color:var(--bg-cover-color,#535353da);
+        // border: 1px solid rgba(0, 0, 0, 0.1);
         border-radius: 4px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        // box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         z-index: 1000;
         &.open {
           display: block;
@@ -72,12 +73,12 @@
           height: 25%;
           #searchInput {
             &::placeholder {
-              color: aliceblue;
+              color: var(--text-color);
             }
             margin: 4px 0 0 0;
             width: 80%;
             height: 100%;
-            background: rgba(0, 0, 0, 0);
+            background: var(--tp);
             border: none;
             outline: none;
           }
@@ -96,7 +97,7 @@
             background: transparent;
           }
           &::-webkit-scrollbar-thumb {
-            background: rgba(150, 150, 150, 0.4);
+            background: var(--scrollbar-thumb-color);
             border-radius: 3px;
           }
           .openTabs,
@@ -108,7 +109,7 @@
               top: 0.01px;
               text-align: left;
               margin: 0 0 14px;
-              background-color: rgb(74, 74, 74);
+              background-color:var(--light-bg-color,#4a4a4a);
             }
             
             background-color: transparent;
@@ -145,7 +146,7 @@
       }
 
       &::-webkit-scrollbar-thumb {
-        background: rgba(150, 150, 150, 0.4);
+        background: var(--scrollbar-thumb-color);
         border-radius: 3px;
       }
 
@@ -163,13 +164,13 @@
       align-items: center;
       justify-content: center;
       border-radius: 10rem;
-      color: white;
+      color: var(--active-text-color);
       width: 2rem;
       height: 2rem;
-      background-color: rgba(0, 0, 0, 0);
+      background-color: var(--tp);
 
       &:hover {
-        background-color: rgba(255, 255, 255, 0.3);
+        background-color: var(--hover1);
       }
     }
   }
@@ -178,14 +179,7 @@
     // flex: 1;
     height: calc(100% - 40px);
     width: 100%;
-    background-color: rgba(46, 46, 46, 0.607);
+    background-color:var(--bg-cover-muted-color,#2e2e2e9b);
   }
 }
-@media (max-width: 800px) or (max-height: 600px) {
-  .tabManager {
-    width: 90%;
-    .tabContent{
-      height: 568px;
-    }
-  }
-}
+

@@ -25,7 +25,7 @@ export type SettingsItemName =
   | "Advanced";
 
 export type ItemId = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
-
+export type themeType = "light" | "dark" | "system" | "custom";
 export type SettingsItem = {
   title: SettingsItemName;
   content: React.ComponentType<any>;
@@ -38,7 +38,8 @@ export type SettingsState = {
   setItemActive: (itemId: ItemId) => void;
 
   theme: "light" | "dark" | "system" | "custom";
-  setTheme: (theme: "light" | "dark" | "system" | "custom") => void;
+  setTheme: (theme: themeType) => void;
+  initTheme: () => void;
 
   defaultViewMode: "cover" | "contain" | "fill" | "none";
   setDefaultViewMode: (mode: "cover" | "contain" | "fill" | "none") => void;
@@ -87,7 +88,26 @@ export const useSettingsStore = create<SettingsState>((set) => ({
     })),
 
   theme: "system",
-  setTheme: (theme) => set({ theme }),
+  
+  setTheme: (theme) => {
+    // 1. Update the store
+    set({ theme });
+
+    // 2. Apply theme to the DOM
+    document.body.classList.remove("light", "dark");
+    document.body.classList.add(theme);
+
+    // 3. Optionally persist it
+    localStorage.setItem("theme", theme);
+  },
+   initTheme: () => {
+    const saved = localStorage.getItem("theme") as themeType;
+    const preferred : themeType =
+      saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+
+    document.body.classList.add(preferred);
+    set({ theme: preferred });
+  },
 
   defaultViewMode: "contain",
   setDefaultViewMode: (mode) => set({ defaultViewMode: mode }),

@@ -10,9 +10,9 @@
     cursor: pointer;
     padding: 5px 10px 5px;
     border-radius: 10px;
-    background-color: rgba(164, 164, 164, 0.404);
+    background-color: var(--light-bg-color);
     &:hover{
-        background-color: rgb(164, 164, 164);
+        background-color: var(--hover2);
     }
   }
   .recentReads {

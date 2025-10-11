@@ -2,7 +2,7 @@ import "./tabManager.scss";
 import { useTabs } from "@/hooks/useTabs";
 import { useSearchTabs } from "@/hooks/useSearchTabs";
 import Tab from "./components/tab/tab";
-import { ImageFile } from "../../../../helper/fs";
+import { ImageFile } from "../../../helper/fs";
 import InnerSearchTabs from "@/components/InnerSearchTabs/InnerSearchTabs";
 import { toast } from "sonner";
 type TabManagerProps = {
@@ -116,7 +116,9 @@ const TabManager = ({ images }: TabManagerProps) => {
                             //   },
                             // });
                           },
-                          onClose: () => {closeRecentTabs!(tab.id)},
+                          onClose: () => {
+                            closeRecentTabs!(tab.id);
+                          },
                         }}
                         type="recent"
                       />

@@ -18,7 +18,7 @@
   height: 80%;
 
   .tabName {
-    color: vars.$tabName;
+    color: var(--text-color);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -35,30 +35,30 @@
     height: 14px;
     border-radius: 35px;
     cursor: pointer;
-    color: white;
+    color: var(--active-text-color);
   }
   &:hover {
-    background-color: rgba(255, 255, 255, 0.276);
+    background-color: var(--accent-hover-bg-color);
     button {
       display: block;
-      background-color: rgba(255, 255, 255, 0);
+      background-color: var(--tp);
       &:hover {
-        background-color: rgba(255, 255, 255, 0.674);
+        background-color: var(--hover1);
       }
     }
   }
 }
 .activeTab {
-  background: vars.$activeTab;
+  background: var(--accent-bg-color);
   background-size: 400% 400%;
-  animation: tabGradientShift 8s linear infinite;
+  // animation: tabGradientShift 8s linear infinite;
   /* border-bottom: 2px solid; */
   /* border-color: rgb(0, 0, 0); */
   &:hover{
     button {
       &:hover {
         display: inline;
-        background-color: vars.$hover3;
+        background-color: var(--hover3);
       }
     }
   }

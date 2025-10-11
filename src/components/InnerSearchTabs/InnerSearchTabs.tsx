@@ -1,36 +1,42 @@
-
-import './InnerSearchTabs.scss'
-import { TabProps } from '@/pages/home/tabManager/components/tab/tab';
-
+import "./InnerSearchTabs.scss";
+import { TabProps } from "@/components/tabManager/components/tab/tab";
 
 export type InnerSearchTabsProps = {
   tab: TabProps;
-  type?: 'open' | 'recent';
+  type?: "open" | "recent";
 };
 const InnerSearchTabs = ({ tab, type }: InnerSearchTabsProps) => {
-  const openTab =(
-    <div className={`innerSearchTabs  ${tab.isActive ? 'yesActive' : 'notActive'}`} id='openTab' onClick={tab.onClick}>
+  const openTab = (
+    <div
+      className={`innerSearchTabs  ${tab.isActive ? "yesActive" : "notActive"}`}
+      id="openTab"
+      onClick={tab.onClick}
+    >
       <span onClick={tab.onClick}>{tab.name}</span>
-    <button onClick={
-            (e) => {
-            e.stopPropagation(); // prevent switching tab when closing
-            tab.onClose!();
-          }}>×</button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation(); // prevent switching tab when closing
+          tab.onClose!();
+        }}
+      >
+        ×
+      </button>
     </div>
   );
   const recentTab = (
-    <div className={`innerSearchTabs `} id='recentTab' >
-      <span onClick={tab.onClick}>
-        {tab.name}
-        </span>
-    <button onClick={
-            (e) => {
-            e.stopPropagation(); // prevent switching tab when closing
-            tab.onClose!();
-          }}>×</button>
+    <div className={`innerSearchTabs `} id="recentTab">
+      <span onClick={tab.onClick}>{tab.name}</span>
+      <button
+        onClick={(e) => {
+          e.stopPropagation(); // prevent switching tab when closing
+          tab.onClose!();
+        }}
+      >
+        ×
+      </button>
     </div>
   );
-  
-  return (type === 'recent')? recentTab: openTab;
-}
+
+  return type === "recent" ? recentTab : openTab;
+};
 export default InnerSearchTabs;

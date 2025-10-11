@@ -3,6 +3,7 @@ import "./App.scss";
 import Welcome from "./pages/welcome/welcome";
 import SourceSelect from "./pages/sourceSelect/sourceSelect";
 // import Storage from "./pages/storage/storage";
+import { useSettings } from "./hooks/useSettings";
 import Home from "./pages/home/home";
 import { Component, useState } from "react";
 const steps = [
@@ -10,7 +11,8 @@ const steps = [
   { key: "sources", Component: SourceSelect },
   // { key: "storage", Component: Storage },
 ];
-function App() {
+function App() {const {initTheme}  = useSettings();
+  initTheme();
   const [index, setIndex] = useState(0);
   const [finished, setFinished] = useState(false);
 

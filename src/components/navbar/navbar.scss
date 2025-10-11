@@ -1,11 +1,10 @@
-@use "@/styles/variables" as vars;
-// @import '../../styles/variables.scss';
+
 .navbar{
     position: relative;
     height: 100%;
     width: 6%;
     max-width: 78px;
-    background-color: var(vars.$hover1,aqua);
+    background-color: transparent;
     flex-shrink: 0;
     z-index: 5;
     display: flex;
@@ -29,14 +28,14 @@
             border-radius: 10px;
             transition: background-color 0.2s ease;
             &:hover{
-                background-color: vars.$hover2;
+                background-color: var(--hover2);
             }
             h3{
-                color: vars.$navbar-text;
+                color: var(--text-color);
                 font-size: 15px;
             }
             .menubarIcons{
-                color: vars.$navbar-text;
+                color: var(--text-color);
                 align-self: center;
                 justify-self: center;
             }
@@ -46,7 +45,7 @@
         margin: 0 0 10px;
         li{
             h3{
-                color: vars.$navbar-text;
+                color: var(--text-color);
             }
         }
     }

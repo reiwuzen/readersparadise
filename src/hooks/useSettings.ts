@@ -4,6 +4,7 @@ export const useSettings = () => {
     const setItemActive = useSettingsStore((state) => state.setItemActive);
     const theme = useSettingsStore((state) => state.theme);
     const setTheme = useSettingsStore((state) => state.setTheme);
+    const initTheme = useSettingsStore((s)=> s.initTheme);
     const defaultViewMode = useSettingsStore((state) => state.defaultViewMode);
     const setDefaultViewMode = useSettingsStore((state) => state.setDefaultViewMode);
     const showNSFW = useSettingsStore((state) => state.showNSFW);
@@ -16,6 +17,7 @@ export const useSettings = () => {
         setItemActive,
         theme,
         setTheme,
+        initTheme,
         activeItem,
         defaultViewMode,
         setDefaultViewMode,

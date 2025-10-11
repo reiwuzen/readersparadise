@@ -16,3 +16,40 @@ $activeTab: linear-gradient(
   turquoise,
   pink
 );
+/* 🌞 Light Theme */
+body.light {
+  --hover1: rgba(255, 255, 255, 0.276);
+  --hover2: rgba(255, 255, 255, 0.454);
+  --hover3: rgba(255, 255, 255, 0.674);
+  --hover4: rgba(255, 255, 255, 0.728);
+  --active-text-color: #000000; /* main active text */
+  --text-color: #202020; /* normal text */
+  --muted-text-color: #6b6b6b; /* muted text */
+  --bg-color: #ffffff; /* main background */
+  --bg-opt1-color: #f4f4f4; /* secondary background */
+  --bg-cover-color: #eaeaea; /* card / container */
+  --bg-cover-muted-color: #dcdcdc; /* subtle muted areas */
+  --accent-bg-color: #4f46e5; /* main accent (indigo-600) */
+  --accent-hover-bg-color: #746cffef; /* darker indigo hover */
+  --scrollbar-thumb-color: #b5b5b5;
+}
+
+/* 🌚 Dark Theme */
+body.dark {
+  --hover1: rgba(255, 255, 255, 0.276);
+  --hover2: rgba(255, 255, 255, 0.454);
+  --hover3: rgba(255, 255, 255, 0.674);
+  --hover4: rgba(255, 255, 255, 0.728);
+  --active-text-color: #ffffff; /* main active text */
+  --text-color: #e0e0e0; /* normal text */
+  --muted-text-color: #a0a0a0; /* muted text */
+  --bg-color: #000000; /* main background */
+  --bg-opt1-color: #121212; /* secondary background */
+  --bg-cover-color: #1e1e1e; /* card / container */
+  --bg-cover-muted-color: #242424; /* subtle muted areas */
+  --accent-bg-color: #6366f1; /* main accent (indigo-500) */
+  --accent-hover-bg-color: #4f46e5; /* darker indigo hover */
+  --scrollbar-thumb-color: #6b6b6b;
+  --light-bg-color: #a4a4a467;
+  --bg-opace-1-color: rgba(0, 0, 0, 0.200);
+}
