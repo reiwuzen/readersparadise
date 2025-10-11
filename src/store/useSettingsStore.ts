@@ -26,6 +26,8 @@ export type SettingsItemName =
 
 export type ItemId = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 export type themeType = "light" | "dark" | "system" | "custom" | 'blueGray' ;
+export type PageLayout = 'single' | 'double';
+export type ScrollDirec= 'ltr'| 'rtl' | 'ttb' | 'btt';
 export type SettingsItem = {
   title: SettingsItemName;
   content: React.ComponentType<any>;
@@ -40,6 +42,12 @@ export type SettingsState = {
   theme: themeType;
   setTheme: (theme: themeType) => void;
   initTheme: () => void;
+
+  pageLayout:PageLayout;
+  setPageLayout: (pageLayout: PageLayout) => void;
+
+  scrollDirection: ScrollDirec;
+  setScrollDirection: (sd: ScrollDirec) => void;
 
   defaultViewMode: "cover" | "contain" | "fill" | "none";
   setDefaultViewMode: (mode: "cover" | "contain" | "fill" | "none") => void;
@@ -121,6 +129,12 @@ export const useSettingsStore = create<SettingsState>((set) => ({
 
     document.body.classList.add(applied);
   },
+
+  pageLayout: 'single',
+  setPageLayout: (pageLayout) => set({pageLayout: pageLayout}),
+
+  scrollDirection: 'ltr',
+  setScrollDirection: (sd) => set({scrollDirection: sd}),
 
   defaultViewMode: "contain",
   setDefaultViewMode: (mode) => set({ defaultViewMode: mode }),
