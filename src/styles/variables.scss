@@ -18,20 +18,23 @@ $activeTab: linear-gradient(
 );
 /* 🌞 Light Theme */
 body.light {
-  --hover1: rgba(255, 255, 255, 0.276);
-  --hover2: rgba(255, 255, 255, 0.454);
-  --hover3: rgba(255, 255, 255, 0.674);
-  --hover4: rgba(255, 255, 255, 0.728);
+  --hover1: rgba(83, 83, 83, 0.276);
+  --hover2: rgba(95, 122, 123, 0.454);
+  --hover3: rgba(167, 167, 167, 0.674);
+  --hover4: rgba(219, 219, 219, 0.728);
   --active-text-color: #000000; /* main active text */
   --text-color: #202020; /* normal text */
   --muted-text-color: #6b6b6b; /* muted text */
   --bg-color: #ffffff; /* main background */
   --bg-opt1-color: #f4f4f4; /* secondary background */
   --bg-cover-color: #eaeaea; /* card / container */
+  --bg-cover-muted-opt1-color: #dcdcdc;
   --bg-cover-muted-color: #dcdcdc; /* subtle muted areas */
   --accent-bg-color: #4f46e5; /* main accent (indigo-600) */
   --accent-hover-bg-color: #746cffef; /* darker indigo hover */
   --scrollbar-thumb-color: #b5b5b5;
+   --bg-opace-1-color: rgba(0, 0, 0, 0.200);
+   --linear-bg: linear-gradient(270deg, #ffffff, #f7f8f8, #eef0f0, #e2e6e6);
 }
 
 /* 🌚 Dark Theme */
@@ -46,10 +49,83 @@ body.dark {
   --bg-color: #000000; /* main background */
   --bg-opt1-color: #121212; /* secondary background */
   --bg-cover-color: #1e1e1e; /* card / container */
+  --bg-cover-muted-pot1-color: #242424;
   --bg-cover-muted-color: #242424; /* subtle muted areas */
   --accent-bg-color: #6366f1; /* main accent (indigo-500) */
   --accent-hover-bg-color: #4f46e5; /* darker indigo hover */
   --scrollbar-thumb-color: #6b6b6b;
   --light-bg-color: #a4a4a467;
   --bg-opace-1-color: rgba(0, 0, 0, 0.200);
+  --linear-bg: linear-gradient(270deg, #000000, #151818, #222626, #000000);
+}
+body.blueGray {
+  /* Hover shades tuned to the darker surface-dark background */
+  --hover1: rgba(255, 255, 255, 0.15);
+  --hover2: rgba(255, 255, 255, 0.25);
+  --hover3: rgba(255, 255, 255, 0.45);
+  --hover4: rgba(255, 255, 255, 0.6);
+
+  /* Texts */
+  --active-text-color: #f9fafb; /* same as text-dark */
+  --text-color: #f9fafb; /* general text */
+  --muted-text-color: #9ca3af; /* subtext-dark */
+
+  /* Backgrounds */
+  --bg-color: #212f4d; /* background-dark */
+  --bg-opt1-color: #1f2937; /* surface-dark */
+  --bg-cover-muted-opt1-color : #354972;
+  --bg-cover-color: #1f2937; /* card/containers */
+  --bg-cover-muted-color: #111827; /* slightly deeper for borders or muted zones */
+
+  /* Accent colors */
+  --accent-bg-color: #6366f1; /* primary (indigo-500) */
+  --accent-hover-bg-color: #4f46e5; /* darker hover shade */
+
+  /* Scrollbar and light overlays */
+  --scrollbar-thumb-color: #4b5563; /* border-dark slightly lighter */
+  --light-bg-color: rgba(255, 255, 255, 0.05); /* soft highlight overlay */
+  --bg-opace-1-color: rgba(0, 0, 0, 0.200); /* translucent background-dark overlay */
+
+  /* Borders */
+  --border-color: #374151; /* border-dark */
+
+  /* Extras for consistency */
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --focus-ring-color: #6366f1;
+  --linear-bg: linear-gradient(270deg, #000000, #151818, #222626, #021322);
+}
+body.s1dark {
+  /* Hover levels */
+  --hover1: rgba(255, 255, 255, 0.15);
+  --hover2: rgba(255, 255, 255, 0.25);
+  --hover3: rgba(255, 255, 255, 0.45);
+  --hover4: rgba(255, 255, 255, 0.6);
+
+  /* Text */
+  --active-text-color: rgb(249 250 251 / 1); /* main active text */
+  --text-color: rgb(249 250 251 / 1); /* normal text */
+  --muted-text-color: rgb(156 163 175 / 1); /* muted text */
+
+  /* Backgrounds */
+  --bg-color: rgb(17 24 39 / 1); /* main background */
+  --bg-opt1-color: rgb(31 41 55 / 1); /* secondary background */
+  --bg-cover-color: rgb(31 41 55 / 1); /* cards, containers */
+  --bg-cover-muted-color: #111827;
+; /* muted panels, alt sections */
+
+  /* Accent */
+  --accent-bg-color: rgb(99 102 241 / 1); /* indigo-500 */
+  --accent-hover-bg-color: rgb(79 70 229 / 1); /* indigo-600 hover */
+
+  /* Scrollbar and overlays */
+  --scrollbar-thumb-color: rgb(75 85 99 / 1);
+  --light-bg-color: rgb(255 255 255 / 0.05);
+  --bg-opace-1-color: rgb(17 24 39 / 0.8);
+
+  /* Borders */
+  --border-color: rgb(55 65 81 / 1);
+
+  /* Misc */
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --focus-ring-color: rgb(99 102 241 / 1);
 }

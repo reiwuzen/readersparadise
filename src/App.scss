@@ -32,7 +32,7 @@
 }
 
 .container {
-  background: linear-gradient(270deg, #000000, #151818, #222626, #021322);
+  background: var(--linear-bg);
   background-size: 600% 600%;
   animation: gradientShift 12s ease infinite;
   position: relative;

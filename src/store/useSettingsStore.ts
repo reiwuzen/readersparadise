@@ -25,7 +25,7 @@ export type SettingsItemName =
   | "Advanced";
 
 export type ItemId = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
-export type themeType = "light" | "dark" | "system" | "custom";
+export type themeType = "light" | "dark" | "system" | "custom" | 'blueGray' ;
 export type SettingsItem = {
   title: SettingsItemName;
   content: React.ComponentType<any>;
@@ -37,7 +37,7 @@ export type SettingsState = {
   items: SettingsItem[];
   setItemActive: (itemId: ItemId) => void;
 
-  theme: "light" | "dark" | "system" | "custom";
+  theme: themeType;
   setTheme: (theme: themeType) => void;
   initTheme: () => void;
 
@@ -87,26 +87,39 @@ export const useSettingsStore = create<SettingsState>((set) => ({
       })),
     })),
 
-  theme: "system",
+  theme: "dark",
   
   setTheme: (theme) => {
     // 1. Update the store
     set({ theme });
 
     // 2. Apply theme to the DOM
-    document.body.classList.remove("light", "dark");
+    document.body.className = ``;
     document.body.classList.add(theme);
 
     // 3. Optionally persist it
     localStorage.setItem("theme", theme);
   },
-   initTheme: () => {
-    const saved = localStorage.getItem("theme") as themeType;
-    const preferred : themeType =
-      saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    initTheme: () => {
+    const saved = localStorage.getItem("theme") as themeType | null;
 
-    document.body.classList.add(preferred);
+    const preferred: themeType =
+      saved ||
+      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+
     set({ theme: preferred });
+
+    // Apply the preferred theme
+    const applied =
+      preferred === "system"
+        ? window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light"
+        : preferred === "custom"
+        ? "light" // change this later when custom themes are implemented
+        : preferred;
+
+    document.body.classList.add(applied);
   },
 
   defaultViewMode: "contain",

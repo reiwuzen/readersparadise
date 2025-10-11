@@ -16,12 +16,14 @@ const GeneralSettings = () => {
         <div className="d2">
           <button  className={`${theme === 'light' ? 'activeTheme' : ''} b1` } onClick={()=> setTheme('light')}>Light</button>
           <button  className={`${theme === 'dark' ? 'activeTheme' : ''} b2`} onClick={()=> setTheme('dark')}>Dark</button>
-          <button  className={`${theme === 'system' ? 'activeTheme' : ''}  b3`} onClick={()=> {
-            toast.message('Comming soon', {description: "available soon", action:{
+          <button  className={`${theme === 'blueGray' ? 'activeTheme' : ''} b2`} onClick={()=> setTheme('blueGray')}>BlueGray</button>
+          <button  className={`${theme === 'system' ? 'activeTheme' : ''}  b3`} onClick={()=> setTheme('system')}>System</button>
+          <button  className={`${theme === 'custom' ? 'activeTheme' : ''}  b3`} onClick={()=> {
+            toast.message('Want custom theme', {description: "Share you opinion in our Discord Server", action:{
               label: "close",
               onClick: ()=>{}
             }})
-          }}>System</button>
+          }}>Custom</button>
         </div>
       </div>
 

@@ -44,7 +44,7 @@
       height: 30px;
       width: 30px;
       &:hover {
-        background-color: var(--hover1);
+        background-color: var(--hover4);
       }
       .searchTabs {
         position: absolute;
@@ -179,7 +179,7 @@
     // flex: 1;
     height: calc(100% - 40px);
     width: 100%;
-    background-color:var(--bg-cover-muted-color,#2e2e2e9b);
+    background-color:var(--bg-cover-muted-opt1-color,#2e2e2e9b);
   }
 }
 

@@ -6,7 +6,7 @@
   align-items: center;
   .inAbout {
     position: relative;
-    color: aliceblue;
+    color: var(--active-text-color);
     height: 90%;
     width: 60%;
     padding: 0 80px 0;
@@ -24,7 +24,7 @@
       z-index: -1;
       filter: blur(12px);
     }
-    background-color: rgba(45, 45, 45, 0.936);
+    background-color: var(--bg-color);
     > h1 {
       padding: 26px 0 26px;
       font-size: 48px;
