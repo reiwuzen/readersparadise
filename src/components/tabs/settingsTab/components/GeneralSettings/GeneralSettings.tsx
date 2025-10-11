@@ -26,7 +26,7 @@ const GeneralSettings = () => {
           }}>Custom</button>
         </div>
       </div>
-
+ 
       <div className="languageSettings">
         <div className="d1">
           <p className="p1">Language</p>

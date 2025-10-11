@@ -22,7 +22,7 @@ const StorageSettings = () => {
               <div className="cmInInInd1">
                 <p>Chapter Cache</p>
                 <p>1.2 GB</p>
-              </div>
+              </div> 
               <div className="cmInInInd2">
                 <button>Clear</button>
               </div>
