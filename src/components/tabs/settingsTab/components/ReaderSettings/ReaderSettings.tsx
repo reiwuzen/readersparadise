@@ -66,10 +66,10 @@ const ReaderSettings = () => {
         <div id="bgcd2">
           <button onClick={()=> setReaderBGColor('light')}
            className={`${readerBGColor === 'light' ? 'isTrue' : ''} b1`}></button>
-          <button onClick={()=> setReaderBGColor('grey')}
-           className={`${readerBGColor === 'grey' ? 'isTrue' : ''} b2`}></button>
           <button onClick={()=> setReaderBGColor('dark')}
-           className={`${readerBGColor === 'dark' ? 'isTrue' : ''} b3`}></button>
+           className={`${readerBGColor === 'dark' ? 'isTrue' : ''} b2`}></button>
+          <button onClick={()=> setReaderBGColor('grey')}
+           className={`${readerBGColor === 'grey' ? 'isTrue' : ''} b3`}></button>
         </div>
         <div id="bgcd3">
           <p>Sync with Theme</p>
