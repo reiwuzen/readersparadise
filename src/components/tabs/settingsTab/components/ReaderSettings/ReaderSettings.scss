@@ -53,11 +53,11 @@
           padding: 16px;
           display: flex;
           flex-direction: column;
-          &.isTrue{
+          &.isTrue {
             background-color: rgb(99 102 241 / 0.2);
             border: 2px solid rgb(99 102 241 / 1);
-            span{
-                color: var(--text-color);
+            span {
+              color: var(--text-color);
             }
           }
           &:hover {
@@ -159,6 +159,19 @@
         display: flex;
         align-items: center;
         gap: 20px;
+        > .b1 {
+          background: white;
+        }
+        > .b2 {
+          background: #444;
+        }
+        > .b3 {
+          background: #000;
+        }
+        > .b1,
+        > .b2,
+        > .b3 {
+        }
         > button {
           cursor: pointer;
 
@@ -168,12 +181,38 @@
           padding: 8px 16px;
           border: none;
           border-radius: 100px;
-          &.activeTheme {
-            background-color: var(--accent-bg-color);
+          &.isTrue {
+            border: 2px solid rgb(99, 102, 241);
             color: var(--active-text-color);
           }
           &:hover {
             border: 2px solid rgb(99, 102, 241);
+            color: var(--text-color);
+          }
+        }
+      }
+      #bgcd3 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 14px 0 0;
+        p {
+          color: var(--muted-text-color);
+          font-size: 14px;
+          text-align: start;
+        }
+        button {
+          cursor: pointer;
+          font-size: 14px;
+          background-color: var(--bg-cover-color);
+          height: 35px;
+          // width: 65px;
+          color: var(--muted-text-color);
+          padding: 8px 16px;
+          border: none;
+          border-radius: 10px;
+          &:hover {
+            background-color: var(--accent-hover-bg-color);
             color: var(--text-color);
           }
         }

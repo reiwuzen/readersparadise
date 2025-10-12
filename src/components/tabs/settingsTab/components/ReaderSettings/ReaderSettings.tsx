@@ -6,7 +6,11 @@ const ReaderSettings = () => {
         pageLayout,
         setPageLayout,
         scrollDirection,
-        setScrollDirection
+        setScrollDirection,
+        readerBGColor,
+        setReaderBGColor,
+        readerBGColorSyncTheme,
+        setReaderBGColorSyncTheme,
     } = useSettings();
   const [val, setVal] = useState<String>("50");
   return (
@@ -60,9 +64,16 @@ const ReaderSettings = () => {
           <p>Choose your preferred reading background.</p>
         </div>
         <div id="bgcd2">
-          <button></button>
-          <button></button>
-          <button></button>
+          <button onClick={()=> setReaderBGColor('light')}
+           className={`${readerBGColor === 'light' ? 'isTrue' : ''} b1`}></button>
+          <button onClick={()=> setReaderBGColor('grey')}
+           className={`${readerBGColor === 'grey' ? 'isTrue' : ''} b2`}></button>
+          <button onClick={()=> setReaderBGColor('dark')}
+           className={`${readerBGColor === 'dark' ? 'isTrue' : ''} b3`}></button>
+        </div>
+        <div id="bgcd3">
+          <p>Sync with Theme</p>
+          <button onClick={()=>setReaderBGColorSyncTheme()}>{readerBGColorSyncTheme ? 'True' : 'False'}</button>
         </div>
       </div>
       <div className="keyboardShortcuts">
