@@ -41,7 +41,7 @@ const TabManager = ({ images }: TabManagerProps) => {
         <button
           className="nextBtn"
           onClick={() => {
-            toast.message("Comming Soon!", {
+            toast.message("Coming Soon!", {
               action: {
                 label: "close",
                 onClick: () => {},

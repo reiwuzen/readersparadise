@@ -5,7 +5,7 @@ import SourceSelect from "./pages/sourceSelect/sourceSelect";
 // import Storage from "./pages/storage/storage";
 import { useSettings } from "./hooks/useSettings";
 import Home from "./pages/home/home";
-import { Component, useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 const steps = [
   { key: "welcome", Component: Welcome },
   { key: "sources", Component: SourceSelect },

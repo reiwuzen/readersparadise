@@ -3,7 +3,7 @@ pub mod cmd;
 pub mod book;
 pub mod import;
 pub mod full_import;
-pub mod multi_webview;
+pub mod scraper;
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)

@@ -31,4 +31,5 @@ chrono = "0.4.42"
 uuid = { version = "1.18.1", features = ["v4",] }
 thiserror = "2.0.17"
 tokio = "1.47.1"
+wry = "0.53.4"
 
