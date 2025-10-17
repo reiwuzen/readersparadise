@@ -1,5 +1,6 @@
 import "./discoverTab.scss";
 import useSourceStore from "../../../store/useSourceStore";
+import AccessoryMenu from "@/components/accessoryMenu/accessoryMenu";
 import { useEffect, useState } from "react";
 type BrowserTabProps = {
   innerTabId?: string;
@@ -41,22 +42,7 @@ const DiscoverTab = ({ innerTabId, qActive, qListed }: BrowserTabProps) => {
             </button>
           )}
         </div>
-        <div className="accessoryMenu">
-          <button
-            id="menuBtn"
-            
-            onClick={()=>{
-              
-            }}
-          >
-            <svg viewBox="0 0 24 24" width="32" height="32" aria-hidden="true" focusable="false">
-  <rect x="3" y="5.5" width="18" height="2" rx="1"></rect>
-  <rect x="3" y="10.5" width="18" height="2" rx="1"></rect>
-  <rect x="3" y="15.5" width="18" height="2" rx="1"></rect>
-</svg>
-            Menu
-          </button>
-        </div>
+        <AccessoryMenu />
       </div>
       <div className="mainDiscoverTab"></div>
     </div>

@@ -1,0 +1,82 @@
+.accessoryMenu {
+  button,
+  #menuBtn {
+    z-index: 10;
+    display: flex;
+    align-items: center;
+
+    border: none;
+    background: transparent;
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    margin: 4px 0 0;
+    padding: 2px 4px 2px 4px;
+    border-radius: 10px;
+    &.showMenu{
+      span {
+      color: var(--scrollbar-thumb-color);
+      font-size: 18px;
+    }
+       &:hover {
+      span {
+        color: var(--bg-opt1-color);
+      }
+    }
+    }
+    &:hover {
+      span {
+        color: var(--text-color);
+      }
+    }
+    span {
+      color: var(--muted-text-color);
+      font-size: 18px;
+    }
+    span {
+      &:nth-child(2) {
+        padding: 0 4px;
+        font-size: 20px;
+        transform: rotate(45deg);
+      }
+    }
+  }
+  .aMenu {
+    background: transparent;
+    z-index: 7;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: calc(100vh - 40px);
+    width: 300px;
+    .FaMenu,
+    .SaMenu,
+    .TaMenu {
+      position: absolute;
+      right: -100%;
+      height: 100%;
+      width: 100%;
+    }
+    .FaMenu {
+      z-index: 3;
+      background-color: var(--hover4);
+    }
+    .SaMenu {
+      z-index: 5;
+      background-color: var(--accent-hover-bg-color);
+    }
+    .TaMenu {
+      z-index: 100;
+      background-color: var(--text-color);
+      padding: 50px 0 0;
+    }
+  }
+}
+@media (max-width: 800px), (max-height: 600px){
+  .accessoryMenu {
+
+    .aMenu{
+      width: 280px;
+    }
+  }
+}

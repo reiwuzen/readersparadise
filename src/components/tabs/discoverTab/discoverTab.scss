@@ -35,27 +35,10 @@
         background: transparent;
         font-size: 12px;
         cursor: pointer;
-        color: #888;
+        color: var(--muted-text-color);
         transition: color 0.2s ease;
         &:hover {
-          color: #000;
-        }
-      }
-    }
-    .accessoryMenu {
-      button{
-        display: flex;
-        align-items: center;
-        border: none;
-        background: transparent;
-        position: absolute;
-        right: 10px;
-        cursor: pointer;
-        margin: 4px 0 0;
-        padding: 0 6px 0 4px;
-        border-radius: 10px;
-        &:hover{
-            background: var(--hover3);
+          color: var(--text-color);
         }
       }
     }
