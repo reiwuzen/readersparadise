@@ -95,7 +95,6 @@ export const useTabsStore = create<TabsState>((set, get) => ({
       type,
       listed: true,
       tabContent: TAB_COMPONENTS[type],
-      tabProps: defaultProps,
     };
 
     set((state) => ({
@@ -144,9 +143,7 @@ export const useTabsStore = create<TabsState>((set, get) => ({
               name: tabName,
               tabContent: TAB_COMPONENTS[tabType],
               tabProps:
-                tabType === "discover"
-                  ? { innerTabId: t.id, qActive: true, qListed: true }
-                  : t.tabProps ?? {},
+                 t.tabProps ?? {},
             }
           : t
       ),

@@ -1,0 +1,24 @@
+.manga-card{
+    &{
+        height: 400px;
+        width: 250px;
+        img{
+            height: 70%;
+            width: 100%;
+            object-fit: cover;
+        }
+        .info{
+            &{
+                .title{
+
+                }
+                .source{
+
+                }
+                .desc{
+
+                }
+            }
+        }
+    }
+}

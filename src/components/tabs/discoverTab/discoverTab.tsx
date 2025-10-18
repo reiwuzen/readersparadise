@@ -1,39 +1,45 @@
 import "./discoverTab.scss";
-import useSourceStore from "../../../store/useSourceStore";
 import AccessoryMenu from "@/components/accessoryMenu/accessoryMenu";
 import { useEffect, useState } from "react";
-type BrowserTabProps = {
-  innerTabId?: string;
-  qActive?: boolean;
-  qListed?: boolean;
-};
+import { useDiscoverStore } from "@/store/useDiscoverStore";
+import CardV2 from "@/components/cardV2/cardV2";
 
-const DiscoverTab = ({ innerTabId, qActive, qListed }: BrowserTabProps) => {
-  const { selected } = useSourceStore();
-  const inner = innerTabId;
+const DiscoverTab = () => {
+  const {
+    searchResults,
+    isLoading,
+    error,
+    searchManga,
+    fetchChapterImages,
+    clearResults,
+  } = useDiscoverStore();
+
   const [sVal, setSVal] = useState<string>("");
+
+  // 🔍 Debounced search
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (sVal) {
-        console.log("Searching for:", sVal);
-        // performSearch(sVal)
+    const timeout = setTimeout(async () => {
+      if (sVal.trim()) {
+        await searchManga(sVal);
+        console.log(useDiscoverStore.getState().searchResults);
+      } else {
+        clearResults();
       }
-    }, 300); // wait 300ms after typing stops
+    }, 300);
 
     return () => clearTimeout(timeout);
   }, [sVal]);
+
   return (
     <div className="discoverTab">
+      {/* === Top Bar === */}
       <div className="accessoryBar">
         <div className="just-a-wrapper">
           <input
             type="search"
-            name=""
             id="searchBar"
             placeholder="Search here..."
-            onInput={(e) => {
-              setSVal(e.currentTarget.value.trimStart());
-            }}
+            onInput={(e) => setSVal(e.currentTarget.value.trimStart())}
             value={sVal}
           />
           {sVal && (
@@ -44,7 +50,24 @@ const DiscoverTab = ({ innerTabId, qActive, qListed }: BrowserTabProps) => {
         </div>
         <AccessoryMenu />
       </div>
-      <div className="mainDiscoverTab"></div>
+
+      {/* === Main Content === */}
+      <div className="mainDiscoverTab">
+        {isLoading && <p className="status-msg">Loading...</p>}
+        {error && <p className="status-msg error">{error}</p>}
+
+        {!isLoading && searchResults.length > 0 && (
+          <div className="discover-grid">
+            {searchResults.map((manga, i) => (
+              <CardV2 key={i} i={i} manga={manga} />
+            ))}
+          </div>
+        )}
+
+        {!isLoading && !error && !searchResults.length && sVal && (
+          <p className="status-msg">No results found.</p>
+        )}
+      </div>
     </div>
   );
 };

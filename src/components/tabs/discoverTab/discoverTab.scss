@@ -10,18 +10,19 @@
     width: 100%;
     position: relative;
     .just-a-wrapper {
-      width: 20%;
+      width: 30%;
       height: 100%;
       position: relative;
       #searchBar {
         border: none;
         outline: none;
         margin: 4px 0 0;
-        padding: 0 8px;
+        padding: 0 40px 0 10px;
         width: 100%;
         height: 90%;
         border-radius: 10px;
         color: var(--text-color);
+        background-color: var(--bg-opt1-color);
         &::-webkit-search-cancel-button {
           display: none;
         }
@@ -46,6 +47,16 @@
   .mainDiscoverTab {
     height: calc(100% - 36px);
     width: 100%;
+    overflow-y: auto;
+    overflow-x: auto;
+    .discover-grid{
+      width: calc(100% - 80px);
+      height:calc(100% - 80px);
+      padding: 40px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
   }
 }
 // @media (max-width: 800px){

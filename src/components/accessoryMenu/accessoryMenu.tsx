@@ -16,23 +16,27 @@ const AccessoryMenu = () => {
 
     if (!AMBP.current || !FaMenu.current || !SaMenu.current || !TaMenu.current)
       return;
-
+    gsap.to(aMenu.current,{
+      right: newState ? "0%" : "-100%",
+      duration: 0.01,
+    })
     gsap.to(AMBP.current, {
-      rotate: newState ? deg : 45, // assuming 0 is the closed rotation
+      rotate: newState ? deg : 45,
       duration: 0.65,
       ease: "power2.out",
+      
     });
 
     const menus = [FaMenu.current, SaMenu.current, TaMenu.current];
     const openDurations = [0.15, 0.2, 0.3];
-    const openDelays = [0, 0.07, 0.17];
+    const openDelays = [0, 0.1, 0.2];
 
     menus.forEach((menu, i) => {
       
       gsap.to(menu, {
-        opacity: newState ? 1 : 0,
+        opacity: newState ? 1 : 1,
         right: newState ? "0%" : "-100%",
-        ease: newState ? "power2.out" : "power2.in",
+        ease: newState ? "power2.out" : "power1.in",
         duration: newState ? openDurations[i] : 0.2,
         delay: newState ? openDelays[i] : 0,
       });
@@ -48,7 +52,7 @@ const AccessoryMenu = () => {
         }}
       >
         <span ref={AMBM} id="ambM">
-          Menu
+          
         </span>
         <span ref={AMBP} id="ambP">
           {"×"}

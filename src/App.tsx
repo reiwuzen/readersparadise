@@ -2,7 +2,8 @@
 import "./App.scss";
 import Welcome from "./pages/welcome/welcome";
 import SourceSelect from "./pages/sourceSelect/sourceSelect";
-// import Storage from "./pages/storage/storage";
+import { invoke } from "@tauri-apps/api/core";
+import sources from '@/data/sources.json'
 import { useSettings } from "./hooks/useSettings";
 import Home from "./pages/home/home";
 import {  useEffect, useState } from "react";
@@ -13,6 +14,9 @@ const steps = [
 ];
 function App() {const {initTheme, setReaderBGColor}  = useSettings();
   const { readerBGColor }=initTheme();
+  invoke("check_sources", {
+    sources
+  })
   useEffect(()=>{
     setReaderBGColor(readerBGColor, 'init');
   },[])

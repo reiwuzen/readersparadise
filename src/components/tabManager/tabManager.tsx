@@ -4,6 +4,7 @@ import { useSearchTabs } from "@/hooks/useSearchTabs";
 import Tab from "./components/tab/tab";
 import { ImageFile } from "../../../helper/fs";
 import InnerSearchTabs from "@/components/InnerSearchTabs/InnerSearchTabs";
+import NetworkStatus from "../network/NetworkStatus";
 import { toast } from "sonner";
 type TabManagerProps = {
   images: ImageFile[];
@@ -49,6 +50,7 @@ const TabManager = ({ images }: TabManagerProps) => {
             });
           }}
         >{`>`}</button>
+        <NetworkStatus /> //FIXME: change the NetworkStatus to the window bar
         <div
           className="searchTabsBtn"
           onClick={isOpen ? close : open}

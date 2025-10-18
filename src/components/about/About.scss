@@ -25,6 +25,9 @@
       filter: blur(12px);
     }
     background-color: var(--bg-color);
+    >a{
+      color: var(--muted-text-color)
+    }
     > h1 {
       padding: 26px 0 26px;
       font-size: 48px;

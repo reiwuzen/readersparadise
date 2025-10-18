@@ -1,0 +1,25 @@
+[
+  {
+    "name": "ManhuaPlus",
+    "options": ["tags", "bookName"],
+    "is_nsfw": false,
+    "is_selected": true,
+    "type": "dynamic",
+    "url": "https://manhuaplus.org/",
+    "search_pattern": "https://manhuaplus.org/search?keyword={query}",
+    "filters": {
+      "selectors": ["#main > div"],
+      "starts": ["https://manhuaplus.org/manga/"],
+      "title_selector": "div.text-center a.clamp.toe.oh.block.fs-15",
+      "link_selector": "div.text-center a.clamp.toe.oh.block.fs-15",
+      "image_selector": "div.b-img a img.lazy",
+      "image_attr": "data-src",
+      "chapter_selector": "a.clamp.toe.oh[style]",
+      "chapter_attr": "href",
+      "chapter_number_regex": "Chapter (\\d+)",
+      "dynamic_page_pattern": "https://cdn.manhuaplus.cc/ch/{CHAPTER_ID}/{page}.webp",
+      "chapter_id_regex": "const\\s+CHAPTER_ID\\s*=\\s*(\\d+);",
+      "max_pages": 50
+    }
+  }
+]

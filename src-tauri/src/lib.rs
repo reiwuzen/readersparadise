@@ -3,7 +3,8 @@ pub mod cmd;
 pub mod book;
 pub mod import;
 pub mod full_import;
-pub mod scraper;
+pub mod discover;
+pub mod sources;
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
@@ -24,6 +25,10 @@ pub fn run() {
             import::select_and_register_folder,
             import::import_selected_folder,
             import::import_book,
+            sources::check_sources,
+            discover::search_manga,
+            // discover::fetch_chapter_images,
+
             ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
