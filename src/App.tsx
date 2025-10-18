@@ -14,10 +14,10 @@ const steps = [
 ];
 function App() {const {initTheme, setReaderBGColor}  = useSettings();
   const { readerBGColor }=initTheme();
-  invoke("check_sources", {
-    sources
-  })
   useEffect(()=>{
+    invoke("check_sources", {
+      sources
+    })
     setReaderBGColor(readerBGColor, 'init');
   },[])
   const [index, setIndex] = useState(0);

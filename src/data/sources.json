@@ -8,17 +8,24 @@
     "url": "https://manhuaplus.org/",
     "search_pattern": "https://manhuaplus.org/search?keyword={query}",
     "filters": {
-      "selectors": ["#main > div"],
+      "main_div_selectors": "div.grid.gtc-f141a.gg-20.p-13.mh-77vh>div",
       "starts": ["https://manhuaplus.org/manga/"],
-      "title_selector": "div.text-center a.clamp.toe.oh.block.fs-15",
-      "link_selector": "div.text-center a.clamp.toe.oh.block.fs-15",
-      "image_selector": "div.b-img a img.lazy",
-      "image_attr": "data-src",
+      "title_selector": "div.b-img a.block",
+      "link_selector": "div.b-img a.block",
+      "cover_image_selector": "div.b-img a img.lazy",
+      "cover_image_attr": "data-src",
+      "latest_chapter": "a.clamp",
       "chapter_selector": "a.clamp.toe.oh[style]",
       "chapter_attr": "href",
       "chapter_number_regex": "Chapter (\\d+)",
-      "dynamic_page_pattern": "https://cdn.manhuaplus.cc/ch/{CHAPTER_ID}/{page}.webp",
+
+      "chapter_api": "https://manhuaplus.org/ajax/image/list/chap/{CHAPTER_ID}",
+      "chapter_api_method": "POST",
       "chapter_id_regex": "const\\s+CHAPTER_ID\\s*=\\s*(\\d+);",
+      "response_type": "html_json",
+      "response_html_field": "html",
+      "image_list_selector": "img",
+      "image_attr_list": ["data-src", "src"],
       "max_pages": 50
     }
   }

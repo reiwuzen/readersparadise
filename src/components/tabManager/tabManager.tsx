@@ -50,7 +50,8 @@ const TabManager = ({ images }: TabManagerProps) => {
             });
           }}
         >{`>`}</button>
-        <NetworkStatus /> //FIXME: change the NetworkStatus to the window bar
+        <NetworkStatus /> 
+        {/* // FIXME: change the NetworkStatus to the window bar */}
         <div
           className="searchTabsBtn"
           onClick={isOpen ? close : open}
