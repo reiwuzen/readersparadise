@@ -1,3 +1,4 @@
+use crate::sources::get_sources_backend;
 use regex::Regex;
 use reqwest::Client;
 use scraper::{Html, Selector};
@@ -6,7 +7,6 @@ use std::{error::Error, fs, path::Path};
 use tauri::AppHandle;
 use tokio::{fs as tokio_fs, select};
 use urlencoding::encode;
-use crate::sources::get_sources_backend;
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Filter {
@@ -75,9 +75,7 @@ pub async fn search_manga(query: String, app: AppHandle) -> Result<Vec<SearchRes
     let mut results = Vec::new();
 
     for source in sources.iter().filter(|s| s.is_selected) {
-        let search_url = source
-        .search_pattern
-        .replace("{query}", &encode(&query));
+        let search_url = source.search_pattern.replace("{query}", &encode(&query));
         let resp = client
             .get(&search_url)
             .send()
@@ -138,7 +136,107 @@ pub async fn search_manga(query: String, app: AppHandle) -> Result<Vec<SearchRes
             }
         }
     }
-
-    println!("Found {} results", results.len());
     Ok(results)
+}
+
+#[tauri::command]
+pub async fn info_manga(_app: AppHandle, url: String) -> Result<(), String> {
+    let client = Client::builder()
+        .user_agent("Mozilla/5.0 (compatible; RustScraper/1.0)")
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let resp = client
+        .get(&url)
+        .send()
+        .await
+        .map_err(|e| format!("Failed to get the url: {}", e))?;
+
+    let html = resp.text().await.map_err(|e| e.to_string())?;
+    let doc = Html::parse_document(&html);
+
+    let info_selector = Selector::parse("aside .y6x11p").unwrap();
+    let span_selector = Selector::parse("span.dt").unwrap();
+    let author_selector = Selector::parse("span.dt > a").unwrap();
+    let tag_selector = Selector::parse("div.mt-15  a.label").unwrap();
+    let desc_selector = Selector::parse("article div#syn-target").unwrap();
+    let mut authors = String::new();
+    let mut status = String::new();
+    let mut manga_type = String::new();
+    let mut bookmarks = String::new();
+    let mut created = String::new();
+    let mut updated = String::new();
+    let mut desc = String::new();
+    let mut tags: Vec<String> = Vec::new();
+
+    let desc_text = doc
+        .select(&desc_selector)
+        .next()
+        .unwrap();
+
+    desc = desc_text
+        .text()
+        .collect::<String>()
+        .trim()
+        .to_string();
+
+    for tag in doc.select(&tag_selector) {
+        let each_tag = tag.text().collect::<String>().trim().to_string();
+        tags.push(each_tag);
+    }
+
+    for element in doc.select(&info_selector) {
+        // join all visible text to help identify what this row is about
+        let header_text = element
+            .text()
+            .collect::<String>()
+            .replace('\n', "")
+            .trim()
+            .to_string();
+
+        // collect all <span class="dt"> text
+        let value_text = element
+            .select(&span_selector)
+            .next()
+            .map(|v| v.text().collect::<String>().trim().to_string())
+            .unwrap_or_default();
+
+        // collect all <a> text under <span.dt> (in case multiple authors)
+        let author_links: Vec<String> = element
+            .select(&author_selector)
+            .map(|a| a.text().collect::<String>().trim().to_string())
+            .filter(|s| !s.is_empty())
+            .collect();
+
+        if header_text.contains("Authors") {
+            // handle multiple authors gracefully
+            authors = if !author_links.is_empty() {
+                author_links.join(", ")
+            } else {
+                value_text.clone()
+            };
+        } else if header_text.contains("Status") {
+            status = value_text;
+        } else if header_text.contains("Type") {
+            manga_type = value_text;
+        } else if header_text.contains("Bookmarks") {
+            bookmarks = value_text;
+        } else if header_text.contains("Created") {
+            created = value_text;
+        } else if header_text.contains("Update") {
+            updated = value_text;
+        }
+    }
+
+    println!("Authors: {}", authors);
+    println!("Status: {}", status);
+    println!("Type: {}", manga_type);
+    println!("Bookmarks: {}", bookmarks);
+    println!("Created: {}", created);
+    println!("Updated: {}", updated);
+    println!("Description: {}", desc);
+    println!("Tags: {:#?}", tags);
+    println!("separator\n------");
+
+    Ok(())
 }

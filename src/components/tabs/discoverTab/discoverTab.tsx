@@ -2,17 +2,11 @@ import "./discoverTab.scss";
 import AccessoryMenu from "@/components/accessoryMenu/accessoryMenu";
 import { useEffect, useState } from "react";
 import { useDiscoverStore } from "@/store/useDiscoverStore";
-import CardV2 from "@/components/cardV2/cardV2";
+import BookSearch from "@/components/books/bookSearch/bookSearch";
+import BookInfo from "@/components/books/bookInfo/bookInfo";
 
 const DiscoverTab = () => {
-  const {
-    searchResults,
-    isLoading,
-    error,
-    searchManga,
-    fetchChapterImages,
-    clearResults,
-  } = useDiscoverStore();
+  const { searchManga, fetchChapterImages, clearResults } = useDiscoverStore();
 
   const [sVal, setSVal] = useState<string>("");
 
@@ -53,20 +47,7 @@ const DiscoverTab = () => {
 
       {/* === Main Content === */}
       <div className="mainDiscoverTab">
-        {isLoading && <p className="status-msg">Loading...</p>}
-        {error && <p className="status-msg error">{error}</p>}
-
-        {!isLoading && searchResults.length > 0 && (
-          <div className="discover-grid">
-            {searchResults.map((manga, i) => (
-              <CardV2 key={i} i={i} manga={manga} />
-            ))}
-          </div>
-        )}
-
-        {!isLoading && !error && !searchResults.length && sVal && (
-          <p className="status-msg">No results found.</p>
-        )}
+        <BookSearch sVal={sVal} />
       </div>
     </div>
   );

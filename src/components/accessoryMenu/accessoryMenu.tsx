@@ -16,21 +16,29 @@ const AccessoryMenu = () => {
 
     if (!AMBP.current || !FaMenu.current || !SaMenu.current || !TaMenu.current)
       return;
-    gsap.to(aMenu.current,{
-      right: newState ? "0%" : "-100%",
-      duration: 0.01,
-    })
+    if(newState){
+
+      gsap.to(aMenu.current,{
+        right:  "0%" ,
+        duration: 0.01,
+      })
+    } else{
+      gsap.to(aMenu.current,{
+        right: "-100%",
+        duration: 0.65,
+      })
+    }
     gsap.to(AMBP.current, {
       rotate: newState ? deg : 45,
       duration: 0.65,
       ease: "power2.out",
       
     });
-
+    
     const menus = [FaMenu.current, SaMenu.current, TaMenu.current];
     const openDurations = [0.15, 0.2, 0.3];
     const openDelays = [0, 0.1, 0.2];
-
+    
     menus.forEach((menu, i) => {
       
       gsap.to(menu, {

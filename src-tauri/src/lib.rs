@@ -1,4 +1,5 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+pub mod data;
 pub mod cmd;
 pub mod book;
 pub mod import;
@@ -27,6 +28,10 @@ pub fn run() {
             import::import_book,
             sources::check_sources,
             discover::search_manga,
+            discover::info_manga,
+            data::clear_data,
+            data::create_data_dir,
+            data::reset_data_dir,
             // discover::fetch_chapter_images,
 
             ])
