@@ -1,16 +1,19 @@
 import './cardV2.scss';
 import { SearchResult } from '@/store/useDiscoverStore';
+import { useDiscover } from '@/hooks/useDiscover';
 export type CardV2Props = {
     i: number;
     manga: SearchResult;
+    // onClick: ()=>void;
 }
 
 const CardV2 = ({manga, i}: CardV2Props) => {
+  const {getSelectedMangaInfo} =useDiscover();
     return (
         <div
                 key={i}
                 className="manga-card"
-                // onClick={() => fetchChapterImages(manga.url, manga.source_name)}
+                onClick={()=>getSelectedMangaInfo(manga.url)}
               >
                 <img
                   src={manga.cover_img ?? ""}

@@ -9,6 +9,22 @@ export interface SearchResult {
   url: string;
 }
 
+export type selectedManga ={
+  cover_img: String,
+  title: String,
+  desc: String,
+  metaData: {
+    Authors: String,
+    Status: String,
+    BookMarks: String,
+    Created: String,
+    Update: String,
+  },
+  chapters: {
+    chapter_link: String,
+  }[],
+
+}
 export interface ChapterImageResult {
   cover: string | null;
   pages: string[];
@@ -20,6 +36,9 @@ interface DiscoverState {
   chapterData: ChapterImageResult | null;
   isLoading: boolean;
   error: string | null;
+  selectedManga: selectedManga | null;
+  getSelectedMangaInfo: (inp: String) => void;
+  setSelectedManga: (inp: selectedManga) => void;
 
   searchManga: (query: string) => Promise<void>;
   fetchChapterImages: (url: string, source_name: string) => Promise<void>;
@@ -31,6 +50,15 @@ export const useDiscoverStore = create<DiscoverState>((set) => ({
   chapterData: null,
   isLoading: false,
   error: null,
+  selectedManga: null,
+  getSelectedMangaInfo: async (inp) => {
+    await invoke("info_manga", {
+      url: inp
+    })
+  },
+  setSelectedManga: (inp) => set({
+    selectedManga: inp
+  }),
 
   // Search across all sources
   searchManga: async (query) => {
