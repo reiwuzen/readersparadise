@@ -117,7 +117,7 @@ const NetworkSettings = () => {
                 <p>Preferred Image Server</p>
                 <p>Choose between CDN options if available from the source.</p>
             </div>
-            <select className="downloadQuality_option">
+            <select className="sourceServer_option">
                 <option>Automatic</option>
                 <option>Server 1 (US)</option>
                 <option>Server 2 (EU)</option>
