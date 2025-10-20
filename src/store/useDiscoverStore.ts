@@ -3,28 +3,31 @@ import { invoke } from "@tauri-apps/api/core";
 
 export interface SearchResult {
   source_name: string;
-  manga_title: string;
-  cover_img: string | null;
+  title: string;
+  cover_image: string | null;
   desc: string | null;
-  url: string;
+  link: string;
+  latest_chapter: string | null;
 }
 
-export type selectedManga ={
-  cover_img: String,
-  title: String,
-  desc: String,
-  metaData: {
-    Authors: String,
-    Status: String,
-    BookMarks: String,
-    Created: String,
-    Update: String,
-  },
-  chapters: {
-    chapter_link: String,
-  }[],
-
-}
+export type EachChapter = {
+  chapter_name: string | null;
+  chapter_number: string | null;
+  chapter_link: string | null;
+};
+export type BookInfo = {
+  title: string;
+  type: string | null;
+  cover_image: string;
+  desc: string | null;
+  author: string;
+  status: string | null;
+  bookmarks: string | null;
+  created: string | null;
+  update: string | null;
+  chapters: EachChapter[];
+  tags: string[];
+};
 export interface ChapterImageResult {
   cover: string | null;
   pages: string[];
@@ -36,11 +39,11 @@ interface DiscoverState {
   chapterData: ChapterImageResult | null;
   isLoading: boolean;
   error: string | null;
-  selectedManga: selectedManga | null;
-  getSelectedMangaInfo: (inp: String) => void;
-  setSelectedManga: (inp: selectedManga) => void;
+  selectedBook: BookInfo | null;
+  getSelectedBookInfo: (link: string, sourceName: string) => void;
+  setSelectedBook: (inp: BookInfo) => void;
 
-  searchManga: (query: string) => Promise<void>;
+  searchBook: (query: string) => Promise<void>;
   fetchChapterImages: (url: string, source_name: string) => Promise<void>;
   clearResults: () => void;
 }
@@ -50,30 +53,35 @@ export const useDiscoverStore = create<DiscoverState>((set) => ({
   chapterData: null,
   isLoading: false,
   error: null,
-  selectedManga: null,
-  getSelectedMangaInfo: async (inp) => {
-    await invoke("info_manga", {
-      url: inp
-    })
+  selectedBook: null,
+  getSelectedBookInfo: async (link, sourceName) => {
+    let res = await invoke<BookInfo>("get_book_info", {
+      link,
+      sourceName,
+    });
+    set({
+      selectedBook: res,
+    });
   },
-  setSelectedManga: (inp) => set({
-    selectedManga: inp
-  }),
+  setSelectedBook: (inp) =>
+    set({
+      selectedBook: inp,
+    }),
 
   // Search across all sources
-  searchManga: async (query) => {
+  searchBook: async (query) => {
     if (!query.trim()) return;
 
     set({ isLoading: true, error: null, searchResults: [] });
     try {
-      const results = await invoke<SearchResult[]>("search_manga", { query });
+      const results = await invoke<SearchResult[]>("search_book", { query });
       set({ searchResults: results, isLoading: false });
     } catch (err: any) {
       set({
         error: err?.message || "Search failed",
         isLoading: false,
       });
-      console.error("searchManga error:", err);
+      console.error("searchBook error:", err);
     }
   },
 
@@ -96,5 +104,6 @@ export const useDiscoverStore = create<DiscoverState>((set) => ({
   },
 
   // Reset results
-  clearResults: () => set({ searchResults: [], chapterData: null, error: null }),
+  clearResults: () =>
+    set({ searchResults: [], chapterData: null, error: null }),
 }));

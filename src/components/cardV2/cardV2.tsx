@@ -3,28 +3,28 @@ import { SearchResult } from '@/store/useDiscoverStore';
 import { useDiscover } from '@/hooks/useDiscover';
 export type CardV2Props = {
     i: number;
-    manga: SearchResult;
+    Book: SearchResult;
     // onClick: ()=>void;
 }
 
-const CardV2 = ({manga, i}: CardV2Props) => {
-  const {getSelectedMangaInfo} =useDiscover();
+const CardV2 = ({Book, i}: CardV2Props) => {
+  const {getSelectedBookInfo} =useDiscover();
     return (
         <div
                 key={i}
-                className="manga-card"
-                onClick={()=>getSelectedMangaInfo(manga.url)}
+                className="book-card"
+                onClick={()=>getSelectedBookInfo(Book.link, Book.source_name)}
               >
                 <img
-                  src={manga.cover_img ?? ""}
-                  alt={manga.manga_title}
+                  src={Book.cover_image ?? ""}
+                  alt={Book.title}
                   className="cover"
                 />
                 <div className="info">
-                  <h4 className="title">{manga.manga_title}</h4>
-                  <p className="source">{manga.source_name}</p>
-                  {manga.desc && (
-                    <p className="desc">{manga.desc.slice(0, 80)}...</p>
+                  <h4 className="title">{Book.title}</h4>
+                  <p className="source">{Book.source_name}</p>
+                  {Book.desc && (
+                    <p className="desc">{Book.desc.slice(0, 80)}...</p>
                   )}
                 </div>
               </div>

@@ -1,6 +1,6 @@
 .bookSearch {
-  height: 100%;
-  width: 100%;
+   width: calc(100% - 0px);
+    height: calc(100% - 0px);
   overflow-y: auto;
   overflow-x: hidden;
   &::-webkit-scrollbar {
@@ -13,9 +13,8 @@
     background-color: var(--scrollbar-thumb-color);
   }
   .discover-grid {
-    width: calc(100% - 70px);
-    height: calc(100% - 80px);
-    padding: 40px 30px 40px 40px;
+    width: calc(100% - 0px);
+    height: calc(100% - 0px);
     display: flex;
     flex-wrap: wrap;
     gap: 40px;

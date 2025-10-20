@@ -5,10 +5,10 @@ export const useDiscover = () => {
   const chapterData = useDiscoverStore((s) => s.chapterData);
   const isLoading = useDiscoverStore((s) => s.isLoading);
   const error = useDiscoverStore((s) => s.error);
-  const selectedManga = useDiscoverStore((s) => s.selectedManga);
-  const getSelectedMangaInfo = useDiscoverStore((s) => s.getSelectedMangaInfo);
-  const setSelectedManga = useDiscoverStore((s) => s.setSelectedManga);
-  const searchManga = useDiscoverStore((s) => s.searchManga);
+  const selectedBook = useDiscoverStore((s) => s.selectedBook);
+  const getSelectedBookInfo = useDiscoverStore((s) => s.getSelectedBookInfo);
+  const setSelectedBook = useDiscoverStore((s) => s.setSelectedBook);
+  const searchBook = useDiscoverStore((s) => s.searchBook);
   const fetchChapterImages = useDiscoverStore((s) => s.fetchChapterImages);
   const clearResults = useDiscoverStore((s) => s.clearResults);
   return {
@@ -16,10 +16,10 @@ export const useDiscover = () => {
     chapterData,
     isLoading,
     error,
-    selectedManga,
-    getSelectedMangaInfo,
-    setSelectedManga,
-    searchManga,
+    selectedBook,
+    getSelectedBookInfo,
+    setSelectedBook,
+    searchBook,
     fetchChapterImages,
     clearResults,
   };

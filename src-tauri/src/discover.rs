@@ -1,242 +1,369 @@
-use crate::sources::get_sources_backend;
 use regex::Regex;
 use reqwest::Client;
 use scraper::{Html, Selector};
-use serde::{Deserialize, Serialize};
+use tauri::App;
+
 use std::{error::Error, fs, path::Path};
-use tauri::AppHandle;
+use tauri::{command, utils::resources, AppHandle};
 use tokio::{fs as tokio_fs, select};
 use urlencoding::encode;
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct Filter {
-    pub main_div_selectors: String,
-    pub starts: Vec<String>,
-    pub title_selector: Option<String>,
-    pub link_selector: Option<String>,
-    pub cover_image_selector: Option<String>,
-    pub cover_image_attr: Option<String>,
-    pub latest_chapter: Option<String>,
-    pub chapter_selector: Option<String>,
-    pub chapter_attr: Option<String>,
-    pub chapter_number_regex: Option<String>,
-    pub dynamic_page_pattern: Option<String>,
-    pub chapter_id_regex: Option<String>,
-    pub max_pages: Option<usize>,
+//crates
+use crate::client::HTTP_CLIENT;
+use crate::models::{
+    BookInfo, EachChapter, EachChapterSelectors, InfoSelectors, SearchResults, SearchSelectors,
+    Source,
+};
+use crate::sources::get_sources_backend;
 
-    // 🆕 New for API-based sources (like ManhuaPlus)
-    pub chapter_api: Option<String>,
-    pub chapter_api_method: Option<String>,
-    pub response_type: Option<String>, // "html", "json", "html_json"
-    pub response_html_field: Option<String>, // e.g. "html"
-    pub image_list_selector: Option<String>, // e.g. "img"
-    pub image_attr_list: Option<Vec<String>>, // e.g. ["data-src", "src"]
-}
+//fn
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct Source {
-    pub name: String,
-    pub options: Vec<String>,
-    pub is_nsfw: bool,
-    pub is_selected: bool,
-    pub r#type: String,
-    pub url: String,
-    pub search_pattern: String,
-    pub filters: Filter,
-}
-
-#[derive(Serialize, Clone, Debug)]
-pub struct SearchResult {
-    pub source_name: String,
-    pub manga_title: String,
-    pub cover_img: Option<String>,
-    pub desc: Option<String>,
-    pub url: String,
-    pub latest_chapter: Option<String>,
-}
-
-#[derive(Serialize, Clone)]
-pub struct ChapterImageResult {
-    pub cover: Option<String>,
-    pub pages: Vec<String>,
-    pub local_cache_paths: Vec<String>,
-    pub chapter_number: Option<String>,
-}
-
-#[tauri::command]
-pub async fn search_manga(query: String, app: AppHandle) -> Result<Vec<SearchResult>, String> {
+#[command]
+pub async fn search_book(query: String, app: AppHandle) -> Result<Vec<SearchResults>, String> {
+    let mut res = Vec::new();
     let sources = get_sources_backend(app).map_err(|e| e.to_string())?;
-
-    let client = Client::builder()
-        .user_agent("Mozilla/5.0 (compatible; RustScraper/1.0)")
-        .build()
-        .map_err(|e| e.to_string())?;
-
-    let mut results = Vec::new();
 
     for source in sources.iter().filter(|s| s.is_selected) {
         let search_url = source.search_pattern.replace("{query}", &encode(&query));
-        let resp = client
+
+        let response = HTTP_CLIENT
             .get(&search_url)
             .send()
             .await
-            .map_err(|e| e.to_string())?;
-        let html = resp.text().await.map_err(|e| e.to_string())?;
+            .map_err(|e| format!("Failed to get response: {}", e))?;
+
+        let html = response.text().await.map_err(|e| e.to_string())?;
         let doc = Html::parse_document(&html);
-        if source.r#type == "dynamic" {
-            let main_div_selector = Selector::parse(&source.filters.main_div_selectors).unwrap();
-            for each_element in doc.select(&main_div_selector) {
-                let each_search_selector = match &source.filters.title_selector {
-                    Some(sel) => Selector::parse(sel)
-                        .map_err(|_| format!("Invalid title selector: {}", sel))?,
-                    None => continue, // skip this source if no selector
-                };
-                if let Some(each_search) = each_element.select(&each_search_selector).next() {
-                    let title = each_search.value().attr("title").unwrap_or("").to_string();
-                    let href = each_search.value().attr("href").unwrap_or("").to_string();
-                    let cover_selector = match &source.filters.cover_image_selector {
-                        Some(sel) => Selector::parse(sel)
-                            .map_err(|_| format!("Invalid title selector: {}", sel))?,
-                        None => continue,
-                    };
-                    let cover_postpend = each_search
-                        .select(&cover_selector)
+
+        match source.r#type.as_str() {
+            // ======================================
+            // 🔹 Dynamic sites
+            // ======================================
+            "dynamic" => {
+                let main_sel = Selector::parse(&source.search_selectors.main_div_selectors)
+                    .map_err(|e| format!("Invalid main_div_selectors: {}", e))?;
+
+                let title_sel = Selector::parse(&source.search_selectors.title_selector.selector)
+                    .map_err(|e| format!("Invalid title selector: {}", e))?;
+
+                let link_sel = Selector::parse(&source.search_selectors.link_selector.selector)
+                    .map_err(|e| format!("Invalid link selector: {}", e))?;
+
+                let cover_sel = Selector::parse(
+                    &source.search_selectors.cover_image_selector.selector,
+                )
+                .map_err(|e| format!("Invalid cover selector: {}", e))?;
+
+                for div in doc.select(&main_sel) {
+                    // --- Title ---
+                    let title = div
+                        .select(&title_sel)
+                        .next()
+                        .and_then(|el| {
+                            if let Some(attr_name) =
+                                &source.search_selectors.title_selector.attr
+                            {
+                                el.value().attr(attr_name).map(|v| v.to_string())
+                            } else {
+                                Some(el.text().collect::<String>().trim().to_string())
+                            }
+                        })
+                        .unwrap_or_default();
+
+                    // --- Link ---
+                    let link = div
+                        .select(&link_sel)
+                        .next()
+                        .and_then(|el| {
+                            if let Some(attr_name) =
+                                &source.search_selectors.link_selector.attr
+                            {
+                                el.value().attr(attr_name).map(|v| v.to_string())
+                            } else {
+                                Some(el.text().collect::<String>().trim().to_string())
+                            }
+                        })
+                        .unwrap_or_default();
+
+                    // --- Cover image ---
+                    let cover_postpend = div
+                        .select(&cover_sel)
                         .next()
                         .and_then(|z| {
-                            // Only call attr if image_attr is Some
                             source
-                                .filters
-                                .cover_image_attr
+                                .search_selectors
+                                .cover_image_selector
+                                .attr
                                 .as_deref()
                                 .and_then(|attr| z.value().attr(attr))
                         })
                         .unwrap_or("")
                         .to_string();
-                    let cover_src =
-                        format!("{}{}", &source.url, cover_postpend.trim_start_matches('/'));
-                    let latest_chapter_selector = match &source.filters.latest_chapter {
-                        Some(sel) => Selector::parse(sel)
-                            .map_err(|_| format!("Invalid title selector: {}", sel))?,
-                        None => continue,
-                    };
-                    let latest_chapter = each_element
-                        .select(&latest_chapter_selector)
-                        .last()
-                        .map(|el| el.text().collect::<Vec<_>>().join("").trim().to_string());
+                    let cover_image = format!(
+                        "{}{}",
+                        &source.url,
+                        cover_postpend.trim_start_matches('/')
+                    );
 
-                    results.push(SearchResult {
+                    // --- Latest chapter (optional) ---
+                    let latest_chapter = if let Some(ref sel_meta) =
+                        source.search_selectors.latest_chapter_selector
+                    {
+                        let chapter_sel = Selector::parse(&sel_meta.selector)
+                            .map_err(|e| format!("Invalid latest chapter selector: {}", e))?;
+
+                        div.select(&chapter_sel)
+                            .next()
+                            .map(|el| el.text().collect::<String>().trim().to_string())
+                    } else {
+                        None
+                    };
+
+                    // Push result
+                    res.push(SearchResults {
                         source_name: source.name.clone(),
-                        manga_title: title,
-                        cover_img: Some(cover_src),
-                        desc: Some("".to_string()),
-                        url: href,
-                        latest_chapter: latest_chapter,
+                        title,
+                        cover_image,
+                        link,
+                        desc: None,
+                        latest_chapter,
                     });
                 }
             }
+
+            // ======================================
+            // 🔹 Static sites (simpler, one big list)
+            // ======================================
+            "static" => {
+                let title_sel = Selector::parse(&source.search_selectors.title_selector.selector)
+                    .map_err(|e| format!("Invalid title selector: {}", e))?;
+
+                let link_sel = Selector::parse(&source.search_selectors.link_selector.selector)
+                    .map_err(|e| format!("Invalid link selector: {}", e))?;
+
+                for el in doc.select(&title_sel) {
+                    let title = el.text().collect::<String>().trim().to_string();
+
+                    let link = if let Some(attr_name) =
+                        &source.search_selectors.link_selector.attr
+                    {
+                        el.value()
+                            .attr(attr_name)
+                            .map(|v| v.to_string())
+                            .unwrap_or_default()
+                    } else {
+                        el.text().collect::<String>().trim().to_string()
+                    };
+
+                    res.push(SearchResults {
+                        source_name: source.name.clone(),
+                        title,
+                        cover_image: "".to_string(),
+                        link,
+                        desc: None,
+                        latest_chapter: None,
+                    });
+                }
+            }
+
+            // ======================================
+            // 🔹 Unknown type
+            // ======================================
+            _ => {
+                eprintln!("Unknown source type: {}", source.r#type);
+            }
         }
     }
-    Ok(results)
+
+    Ok(res)
 }
 
-#[tauri::command]
-pub async fn info_manga(_app: AppHandle, url: String) -> Result<(), String> {
-    let client = Client::builder()
-        .user_agent("Mozilla/5.0 (compatible; RustScraper/1.0)")
-        .build()
-        .map_err(|e| e.to_string())?;
 
-    let resp = client
-        .get(&url)
+#[command]
+pub async fn get_book_info(
+    link: String,
+    source_name: String,
+    app: AppHandle,
+) -> Result<BookInfo, String> {
+    let sources = get_sources_backend(app).map_err(|e| e.to_string())?;
+
+    let source = sources
+        .iter()
+        .find(|s| s.name == source_name)
+        .ok_or_else(|| format!("Source not found: {}", source_name))?;
+
+    let response = HTTP_CLIENT
+        .get(&link)
         .send()
         .await
-        .map_err(|e| format!("Failed to get the url: {}", e))?;
+        .map_err(|e| format!("Failed to get response: {}", e))?;
 
-    let html = resp.text().await.map_err(|e| e.to_string())?;
+    let html = response.text().await.map_err(|e| e.to_string())?;
     let doc = Html::parse_document(&html);
 
-    let info_selector = Selector::parse("aside .y6x11p").unwrap();
-    let span_selector = Selector::parse("span.dt").unwrap();
-    let author_selector = Selector::parse("span.dt > a").unwrap();
-    let tag_selector = Selector::parse("div.mt-15  a.label").unwrap();
-    let desc_selector = Selector::parse("article div#syn-target").unwrap();
-    let mut authors = String::new();
-    let mut status = String::new();
-    let mut manga_type = String::new();
-    let mut bookmarks = String::new();
-    let mut created = String::new();
-    let mut updated = String::new();
-    let mut desc = String::new();
-    let mut tags: Vec<String> = Vec::new();
-
-    let desc_text = doc
-        .select(&desc_selector)
+    let title_selector = Selector::parse(&source.info_selectors.title_selector.selector).unwrap();
+    let title = doc
+        .select(&title_selector)
         .next()
+        .map(|el| el.text().collect::<String>().trim().to_string())
         .unwrap();
 
-    desc = desc_text
-        .text()
-        .collect::<String>()
-        .trim()
+    let cover_img_sel =
+        Selector::parse(&source.info_selectors.cover_image_selector.selector).unwrap();
+
+    let cover_postpend = doc
+        .select(&cover_img_sel)
+        .next()
+        .and_then(|z| {
+            // Only call attr if image_attr is Some
+            source
+                .info_selectors
+                .cover_image_selector
+                .attr
+                .as_deref()
+                .and_then(|attr| z.value().attr(attr))
+        })
+        .unwrap_or("")
         .to_string();
 
-    for tag in doc.select(&tag_selector) {
-        let each_tag = tag.text().collect::<String>().trim().to_string();
-        tags.push(each_tag);
-    }
+    let cover_image = format!("{}{}", &source.url, cover_postpend.trim_start_matches('/'));
 
-    for element in doc.select(&info_selector) {
-        // join all visible text to help identify what this row is about
-        let header_text = element
-            .text()
-            .collect::<String>()
-            .replace('\n', "")
-            .trim()
-            .to_string();
+    let desc_selector = Selector::parse(&source.info_selectors.desc_selector.selector).unwrap();
 
-        // collect all <span class="dt"> text
-        let value_text = element
-            .select(&span_selector)
-            .next()
-            .map(|v| v.text().collect::<String>().trim().to_string())
+    let desc = doc
+        .select(&desc_selector)
+        .next()
+        .map(|el| el.text().collect::<String>().trim().to_string())
+        .unwrap();
+
+    let author_sel = Selector::parse(&source.info_selectors.author_selector.selector).unwrap();
+    let author = doc
+        .select(&author_sel)
+        .next()
+        .map(|z| z.text().collect::<String>().to_string())
+        .unwrap_or_default();
+
+    let status = extract_specific_value(
+        &doc,
+        &source.info_selectors.status_selector.selector,
+        "status",
+    )
+    .unwrap_or_default();
+
+    let r#type =
+        extract_specific_value(&doc, &source.info_selectors.type_selector.selector, "type")
             .unwrap_or_default();
 
-        // collect all <a> text under <span.dt> (in case multiple authors)
-        let author_links: Vec<String> = element
-            .select(&author_selector)
-            .map(|a| a.text().collect::<String>().trim().to_string())
-            .filter(|s| !s.is_empty())
-            .collect();
+    let bookmarks = extract_specific_value(
+        &doc,
+        &source.info_selectors.bookmarks_selector.selector,
+        "bookmarks",
+    )
+    .unwrap_or_default();
 
-        if header_text.contains("Authors") {
-            // handle multiple authors gracefully
-            authors = if !author_links.is_empty() {
-                author_links.join(", ")
-            } else {
-                value_text.clone()
-            };
-        } else if header_text.contains("Status") {
-            status = value_text;
-        } else if header_text.contains("Type") {
-            manga_type = value_text;
-        } else if header_text.contains("Bookmarks") {
-            bookmarks = value_text;
-        } else if header_text.contains("Created") {
-            created = value_text;
-        } else if header_text.contains("Update") {
-            updated = value_text;
+    let created = extract_specific_value(
+        &doc,
+        &source.info_selectors.created_selector.selector,
+        "created",
+    )
+    .unwrap_or_default();
+
+    let updated = extract_specific_value(
+        &doc,
+        &source.info_selectors.update_selector.selector,
+        "update",
+    )
+    .unwrap_or_default();
+
+    let chapters_sel = Selector::parse(&source.info_selectors.chapters_selector.selector).unwrap();
+
+    let mut chapters: Vec<EachChapter> = Vec::new();
+    for chapter in doc.select(&chapters_sel) {
+        let chapter_number = chapter.text().collect::<String>().trim().to_string();
+
+        let chapter_link = if let Some(attr_name) = &source.info_selectors.chapters_selector.attr {
+            chapter
+                .value()
+                .attr(attr_name)
+                .map(|v| v.to_string())
+                .unwrap_or_default()
+        } else {
+            // fallback: use the text itself
+            chapter.text().collect::<String>().trim().to_string()
+        };
+
+        let el_chapter = EachChapter {
+            chapter_number: Some(chapter_number),
+            chapter_link: Some(chapter_link),
+            chapter_name: None,
+        };
+        chapters.push(el_chapter);
+
+        // println!("{} -> {}", chapter_number, chapter_link);
+    }
+
+
+    let mut tags: Vec<String> = Vec::new();
+    let tag_sel =Selector::parse(&source.info_selectors.tags_selector.selector).unwrap();
+    for tag in doc.select(&tag_sel){
+        let t = tag.text().collect::<String>().trim().to_string();
+        tags.push(t);
+    }
+
+    let book = BookInfo {
+        cover_image,
+        title,
+        desc: Some(desc),
+        chapters,
+        status: Some(status),
+        bookmarks: Some(bookmarks),
+        update: Some(updated),
+        created: Some(created),
+        author,
+        tags,
+        r#type: Some(r#type),
+    };
+    Ok(book)
+}
+
+fn extract_specific_value(doc: &Html, selector_str: &str, label: &str) -> Option<String> {
+    let sel = Selector::parse(selector_str).ok()?;
+    let parent_sel = Selector::parse(".y6x11p").ok()?; // relaxed to match any tag with this class
+
+    for span in doc.select(&sel) {
+        let span_text = span.text().collect::<String>().trim().to_string();
+
+        // --- Case 1: Label is inside the span itself ---
+        if span_text.to_lowercase().contains(&label.to_lowercase()) {
+            // Remove label text like "type :" or "status :"
+            let cleaned = span_text
+                .replace(&format!("{} :", label), "")
+                .replace(&format!("{}:", label), "")
+                .replace(&label.to_lowercase(), "")
+                .trim()
+                .to_string();
+            return Some(cleaned);
+        }
+
+        // --- Case 2: Label is in parent text ---
+        if let Some(parent) = span.ancestors().find_map(|node| {
+            node.value().as_element().and_then(|el| {
+                let class = el.attr("class").unwrap_or("");
+                if class.contains("y6x11p") {
+                    Some(node)
+                } else {
+                    None
+                }
+            })
+        }) {
+            let parent_el = scraper::ElementRef::wrap(parent)?;
+            let parent_text = parent_el.text().collect::<String>().to_lowercase();
+
+            if parent_text.contains(&label.to_lowercase()) {
+                return Some(span_text);
+            }
         }
     }
 
-    println!("Authors: {}", authors);
-    println!("Status: {}", status);
-    println!("Type: {}", manga_type);
-    println!("Bookmarks: {}", bookmarks);
-    println!("Created: {}", created);
-    println!("Updated: {}", updated);
-    println!("Description: {}", desc);
-    println!("Tags: {:#?}", tags);
-    println!("separator\n------");
-
-    Ok(())
+    None
 }

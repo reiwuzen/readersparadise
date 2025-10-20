@@ -6,6 +6,8 @@ pub mod import;
 pub mod full_import;
 pub mod discover;
 pub mod sources;
+pub mod models;
+pub mod client;
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
@@ -27,8 +29,8 @@ pub fn run() {
             import::import_selected_folder,
             import::import_book,
             sources::check_sources,
-            discover::search_manga,
-            discover::info_manga,
+            discover::get_book_info,
+            discover::search_book,
             data::clear_data,
             data::create_data_dir,
             data::reset_data_dir,

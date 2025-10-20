@@ -6,7 +6,8 @@ import BookSearch from "@/components/books/bookSearch/bookSearch";
 import BookInfo from "@/components/books/bookInfo/bookInfo";
 
 const DiscoverTab = () => {
-  const { searchManga, fetchChapterImages, clearResults } = useDiscoverStore();
+  const { searchBook, fetchChapterImages, clearResults, selectedBook } =
+    useDiscoverStore();
 
   const [sVal, setSVal] = useState<string>("");
 
@@ -14,7 +15,7 @@ const DiscoverTab = () => {
   useEffect(() => {
     const timeout = setTimeout(async () => {
       if (sVal.trim()) {
-        await searchManga(sVal);
+        await searchBook(sVal);
         console.log(useDiscoverStore.getState().searchResults);
       } else {
         clearResults();
@@ -47,7 +48,7 @@ const DiscoverTab = () => {
 
       {/* === Main Content === */}
       <div className="mainDiscoverTab">
-        <BookSearch sVal={sVal} />
+        {selectedBook ? <BookInfo /> : <BookSearch sVal={sVal} />}
       </div>
     </div>
   );

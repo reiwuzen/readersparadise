@@ -1,8 +1,12 @@
-use crate::discover::Source;
 use serde_json::Value;
 use std::{fs, path::PathBuf};
 use tauri::AppHandle;
 use tauri::Manager;
+
+
+//crates
+use crate::models::Source;
+
 
 fn get_sources_frontend(sources: Value) -> Result<String, String> {
     serde_json::to_string_pretty(&sources).map_err(|e| e.to_string())

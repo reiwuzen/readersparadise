@@ -15,7 +15,7 @@ const BookSearch = ({ sVal }: BookSearchProps) => {
       {!isLoading && searchResults.length > 0 && (
         <div className="discover-grid">
           {searchResults.map((manga, i) => (
-            <CardV2 key={i} i={i} manga={manga}  />
+            <CardV2 key={i} i={i} Book={manga}  />
           ))}
         </div>
       )}
