@@ -1,0 +1,10 @@
+{
+    "name" : "HentaiRead",
+    "url" : "https://hentairead.com/",
+    "search_url" : "",
+    "is_selected" : false,
+    "is_nsfw": true,
+    "is_main": false,
+    "is_fav": false,
+    "is_all" : true
+  }

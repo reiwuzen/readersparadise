@@ -1,0 +1,10 @@
+{
+    "name": "Manhwa18",
+    "url": "https://manhwa18.net/",
+    "search_url" : "",
+    "is_selected" : false,
+    "is_nsfw": true,
+    "is_main": false,
+    "is_fav": false,
+    "is_all" : true
+  }

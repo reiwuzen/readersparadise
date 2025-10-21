@@ -34,7 +34,7 @@ const BookInfo = () => {
               </li>
               <li>
                 <p>Bookmarks:</p>
-                <p>{book_info.status}</p>
+                <p>{book_info.bookmarks}</p>
               </li>
               <li>
                 <p>Created:</p>

@@ -15,9 +15,6 @@ const steps = [
 function App() {const {initTheme, setReaderBGColor}  = useSettings();
   const { readerBGColor }=initTheme();
   useEffect(()=>{
-    invoke("check_sources", {
-      sources
-    })
     setReaderBGColor(readerBGColor, 'init');
   },[])
   const [index, setIndex] = useState(0);
