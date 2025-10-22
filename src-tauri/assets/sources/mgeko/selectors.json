@@ -61,14 +61,14 @@
         "sel": "div.novel-body section#info p.description"
     },
     "chapter_list":{
-        "sel": "ul.chapter-list li.chapter-list-item",
+        "sel": "ul.chapter-list li",
         "link":{
             "sel": "a",
             "attr": "href"
         },
         "number":{
-            "sel": "a div.chapter-number",
-            "update": "a div.chapter-number span"
+            "sel": "a strong",
+            "update": "a time"
         }
     }
   }

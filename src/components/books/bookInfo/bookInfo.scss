@@ -152,6 +152,10 @@
             display: flex;
             align-items: center; /* vertical center */
             justify-content: center; /* horizontal center if you want */
+            &:hover{
+              cursor: pointer;
+              background-color: var(--hover2);
+            }
           }
         }
       }

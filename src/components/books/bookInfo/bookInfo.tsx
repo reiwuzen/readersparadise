@@ -3,7 +3,7 @@ import "./bookInfo.scss";
 import { useDiscover } from "@/hooks/useDiscover";
 
 const BookInfo = () => {
-  const { selectedBook } = useDiscover();
+  const { selectedBook, getBookChapter } = useDiscover();
   let book_info = selectedBook;
   if (book_info !== null) {
     console.log(book_info); //debug
@@ -49,9 +49,11 @@ const BookInfo = () => {
           <div className="bookData">
             <h3>{book_info.title}</h3>
             <ul className="bTags">
-              {book_info.tags.length > 0
-                ? book_info.tags.map((tag, i) => <li key={i}>{tag}</li>)
-                : (<p>No tags Available</p>)}
+              {book_info.tags.length > 0 ? (
+                book_info.tags.map((tag, i) => <li key={i}>{tag}</li>)
+              ) : (
+                <p>No tags Available</p>
+              )}
             </ul>
             <p id="uniq">Description :</p>
             <p>{book_info.desc}</p>
@@ -60,7 +62,16 @@ const BookInfo = () => {
               <input type="search" name="" id="ChapterSearch" />
               <ul className="chapterInfo">
                 {book_info.chapters.map((chapter, i) => (
-                  <li key={i}>{chapter.chapter_number}</li>
+                  <li
+                    key={i}
+                    onClick={() => {
+                      if (chapter.chapter_link && chapter.chapter_number) {
+                        getBookChapter(chapter.chapter_link, chapter.chapter_number);
+                      }
+                    }}
+                  >
+                    {chapter.chapter_number}
+                  </li>
                 ))}
               </ul>
             </div>

@@ -33,9 +33,11 @@ pub fn run() {
             // sources::check_sources,
             discover::get_book_info,
             discover::search_book,
+            discover::get_book_chapter,
             data::clear_data,
             data::create_data_dir,
             data::reset_data_dir,
+            sources::download_1_chapter,
             // discover::fetch_chapter_images,
 
             ])

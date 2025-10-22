@@ -11,9 +11,9 @@ use urlencoding::encode;
 
 ///crate
 use crate::client::HTTP_CLIENT;
-use crate::helper::{as_opt_str, format_join, get_val, get_direct_text, clean_description};
+use crate::helper::{as_opt_str, clean_description, format_join, get_direct_text, get_val};
 use crate::models::{BookInfo, EachChapter, SearchResults};
-use crate::{wrap_err};
+use crate::wrap_err;
 
 //traits
 use crate::sources::F;
@@ -279,6 +279,7 @@ impl Mgeko {
         Ok(res)
     }
     pub async fn get_book(&self, link: String) -> Result<BookInfo, String> {
+        // --- 1️⃣ Fetch the main book page (async safe) ---
         let response = HTTP_CLIENT
             .get(&link)
             .send()
@@ -286,137 +287,215 @@ impl Mgeko {
             .map_err(|e| format!("Failed to get response: {}", e))?;
 
         let html = response.text().await.map_err(|e| e.to_string())?;
+
+        // Clone your selectors & config because `&self` can't move into another thread.
+        let selectors = self.selectors.clone();
+        let config = self.config.clone();
+
+        // --- 2️⃣ Parse book info and find all_ch_link in a blocking thread ---
+        let (mut book, all_ch_link) = tokio::task::spawn_blocking(move || {
+            Mgeko::parse_book_metadata_and_all_ch_link(&selectors, &config, html)
+        })
+        .await
+        .map_err(|e| format!("Join error parsing main page: {}", e))??;
+
+        // --- 3️⃣ Fetch the chapters page (async safe) ---
+        let new_resp = HTTP_CLIENT
+            .get(&all_ch_link)
+            .send()
+            .await
+            .map_err(|e| format!("Failed to get response: {}", e))?;
+        let new_html = new_resp.text().await.map_err(|e| e.to_string())?;
+
+        // --- 4️⃣ Parse chapters on blocking thread ---
+        let selectors_for_chapters = self.selectors.clone(); // clone again for thread safety
+        let chapters = tokio::task::spawn_blocking(move || {
+            Mgeko::parse_chapters_from_html(&selectors_for_chapters, new_html)
+        })
+        .await
+        .map_err(|e| format!("Join error parsing chapters: {}", e))??;
+
+        // --- 5️⃣ Combine results ---
+        book.chapters = chapters;
+        Ok(book)
+    }
+    pub async fn get_chapter(&self, link: String) -> Result<Vec<String>, String> {
+        let resp = HTTP_CLIENT
+            .get(&link)
+            .send()
+            .await
+            .map_err(|e| format!("Failed to get response: {}", e))?;
+        let html = resp.text().await.map_err(|e| e.to_string())?;
         let doc = Html::parse_document(&html);
 
-        
-            let title_sel = Selector::parse(&self.selectors.book_sel.title_sel.sel)
-                .map_err(|e| format!("Failed to parse title_sel: {}", e))?;
-            let cover_img_sel = Selector::parse(&self.selectors.book_sel.cover_img_sel.sel)
-                .map_err(|e| format!("Failed to parse cover_img_sel: {}", e))?;
-            //
-            let desc_sel = Selector::parse(&self.selectors.book_sel.desc.sel)
-                .map_err(|e| format!("Failed to parse desc_sel: {}", e))?;
-            let stats_sel = Selector::parse(&self.selectors.book_sel.stats.sel)
-                .map_err(|e| format!("Failed to parse desc_sel: {}", e))?;
-            //
-            let title = doc
-                .select(&title_sel)
+        let e_img_sel = wrap_err!(
+            Selector::parse("div#chapter-reader img"),
+            "failed to parse e_img_sel"
+        )?;
+        let mut img_s = Vec::new();
+        for e_img in doc.select(&e_img_sel) {
+            // Try src first, then data-src, then data-original
+            let src = e_img
+                .value()
+                .attr("src")
+                .or_else(|| e_img.value().attr("data-src"))
+                .or_else(|| e_img.value().attr("data-original"))
+                .unwrap_or_default()
+                .to_string();
+            if !src.is_empty() {
+                img_s.push(src);
+            }
+        }
+        if img_s.last().map(|s| s.as_str()) == Some("https://imgsrv4.com/credits-mgeko.png") {
+            img_s.pop();
+        }
+        Ok(img_s)
+    }
+    pub fn parse_book_metadata_and_all_ch_link(
+        selectors: &Sel, // <- same struct as self.selectors
+        config: &Conf,   // <- same struct as self.config
+        html: String,
+    ) -> Result<(BookInfo, String), String> {
+        let doc = Html::parse_document(&html);
+
+        let title_sel = Selector::parse(&selectors.book_sel.title_sel.sel)
+            .map_err(|e| format!("Failed to parse title_sel: {}", e))?;
+        let cover_img_sel = Selector::parse(&selectors.book_sel.cover_img_sel.sel)
+            .map_err(|e| format!("Failed to parse cover_img_sel: {}", e))?;
+        let desc_sel = Selector::parse(&selectors.book_sel.desc.sel)
+            .map_err(|e| format!("Failed to parse desc_sel: {}", e))?;
+        let stats_sel = Selector::parse(&selectors.book_sel.stats.sel)
+            .map_err(|e| format!("Failed to parse stats_sel: {}", e))?;
+
+        let title = doc
+            .select(&title_sel)
+            .next()
+            .map(|el| get_val(&el, None))
+            .unwrap_or_default();
+
+        let cover_image = doc
+            .select(&cover_img_sel)
+            .next()
+            .map(|el| get_val(&el, as_opt_str(&selectors.book_sel.cover_img_sel.attr)))
+            .unwrap_or_default();
+
+        let raw_desc = doc
+            .select(&desc_sel)
+            .next()
+            .map(|el| get_val(&el, None))
+            .unwrap_or_default();
+        let desc = Some(clean_description(&raw_desc, None));
+
+        // genres
+        let mut tags = Vec::new();
+        let genre_sel = Selector::parse(&selectors.book_sel.categories.sel)
+            .map_err(|e| format!("Failed to parse genre_sel: {}", e))?;
+        for g in doc.select(&genre_sel) {
+            tags.push(g.text().collect::<String>());
+        }
+
+        // author
+        let author_sel = Selector::parse(&selectors.book_sel.author_sel.sel)
+            .map_err(|e| format!("Failed to parse author_sel: {}", e))?;
+        let author = doc
+            .select(&author_sel)
+            .next()
+            .map(|el| get_val(&el, None))
+            .unwrap_or_default();
+
+        // stats
+        let mut bookmarks = String::new();
+        let mut status = String::new();
+        let mut views = String::new();
+        let strong_sel = Selector::parse("strong").unwrap();
+        let small_sel = Selector::parse("small").unwrap();
+
+        for stat in doc.select(&stats_sel) {
+            let strong = stat
+                .select(&strong_sel)
                 .next()
                 .map(|el| get_val(&el, None))
                 .unwrap_or_default();
-            //
-            let cover_img_post = doc
-                .select(&cover_img_sel)
-                .next()
-                .map(|el| get_val(&el, as_opt_str(&self.selectors.book_sel.cover_img_sel.attr)))
-                .unwrap_or_default();
-            let cover_img = cover_img_post;
-            //
-            let raw_desc = doc.select(&desc_sel).next().map(|el| get_val(&el, None)).unwrap();
-            let desc = Some(clean_description(&raw_desc, None));
-            let mut genres = Vec::new();
-            let genre_sel = wrap_err!(
-                Selector::parse(&self.selectors.book_sel.categories.sel),
-                "Failed to parse the genre_sel"
-            )?;
-            for genre in doc.select(&genre_sel) {
-                let g = genre.text().collect::<String>().to_string();
-                genres.push(g);
-            }
-            let authors_sel = wrap_err!(
-                Selector::parse(&self.selectors.book_sel.author_sel.sel),
-                "Failed to parse authors_sel"
-            )?;
-            let authors = doc
-                .select(&authors_sel)
+            let small = stat
+                .select(&small_sel)
                 .next()
                 .map(|el| get_val(&el, None))
                 .unwrap_or_default();
-            let mut latest_chapter = String::new();
-            let mut bookmarks = String::new();
-            let mut status = String::new();
-            let mut views = String::new();
-            for stat in doc.select(&stats_sel) {
-                let strong = stat
-                    .select(
-                        &Selector::parse("strong")
-                            .map_err(|el| format!("Failed to parse strong: {}", el))?,
-                    )
-                    .next()
-                    .map(|el| get_val(&el, None))
-                    .unwrap_or_default();
-                let small = stat
-                    .select(
-                        &Selector::parse("small")
-                            .map_err(|el| format!("Failed to parse strong: {}", el))?,
-                    )
-                    .next()
-                    .map(|el| get_val(&el, None))
-                    .unwrap_or_default();
-                if small == "Chapters" {
-                    latest_chapter = strong
-                } else if small == "Views" {
-                    views = strong
-                } else if small == "Bookmarked" {
-                    bookmarks = strong
-                } else if small == "Status" {
-                    status = strong
-                }
+            match small.as_str() {
+                "Views" => views = strong,
+                "Bookmarked" => bookmarks = strong,
+                "Status" => status = strong,
+                _ => {}
             }
-            let update_sel = Selector::parse(&self.selectors.book_sel.update_info.sel)
-                .map_err(|el| format!("Failed to parse update_sel: {}", el))?;
-            let update = doc.select(&update_sel).next().map(|el| get_val(&el, None));
-            let mut chapters = Vec::new();
-            let e_chapters_sel = wrap_err!(
-                Selector::parse(&self.selectors.book_sel.chapter_list.sel),
-                "Failed to parse chapter_list_sel"
-            )?;
-            let e_ch_n_sel = wrap_err!(
-                Selector::parse(&self.selectors.book_sel.chapter_list.number.sel),
-                "Failed to select e_ch_n_sel"
-            )?;
-            let e_ch_l_sel = wrap_err!(
-                Selector::parse(&self.selectors.book_sel.chapter_list.link.sel),
-                "Failed to select e_ch_l_sel"
-            )?;
-            
-            for e_ch in doc.select(&e_chapters_sel) {
-                let e_ch_n = e_ch.select(&e_ch_n_sel).next().map(|el| get_direct_text(&el));
-                let e_ch_l = e_ch.select(&e_ch_l_sel).next().map(|el| {
-                    get_val(
-                        &el,
-                        as_opt_str(&self.selectors.book_sel.chapter_list.link.attr),
-                    )
-                });
-                //TODO: to load all chapters we need to follow the load all chapter link and then parse
-                chapters.push(EachChapter {
-                    chapter_name: None,
-                    chapter_number: e_ch_n.clone(),
-                    chapter_link: e_ch_l.clone(),
-                });
-                println!(
-                    "chap: {}, link: {}",
-                    e_ch_n.unwrap_or("None".to_string()).clone(),
-                    e_ch_l.unwrap_or("None".to_string()).clone()
-                );
-            }
-            {
-                let book = BookInfo {
-                    title,
-                    cover_image: cover_img,
-                    desc,
-                    tags: genres,
-                    author: authors,
-                    r#type: None,
-                    bookmarks: Some(bookmarks),
-                    created: None,
-                    status: Some(status),
-                    update,
-                    chapters,
-                };
-                print!("Book: {:#?}", book);
-                Ok(book)
-            }
-        
+        }
+
+        // update
+        let update_sel = Selector::parse(&selectors.book_sel.update_info.sel)
+            .map_err(|e| format!("Failed to parse update_sel: {}", e))?;
+        let update = doc.select(&update_sel).next().map(|el| get_val(&el, None));
+
+        // all chapters link
+        let all_chapters_link_sel = Selector::parse("div.intro a#library-push")
+            .map_err(|e| format!("Failed to parse all_chapters_link_sel: {}", e))?;
+        let all_ch_link_post = doc
+            .select(&all_chapters_link_sel)
+            .next()
+            .map(|el| get_val(&el, as_opt_str(&Some("href".to_string()))))
+            .ok_or("No all_chapters_link found")?;
+        let all_ch_link = format_join(&config.url, &all_ch_link_post);
+
+        // partial book (without chapters)
+        let book = BookInfo {
+            title,
+            cover_image,
+            desc,
+            tags,
+            author,
+            r#type: None,
+            bookmarks: Some(bookmarks),
+            created: None,
+            status: Some(status),
+            update,
+            chapters: Vec::new(), // will be filled later
+        };
+
+        Ok((book, all_ch_link))
+    }
+
+    pub fn parse_chapters_from_html(
+        selectors: &Sel,
+        new_html: String,
+    ) -> Result<Vec<EachChapter>, String> {
+        let new_doc = Html::parse_document(&new_html);
+
+        let e_chapters_sel = Selector::parse(&selectors.book_sel.chapter_list.sel)
+            .map_err(|e| format!("chapter_list_sel: {}", e))?;
+        let e_ch_n_sel = Selector::parse(&selectors.book_sel.chapter_list.number.sel)
+            .map_err(|e| format!("chapter_list.number.sel: {}", e))?;
+        let e_ch_l_sel = Selector::parse(&selectors.book_sel.chapter_list.link.sel)
+            .map_err(|e| format!("chapter_list.link.sel: {}", e))?;
+
+        let mut chapters = Vec::new();
+        for e_ch in new_doc.select(&e_chapters_sel) {
+            let e_ch_n = e_ch
+                .select(&e_ch_n_sel)
+                .next()
+                .map(|el| get_direct_text(&el));
+            let e_ch_l_post = e_ch
+                .select(&e_ch_l_sel)
+                .next()
+                .map(|el| get_val(&el, as_opt_str(&selectors.book_sel.chapter_list.link.attr)))
+                .unwrap_or_default();
+            //
+            let e_ch_l = Some(format_join(&selectors.url, &e_ch_l_post));
+
+            chapters.push(EachChapter {
+                chapter_name: None,
+                chapter_number: e_ch_n.clone(),
+                chapter_link: e_ch_l.clone(),
+            });
+        }
+
+        Ok(chapters)
     }
 }

@@ -47,3 +47,13 @@ pub async fn get_book_info(
     //
     Ok(res)
 }
+
+#[command]
+pub async fn get_book_chapter(
+    link: String,
+    app: AppHandle
+) -> Result<Vec<String>,String >{
+    let mgeko =wrap_err!(Mgeko::load_all(&app), "Failed to load mgeko source")?;
+    let res = wrap_err!(mgeko.get_chapter(link).await, "Failed to get results from source")?;
+    Ok(res)
+}

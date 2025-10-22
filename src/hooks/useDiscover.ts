@@ -6,6 +6,8 @@ export const useDiscover = () => {
   const isLoading = useDiscoverStore((s) => s.isLoading);
   const error = useDiscoverStore((s) => s.error);
   const selectedBook = useDiscoverStore((s) => s.selectedBook);
+  const bookChapter = useDiscoverStore((s)=>s.bookChapter);
+  const getBookChapter =useDiscoverStore((s)=>s.getBookChapter);
   const getSelectedBookInfo = useDiscoverStore((s) => s.getSelectedBookInfo);
   const setSelectedBook = useDiscoverStore((s) => s.setSelectedBook);
   const searchBook = useDiscoverStore((s) => s.searchBook);
@@ -16,6 +18,8 @@ export const useDiscover = () => {
     chapterData,
     isLoading,
     error,
+    bookChapter,
+    getBookChapter,
     selectedBook,
     getSelectedBookInfo,
     setSelectedBook,

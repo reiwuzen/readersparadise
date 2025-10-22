@@ -68,8 +68,12 @@
     }
     .TaMenu {
       z-index: 100;
+      color: var(--bg-color);
       background-color: var(--text-color);
       padding: 50px 0 0;
+      button{
+        color: var(--bg-color);
+      }
     }
   }
 }
