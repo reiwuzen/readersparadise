@@ -168,7 +168,7 @@
     margin: 2rem auto;
     border-radius: 10px;
     background-color: var(--bg-cover-muted-color);
-    text-align: s;
+    // text-align: s;
     align-items: start;
   }
   .preloadPages {
@@ -198,7 +198,7 @@
     height: 60px;
     border-radius: 10px;
     display: flex;
-    align-items: center;
+    align-items: start;
     padding: 16px;
     background-color: var(--bg-cover-muted-color);
     justify-content: space-between;
@@ -211,6 +211,7 @@
       p {
         color: var(--muted-text-color);
         font-size: 14px;
+        text-align: start;
       }
     }
     .maxConcurrentinput {
@@ -250,6 +251,7 @@
       color: var(--muted-text-color);
       font-size: 14px;
       margin: 0; // Remove default margins
+      text-align: start;
     }
   }
   
@@ -302,6 +304,7 @@
       p {
         color: var(--muted-text-color);
         font-size: 14px;
+        text-align: start;
       }
     }
   }
@@ -385,6 +388,7 @@
       p {
         color: var(--muted-text-color);
         font-size: 14px;
+        text-align: start;
       }
     }
   }
@@ -407,6 +411,7 @@
       p {
         color: var(--muted-text-color);
         font-size: 14px;
+        text-align: start;
       }
     }
     .Timeoutinput {
