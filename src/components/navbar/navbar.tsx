@@ -106,7 +106,7 @@ const Navbar = ({ setImages }: NavbarProps) => {
           </svg>
           <h3>Settings</h3>
         </li>
-        <li
+        {/* <li
           onClick={async () => {
             try {
               const imported = await invoke<{
@@ -148,7 +148,7 @@ const Navbar = ({ setImages }: NavbarProps) => {
           </svg>
 
           <h3>Import</h3>
-        </li>
+        </li> */}
         <li
           onContextMenu={(e) => openContextMenu(e, "about")}
           onClick={() =>

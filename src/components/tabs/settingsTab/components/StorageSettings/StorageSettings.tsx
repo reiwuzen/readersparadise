@@ -39,6 +39,46 @@ const StorageSettings = () => {
           </div>
         </div>
       </div>
+      <div className="diskManagementSettings">
+        <div id="dms">
+            <div id="dms1">
+              <p>Disk Management</p>
+              <p>Manage storage space and cleanup policies</p>
+            </div>
+            <div id="dms2">
+              <p>Storage Overview</p>
+              <p>Total space</p>
+              <span>500 GB</span>
+              <p>Used space</p>
+              <span>325 GB</span>
+              <p>Available Space</p>
+              <span>175 GB</span>
+            </div>
+        </div>
+        <div className="automaticCleanup">
+          <div id="amc1">
+            <p>Automatic Cleanup</p>
+            <p>Automatically remove old files when disk space is low</p>
+            <div id="amc2">
+              <button>clear</button>
+            </div>
+          </div>
+          <div className="fileRetentionPeriod">
+            <p>File Retention Period</p>
+            <p>Delete temporary files older than this period</p>
+            <div className="frp1">
+              <select id="frp2">
+                <option>7 days</option>
+                <option>14 days</option>
+                <option>30 days</option>
+                <option>60 days</option>
+                <option>90 days</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
       <div className="downloadSettings">
         <div id="dsd1">
           <p>Download Preferences</p>

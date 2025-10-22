@@ -50,7 +50,13 @@ const TabManager = ({ images }: TabManagerProps) => {
             });
           }}
         >{`>`}</button>
-        <NetworkStatus /> 
+        <div id="appUrl">
+          <input 
+          type="url"
+          value={`/library`} />
+          
+        </div>
+        {/* <NetworkStatus />   */}
         {/* // FIXME: change the NetworkStatus to the window bar */}
         <div
           className="searchTabsBtn"
