@@ -15,6 +15,13 @@
     gap: 0.2rem;
     display: flex;
     height: 40px;
+    div#appUrl{
+      display: flex;
+      align-items: center;
+      input{
+        outline: none;
+      }
+    }
     .prevBtn,
     .nextBtn,
     .searchTabsBtn {
