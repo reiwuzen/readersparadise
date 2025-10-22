@@ -7,7 +7,7 @@ type MenuItem = {
   separator?: boolean;
   // optional, for dividers
 };
-import { TabType } from "../store/useTabsStore";
+import { TabType } from "@/store/useTabsStore";
 type MenuState = {
   x: number;
   y: number;

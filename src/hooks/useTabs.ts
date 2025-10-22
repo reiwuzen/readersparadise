@@ -1,29 +1,30 @@
-import { useTabsStore } from "../store/useTabsStore"; // path to the zustand store
-// import type { TabType, TabItem } from "../store/useTabsStore";
+import { useTabsStore } from "@/store/useTabsStore";
 
 export const useTabs = () => {
-  const tabs = useTabsStore((state) => state.tabs);
-  const recentTabs = useTabsStore((state) => state.recentTabs);
-  const openRecentTabs = useTabsStore((state)=> state.openRecentTabs);
-  const closeRecentTabs = useTabsStore((state)=> state.closeRecentTabs);
-  const activeTabId = useTabsStore((state) => state.activeTabId);
-  const addTab = useTabsStore((state) => state.addTab);
-  const closeTab = useTabsStore((state) => state.closeTab);
-  const activateTab = useTabsStore((state) => state.activateTab);
-  const setActiveTabId = useTabsStore((state) => state.setActiveTabId);
-
-  const activeTab = tabs.find((t) => t.id === activeTabId);
-
+  const activeTabId = useTabsStore((s) => s.activeTabId);
+  const tabs = useTabsStore((s) => s.tabs);
+  const recentTabs = useTabsStore((s) => s.recentTabs);
+  const timelineOfActiveTab = useTabsStore((s) => s.timelineOfActiveTab);
+  const addTab = useTabsStore((s) => s.addTab);
+  const closeTab = useTabsStore((s) => s.closeTab);
+  const switchTab = useTabsStore((s) => s.switchTab);
+  const changeTab = useTabsStore((s) => s.changeTab);
+  const openRecentTabs = useTabsStore((s) => s.openRecentTabs);
+  const closeRecentTabs = useTabsStore((s) => s.closeRecentTabs);
+  const goBack = useTabsStore((s) => s.goBack);
+  const goForward = useTabsStore((s) => s.goForward);
   return {
+    activeTabId,
     tabs,
     recentTabs,
-    openRecentTabs,
-    closeRecentTabs,
-    activeTab,
-    activeTabId,
+    timelineOfActiveTab,
     addTab,
+    changeTab,
+    closeRecentTabs,
     closeTab,
-    activateTab,
-    setActiveTabId,
+    goBack,
+    goForward,
+    switchTab,
+    openRecentTabs,
   };
 };

@@ -6,27 +6,37 @@ import Reader from "@/components/reader/Reader";
 import About from "@/components/about/About";
 import { toast } from "sonner";
 
-export type TabType = "library" | "discover" | "settings" | 'reader' | 'about' ;
-const initialActiveTabId =crypto.randomUUID();
-export type TabItem<Props = any> = {
-  id: string;
+export type TabType = "library" | "discover" | "settings" | "reader" | "about";
+
+export type TabMetaData<Props = any> = {
   name: string;
   type: TabType;
-  listed?: boolean;
+  url: string;
   tabContent: React.ComponentType<Props>;
-  tabProps?: Props;
+};
+
+export type TabItem = {
+  id: string;
+  listed: boolean;
+  activeMetaData: TabMetaData; // make activemeta data the 
+ 
+  currentIndex: number;
+  metaData: TabMetaData[];
 };
 
 type TabsState = {
   tabs: TabItem[];
   recentTabs: TabItem[];
-  openRecentTabs: (id: string) => void;
-  closeRecentTabs?: (id: string) => void;
   activeTabId: string;
+  timelineOfActiveTab: string[];
   addTab: (type: TabType) => void;
   closeTab: (id: string) => void;
-  activateTab: (tabType: TabType, tabName: string) => void;
-  setActiveTabId: (id: string) => void;
+  switchTab: (id: string) => void;
+  changeTab: (id: string, name: string, type: TabType) => void;
+  openRecentTabs: (id: string) => void;
+  closeRecentTabs: (id: string) => void;
+  goBack: (id: string) => void;
+  goForward: (id: string) => void;
 };
 
 const TAB_COMPONENTS: Record<TabType, React.ComponentType<any>> = {
@@ -38,118 +48,178 @@ const TAB_COMPONENTS: Record<TabType, React.ComponentType<any>> = {
 };
 
 export const useTabsStore = create<TabsState>((set, get) => ({
-  tabs: [
-    {
-      id: initialActiveTabId,
-      name: "Library",
-      type: "library",
-      listed: true,
-      tabContent: LibraryTab,
-    },
-  ],
+  tabs: [],
   recentTabs: [],
-  openRecentTabs: (id) => {
-    set((state) => {
-      const chosenRecentTab = state.recentTabs.find((t) => t.id === id);
-      if (!chosenRecentTab) return state;
-      const updatedChosenRecentTab = { ...chosenRecentTab, listed: true };
-      const filteredRecentTabs = state.recentTabs.filter((t) => t.id !== id);
-      return {
-        tabs: [...state.tabs, updatedChosenRecentTab],
-        recentTabs: filteredRecentTabs,
-        activeTabId: id,
+  activeTabId: "",
+  timelineOfActiveTab: [],
+
+  addTab: (type) =>
+    set((s) => {
+      const initialMeta: TabMetaData = {
+        name: type.charAt(0).toUpperCase() + type.slice(1),
+        type,
+        url: `/${type}`,
+        tabContent: TAB_COMPONENTS[type],
       };
-    });
-  },
-  closeRecentTabs: (id) => {
-    set((state) => {
-      // const chosenRecentTab = state.tabs.find((t) => t.id === id);
-      // if (!chosenRecentTab) return state;
-      // const updatedChosenTab = {...chosenRecentTab, listed: false};
-      const filteredRecentTabs = state.recentTabs.filter((t) => t.id !== id);
-      if (!filteredRecentTabs) return state;
-      return {
-        recentTabs: filteredRecentTabs,
+
+      const tab: TabItem = {
+        id: crypto.randomUUID(),
+        listed: true,
+        currentIndex: 0,
+        activeMetaData: initialMeta,
+        metaData: [initialMeta],
       };
-    });
-  },
-  activeTabId: initialActiveTabId,
 
-  addTab: (type) => {
-    const newId = crypto.randomUUID();
+      return {
+        ...s,
+        activeTabId: tab.id,
+        tabs: [...s.tabs, tab],
+        timelineOfActiveTab: [...s.timelineOfActiveTab, tab.id],
+      };
+    }),
 
-    let defaultProps: Record<string, any> = {};
-    switch (type) {
-      case "discover":
-        defaultProps = {
-          innerTabId: newId,
-          qActive: true,
-          qListed: true,
-        };
-        break;
-    }
+  closeTab: (id) =>
+    set((s) => {
+      const tab = s.tabs.find((t) => t.id === id);
+      if (!tab) return s;
 
-    const newTab: TabItem = {
-      id: newId,
-      name: type[0].toUpperCase() + type.slice(1),
-      type,
-      listed: true,
-      tabContent: TAB_COMPONENTS[type],
-    };
+      const recentTab = { ...tab, listed: false };
+      const newTabs = s.tabs.filter((t) => t.id !== id);
+      const newTimeline = s.timelineOfActiveTab.filter((i) => i !== id);
+      const newActive = newTimeline.length
+        ? newTimeline[newTimeline.length - 1]
+        : "";
 
-    set((state) => ({
-      tabs: [...state.tabs, newTab],
-      activeTabId: newId,
-    }));
-  },
+      return {
+        ...s,
+        tabs: newTabs,
+        recentTabs: [...s.recentTabs, recentTab],
+        timelineOfActiveTab: newTimeline,
+        activeTabId: newActive,
+      };
+    }),
 
-  closeTab: (id) => {
-    set((state) => {
-      // if (state.tabs.length === 1) return state;
-
-      const closedTab = state.tabs.find((t) => t.id === id);
-      if (!closedTab) return state;
-
-      // mark it unlisted
-      const updatedClosedTab = { ...closedTab, listed: false };
-
-      // filter it out of open tabs
-      const filtered = state.tabs.filter((t) => t.id !== id);
-
-      // push into recentTabs
-      const updatedRecent = [...state.recentTabs, updatedClosedTab];
-
-      let newActiveId = state.activeTabId;
-      if (state.activeTabId === id && filtered.length > 0) {
-        newActiveId = filtered[filtered.length - 1].id;
+  switchTab: (id) =>
+    set((s) => {
+      const tab = s.tabs.find((t) => t.id === id);
+      if (!tab) {
+        toast.error("Tab not found");
+        return s;
       }
-
       return {
-        tabs: filtered,
-        activeTabId: newActiveId,
-        recentTabs: updatedRecent,
+        ...s,
+        activeTabId: id,
+        timelineOfActiveTab: [...s.timelineOfActiveTab, id],
       };
-    });
-  },
+    }),
 
-  activateTab: (tabType, tabName) => {
-    // toast(`${tabType} && ${tabName}`)
-    set((state) => ({
-      tabs: state.tabs.map((t) =>
-        t.id === state.activeTabId
+  changeTab: (id, name, type) =>
+    set((s) => {
+      const tabs = s.tabs.map((t) =>
+        t.id === id
           ? {
               ...t,
-              type: tabType,
-              name: tabName,
-              tabContent: TAB_COMPONENTS[tabType],
-              tabProps:
-                 t.tabProps ?? {},
+              currentIndex: t.currentIndex + 1,
+              metaData: [
+                ...t.metaData,
+                {
+                  name,
+                  type,
+                  url: `/${type}`,
+                  tabContent: TAB_COMPONENTS[type],
+                },
+              ],
+              activeMetaData: {
+                name,
+                type,
+                url: `/${type}`,
+                tabContent: TAB_COMPONENTS[type],
+              },
             }
           : t
-      ),
-    }));
-    // console.log("from activate tab")
-  },
+      );
+      return { ...s, tabs };
+    }),
 
-  setActiveTabId: (id) => set({ activeTabId: id }),
+  openRecentTabs: (id) =>
+    set((s) => {
+      const recentTab = s.recentTabs.find((rt) => rt.id === id);
+      if (!recentTab) {
+        toast.error("Recent tab not found");
+        return s;
+      }
+
+      if (s.tabs.some((t) => t.id === id)) {
+        toast.info("Tab already open");
+        return s;
+      }
+
+      const tab = { ...recentTab, listed: true };
+      const newRecentTabs = s.recentTabs.filter((rt) => rt.id !== id);
+
+      return {
+        ...s,
+        tabs: [...s.tabs, tab],
+        recentTabs: newRecentTabs,
+        activeTabId: id,
+        timelineOfActiveTab: [...s.timelineOfActiveTab, id],
+      };
+    }),
+
+  closeRecentTabs: (id) =>
+    set((s) => ({
+      ...s,
+      recentTabs: s.recentTabs.filter((rt) => rt.id !== id),
+    })),
+
+  goBack: (id) =>
+    set((s) => {
+      const tab = s.tabs.find((t) => t.id === id);
+      if (!tab) return s;
+
+      if (tab.currentIndex === 0) {
+        toast.info("Already at the first state");
+        return s;
+      }
+
+      const newIndex = tab.currentIndex - 1;
+      const updatedTab: TabItem = {
+        ...tab,
+        currentIndex: newIndex,
+        activeMetaData: tab.metaData[newIndex],
+      };
+
+      toast.info(`Went back to "${tab.metaData[newIndex].name}"`);
+
+      return {
+        ...s,
+        tabs: s.tabs.map((t) => (t.id === id ? updatedTab : t)),
+      };
+    }),
+
+  goForward: (id) =>
+    set((s) => {
+      const tab = s.tabs.find((t) => t.id === id);
+      if (!tab) return s;
+
+      const maxIndex = tab.metaData.length - 1;
+      if (tab.currentIndex >= maxIndex) {
+        toast.info("Already at the latest state");
+        return s;
+      }
+
+      const newIndex = tab.currentIndex + 1;
+      const updatedTab: TabItem = {
+        ...tab,
+        currentIndex: newIndex,
+        activeMetaData: tab.metaData[newIndex],
+      };
+
+      toast.info(`Went forward to "${tab.metaData[newIndex].name}"`);
+
+      return {
+        ...s,
+        tabs: s.tabs.map((t) => (t.id === id ? updatedTab : t)),
+      };
+    }),
 }));

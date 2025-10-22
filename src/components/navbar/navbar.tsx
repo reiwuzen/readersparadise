@@ -7,12 +7,14 @@ import { useTabs } from "../../hooks/useTabs";
 import { useImport } from "@/hooks/useImport";
 import { toast } from "sonner";
 import { invoke } from "@tauri-apps/api/core";
+import { useActiveTab } from "@/hooks/useActiveTab";
 type NavbarProps = {
   setImages: React.Dispatch<React.SetStateAction<ImageFile[]>>;
 };
 const Navbar = ({ setImages }: NavbarProps) => {
   const { importMangaFolder } = useImport();
-  const { activateTab, tabs, addTab } = useTabs();
+  const {activeTabId, activeMetaData} = useActiveTab();
+  const { changeTab, tabs, addTab } = useTabs();
   const [loggedIn, setLoggedIn] = useState<Boolean>(false);
   const { openContextMenu, renderContextMenu } = useContextMenu();
   return (
@@ -21,7 +23,7 @@ const Navbar = ({ setImages }: NavbarProps) => {
         <li
           onClick={() => {
             tabs.length !== 0
-              ? activateTab("library", "Library")
+              ? changeTab(activeTabId, "Library","library",)
               : addTab("library");
           }}
           onContextMenu={(e) => openContextMenu(e, "library")}
@@ -43,7 +45,7 @@ const Navbar = ({ setImages }: NavbarProps) => {
         <li
           onClick={() => {
             tabs.length !== 0
-              ? activateTab("discover", "Discover")
+              ? changeTab(activeTabId,"Discover","discover",)
               : addTab("discover");
           }}
           onContextMenu={(e) => openContextMenu(e, "discover")}
@@ -66,7 +68,7 @@ const Navbar = ({ setImages }: NavbarProps) => {
         <li
           onClick={() => {
             tabs.length !== 0
-              ? activateTab("settings", "Settings")
+              ? changeTab(activeTabId, "Settings","settings",)
               : addTab("settings");
           }}
           onContextMenu={(e) => openContextMenu(e, "settings")}
@@ -124,7 +126,7 @@ const Navbar = ({ setImages }: NavbarProps) => {
             }
             // await importMangaFolder();
             tabs.length !== 0
-              ? activateTab("library", "Library")
+              ? changeTab("library", "Library")
               : addTab("library");
           }}
           onContextMenu={(e) => openContextMenu(e, "library")}
@@ -152,7 +154,7 @@ const Navbar = ({ setImages }: NavbarProps) => {
         <li
           onContextMenu={(e) => openContextMenu(e, "about")}
           onClick={() =>
-            tabs.length !== 0 ? activateTab("about", "About") : addTab("about")
+            tabs.length !== 0 ? changeTab(activeTabId, "About","about") : addTab("about")
           }
         >
           <svg
