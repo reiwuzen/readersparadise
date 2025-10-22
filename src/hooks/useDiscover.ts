@@ -11,7 +11,6 @@ export const useDiscover = () => {
   const getSelectedBookInfo = useDiscoverStore((s) => s.getSelectedBookInfo);
   const setSelectedBook = useDiscoverStore((s) => s.setSelectedBook);
   const searchBook = useDiscoverStore((s) => s.searchBook);
-  const fetchChapterImages = useDiscoverStore((s) => s.fetchChapterImages);
   const clearResults = useDiscoverStore((s) => s.clearResults);
   return {
     searchResults,
@@ -24,7 +23,7 @@ export const useDiscover = () => {
     getSelectedBookInfo,
     setSelectedBook,
     searchBook,
-    fetchChapterImages,
+
     clearResults,
   };
 };

@@ -39,6 +39,8 @@ export interface ChapterImageResult {
 }
 
 interface DiscoverState {
+  sVal: string;
+  setSVal: (inp: string)=>void;
   searchResults: SearchResult[];
   chapterData: ChapterImageResult | null;
   isLoading: boolean;
@@ -51,11 +53,15 @@ interface DiscoverState {
   getBookChapter: (link: string, ch_no:string) => void;
 
   searchBook: (query: string) => Promise<void>;
-  fetchChapterImages: (url: string, source_name: string) => Promise<void>;
+  // fetchChapterImages: (url: string, source_name: string) => Promise<void>;
   clearResults: () => void;
 }
 
 export const useDiscoverStore = create<DiscoverState>((set) => ({
+  sVal: "",
+  setSVal:(inp)=> set({
+    sVal:inp
+  }),
   searchResults: [],
   chapterData: null,
   isLoading: false,
@@ -101,22 +107,7 @@ export const useDiscoverStore = create<DiscoverState>((set) => ({
       })
   },
   // Fetch chapters and cache images locally
-  fetchChapterImages: async (url, source_name) => {
-    set({ isLoading: true, error: null });
-    try {
-      const result = await invoke<ChapterImageResult>("fetch_chapter_images", {
-        url,
-        sourceName: source_name,
-      });
-      set({ chapterData: result, isLoading: false });
-    } catch (err: any) {
-      set({
-        error: err?.message || "Failed to fetch chapter images",
-        isLoading: false,
-      });
-      console.error("fetchChapterImages error:", err);
-    }
-  },
+  
 
   // Reset results
   clearResults: () =>

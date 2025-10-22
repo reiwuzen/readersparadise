@@ -13,13 +13,17 @@ export type TabMetaData<Props = any> = {
   type: TabType;
   url: string;
   tabContent: React.ComponentType<Props>;
+  optional?: {
+    sVal: string;
+    tabSubContent?: React.ComponentType<Props>;
+  };
 };
 
 export type TabItem = {
   id: string;
   listed: boolean;
-  activeMetaData: TabMetaData; // make activemeta data the 
- 
+  activeMetaData: TabMetaData; // make activemeta data the
+
   currentIndex: number;
   metaData: TabMetaData[];
 };
@@ -29,6 +33,8 @@ type TabsState = {
   recentTabs: TabItem[];
   activeTabId: string;
   timelineOfActiveTab: string[];
+  setTimelineOfActiveTab: (id: string, m: "a" | "r") => void;
+  setNewMetaData: (id: string, name: string, url: string) => void;
   addTab: (type: TabType) => void;
   closeTab: (id: string) => void;
   switchTab: (id: string) => void;
@@ -52,8 +58,62 @@ export const useTabsStore = create<TabsState>((set, get) => ({
   recentTabs: [],
   activeTabId: "",
   timelineOfActiveTab: [],
+  setTimelineOfActiveTab: (id, m) =>
+    set((s) => {
+      const newTimeline = s.timelineOfActiveTab.filter((nt) => nt !== id);
+      if (m === "a") return { ...s, timelineOfActiveTab: [...newTimeline, id] };
+      if (m === "r") return { ...s, timelineOfActiveTab: newTimeline };
+      return s; // fallback
+    }),
+  setNewMetaData: (id, name, url, comp?: React.ComponentType<any>) =>
+    set((s) => {
+      const tabs = s.tabs.map((t) => {
+        if (t.id !== id) return t;
 
-  addTab: (type) =>
+        const h = () => {
+          if (
+            t.activeMetaData.optional !== null &&
+            t.activeMetaData.optional !== undefined
+          ) {
+            return {
+              ...t.activeMetaData,
+              name,
+              url,
+              optional: {
+                sVal: t.activeMetaData.optional.sVal ?? "",
+                tabSubContent: comp,
+              },
+            };
+          } else {
+            return {
+              ...t.activeMetaData,
+              name,
+              url,
+            };
+          }
+        };
+        // Create new metadata object
+        const newMeta = h();
+        // Append it to the metaData array
+        const newMetaDataArr = [...t.metaData, newMeta];
+
+        return {
+          ...t,
+          activeMetaData: newMeta,
+          metaData: newMetaDataArr,
+          currentIndex: newMetaDataArr.length - 1, // set newMeta as current
+        };
+      });
+
+      return { ...s, tabs };
+    }),
+  addTab: (type) => {
+    const tabId = crypto.randomUUID();
+
+    // First update timeline using existing action
+    get().setTimelineOfActiveTab(tabId, "a");
+
+    // Then create the tab in a separate set()
     set((s) => {
       const initialMeta: TabMetaData = {
         name: type.charAt(0).toUpperCase() + type.slice(1),
@@ -63,7 +123,7 @@ export const useTabsStore = create<TabsState>((set, get) => ({
       };
 
       const tab: TabItem = {
-        id: crypto.randomUUID(),
+        id: tabId,
         listed: true,
         currentIndex: 0,
         activeMetaData: initialMeta,
@@ -74,30 +134,35 @@ export const useTabsStore = create<TabsState>((set, get) => ({
         ...s,
         activeTabId: tab.id,
         tabs: [...s.tabs, tab],
-        timelineOfActiveTab: [...s.timelineOfActiveTab, tab.id],
       };
-    }),
+    });
+  },
 
-  closeTab: (id) =>
+  closeTab: (id) => {
+    // First remove from timeline safely
+    get().setTimelineOfActiveTab(id, "r");
+
+    // Then update tabs
     set((s) => {
       const tab = s.tabs.find((t) => t.id === id);
       if (!tab) return s;
 
       const recentTab = { ...tab, listed: false };
       const newTabs = s.tabs.filter((t) => t.id !== id);
-      const newTimeline = s.timelineOfActiveTab.filter((i) => i !== id);
-      const newActive = newTimeline.length
-        ? newTimeline[newTimeline.length - 1]
-        : "";
+
+      const newActive =
+        s.timelineOfActiveTab.length > 0
+          ? s.timelineOfActiveTab[s.timelineOfActiveTab.length - 1]
+          : "";
 
       return {
         ...s,
         tabs: newTabs,
         recentTabs: [...s.recentTabs, recentTab],
-        timelineOfActiveTab: newTimeline,
         activeTabId: newActive,
       };
-    }),
+    });
+  },
 
   switchTab: (id) =>
     set((s) => {

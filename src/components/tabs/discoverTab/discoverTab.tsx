@@ -1,35 +1,45 @@
 import "./discoverTab.scss";
 import AccessoryMenu from "@/components/accessoryMenu/accessoryMenu";
 import { useEffect, useState } from "react";
+import { useActiveTab } from "@/hooks/useActiveTab";
 import { useDiscoverStore } from "@/store/useDiscoverStore";
 import BookSearch from "@/components/books/bookSearch/bookSearch";
 import BookInfo from "@/components/books/bookInfo/bookInfo";
 import BookChapter from "@/components/books/bookChapter/bookChapter";
 
 const DiscoverTab = () => {
-  const {
-    searchBook,
-    fetchChapterImages,
-    clearResults,
-    selectedBook,
-    bookChapter,
-  } = useDiscoverStore();
+  const { searchBook, clearResults, selectedBook, bookChapter } = useDiscoverStore();
+  const { activeMetaData, setNewMetaData } = useActiveTab();
 
-  const [sVal, setSVal] = useState<string>("");
+  // Local state while typing
+  const [localSVal, setLocalSVal] = useState<string>(activeMetaData?.optional?.sVal ?? "");
 
-  // 🔍 Debounced search
+  // Debounced effect: update metadata and perform search after user stops typing
   useEffect(() => {
-    const timeout = setTimeout(async () => {
-      if (sVal.trim()) {
-        await searchBook(sVal);
-        console.log(useDiscoverStore.getState().searchResults);
+  const timeout = setTimeout(async () => {
+    if (!activeMetaData) return;
+    const x = ():string=>{
+      if(localSVal.length !== 0){
+        return `/discover?search=${localSVal}`
       } else {
-        clearResults();
+        return `/discover`
       }
-    }, 300);
+    }
+    setNewMetaData(
+      activeMetaData.name ?? "Discover",
+      x(),
+      { sVal: localSVal }
+    );
 
-    return () => clearTimeout(timeout);
-  }, [sVal]);
+    if (localSVal.trim()) {
+      await searchBook(localSVal);
+    } else {
+      clearResults();
+    }
+  }, 300);
+
+  return () => clearTimeout(timeout);
+}, [localSVal]);
 
   return (
     <div className="discoverTab">
@@ -40,11 +50,11 @@ const DiscoverTab = () => {
             type="search"
             id="searchBar"
             placeholder="Search here..."
-            onInput={(e) => setSVal(e.currentTarget.value.trimStart())}
-            value={sVal}
+            value={localSVal}
+            onInput={(e) => setLocalSVal(e.currentTarget.value.trimStart())}
           />
-          {sVal && (
-            <button className="clear-btn" onClick={() => setSVal("")}>
+          {localSVal && (
+            <button className="clear-btn" onClick={() => setLocalSVal("")}>
               clear
             </button>
           )}
@@ -59,7 +69,7 @@ const DiscoverTab = () => {
         ) : selectedBook ? (
           <BookInfo />
         ) : (
-          <BookSearch sVal={sVal} />
+          <BookSearch sVal={localSVal} />
         )}
       </div>
     </div>

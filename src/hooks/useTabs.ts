@@ -5,6 +5,7 @@ export const useTabs = () => {
   const tabs = useTabsStore((s) => s.tabs);
   const recentTabs = useTabsStore((s) => s.recentTabs);
   const timelineOfActiveTab = useTabsStore((s) => s.timelineOfActiveTab);
+  const setNewMetaData =useTabsStore((s)=>s.setNewMetaData);
   const addTab = useTabsStore((s) => s.addTab);
   const closeTab = useTabsStore((s) => s.closeTab);
   const switchTab = useTabsStore((s) => s.switchTab);
@@ -18,6 +19,7 @@ export const useTabs = () => {
     tabs,
     recentTabs,
     timelineOfActiveTab,
+    setNewMetaData,
     addTab,
     changeTab,
     closeRecentTabs,
