@@ -1,0 +1,91 @@
+[
+  {
+    "ManhuaPlus": {
+      "name": "ManhuaPlus",
+      "options": ["tags", "bookName"],
+      "is_nsfw": false,
+      "is_selected": true,
+      "type": "dynamic",
+      "url": "https://manhuaplus.org/",
+      "starts": ["https://manhuaplus.org/manga/"],
+      "search_pattern": "https://manhuaplus.org/search?keyword={query}",
+      "search_selectors": {
+        "main_div_selectors": "div.grid.gtc-f141a.gg-20.p-13.mh-77vh>div",
+        "title_selector": {
+          "selector": "div.text-center a.clamp.toe.oh.block.fs-15.lh-20.yt8m.ck.fw-600",
+          "alt_selector": "div.b-img a.block",
+          "attr": "title"
+        },
+        "link_selector": {
+          "selector": "div.b-img a.block",
+          "attr": "href"
+        },
+        "latest_chpater_selector": {
+          "selector": "div.grid.gtc-f141a.gg-20.p-13.mh-77vh>div a.clamp.toe.oh",
+          "link_attr": "href"
+        },
+        "cover_image_selector": {
+          "selector": "div.grid.gtc-f141a.gg-20.p-13.mh-77vh>div div.b-img a img.lazy",
+          "attr": "data-src"
+        }
+      },
+      "info_selectors": {
+        "author_selector": {
+          "selector": "div.y6x11p span.dt a"
+        },
+        "cover_image_selector": {
+          "selector": "img.full.r2.md-w120",
+          "attr": "src"
+        },
+        "status_selector": {
+          "selector": "div.y6x11p span.dt"
+        },
+        "type_selector": {
+          "selector": "div.y6x11p span.dt"
+        },
+        "bookmarks_selector": {
+          "selector": "div.y6x11p span.dt"
+        },
+        "created_selector": {
+          "selector": "div.y6x11p span.dt"
+        },
+        "update_selector": {
+          "selector": "div.y6x11p span.dt"
+        },
+        "title_selector": {
+          "selector": "h1.mt-0.mb-6.fs-20",
+          "link": ""
+        },
+        "desc_selector": {
+          "selector": "article div#syn-target"
+        },
+        "chapters_selector": {
+          "selector": "div.bc-fff.s1.r2.p-13 ul li.chapter a",
+          "attr": "href",
+          "time_selector": {
+            "selector": "div.bc-fff.s1.r2.p-13 ul li.chapter time",
+            "attr": "datetime"
+          }
+        },
+        "tags_selector": {
+          "selector": "a.label.mr-7.mb-6.fs-13.r4.i-block",
+          "link": ""
+        }
+      },
+      "each_chapter_selectors": {
+        "chapter_id": "html",
+        "chapter_api": "https://manhuaplus.org/ajax/image/list/chap/{CHAPTER_ID}"
+      },
+      "chapter_number_regex": "Chapter (\\d+)",
+
+      "chapter_api": "https://manhuaplus.org/ajax/image/list/chap/{CHAPTER_ID}",
+      "chapter_api_method": "POST",
+      "chapter_id_regex": "const\\s+CHAPTER_ID\\s*=\\s*(\\d+);",
+      "response_type": "html_json",
+      "response_html_field": "html",
+      "image_list_selector": "img",
+      "image_attr_list": ["data-src", "src"],
+      "max_pages": 50
+    }
+  }
+]

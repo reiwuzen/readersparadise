@@ -1,0 +1,10 @@
+{
+  "name": "Mgeko",
+  "url": "https://www.mgeko.cc/",
+  "search_url": "https://www.mgeko.cc/search/?search={query}",
+  "is_selected": true,
+  "is_nsfw": false,
+  "is_main": false,
+  "is_fav": false,
+  "is_all": true
+}

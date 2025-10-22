@@ -1,4 +1,5 @@
 // src/models/source.rs
+use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 //elemental structs
@@ -48,7 +49,7 @@ pub struct EachChapterSelectors {
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct Source {
+pub struct Selectors {
     pub name: String,
     pub options: Vec<String>,
     pub is_nsfw: bool,
@@ -105,4 +106,29 @@ pub struct BookInfo{
     pub update: Option<String>,
     pub chapters: Vec<EachChapter>,
     pub tags: Vec<String>
+}
+
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct Source{
+    pub name: String,
+    pub url: String,
+    pub search_url: String,
+    pub is_selected: bool,
+    pub is_nsfw: bool,
+    pub is_main: bool,
+    pub is_fav: bool,
+    pub is_all: bool,
+}
+
+pub type Sources = HashMap<String, Source>;
+
+
+//traits
+pub trait F {
+    fn is_selected(&self) -> bool;
+    fn is_nsfw(&self) -> bool;
+    fn is_main(&self) -> bool;
+    fn is_fav(&self) -> bool;
+    fn is_all(&self) -> bool;
 }

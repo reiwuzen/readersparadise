@@ -1,0 +1,75 @@
+{
+  "name": "Mgeko",
+  "url": "https://www.mgeko.cc/",
+  "search_url": "https://www.mgeko.cc/search/?search={query}",
+  "search_sel": {
+    "main_sel": "ul.novel-list.grid.col.col2 > li.novel-item",
+    "link_sel": {
+      "sel": "ul.novel-list.grid.col.col2 > li.novel-item >a",
+      "attr": "href"
+    },
+    "title_sel": {
+      "sel": "ul.novel-list.grid.col.col2 > li.novel-item h4.novel-title",
+      "attr": ""
+    },
+    "cover_img_sel": {
+      "sel": "ul.novel-list.grid.col.col2 > li.novel-item div.cover-wrap figure.novel-cover img.lazy",
+      "attr": "data-src"
+    },
+    "authors_sel": {
+      "sel": "ul.novel-list.grid.col.col2 > li.novel-item h6.text1row",
+      "attr": ""
+    },
+    "stats_sel": {
+      "sel": "ul.novel-list.grid.col.col2 > li.novel-item div.novel-stats",
+      "latest_chapter_sel": {
+        "sel": "ul.novel-list.grid.col.col2 > li.novel-item div.novel-stats strong"
+      },
+      "update_sel": {
+        "sel": "ul.novel-list.grid.col.col2 > li.novel-item div.novel-stats span"
+      }
+    }
+  },
+  "book_sel": {
+    "cover_img_sel": {
+      "sel": "div.fixed-img figure.cover img.lazy",
+      "attr": "data-src"
+    },
+    "title_sel": {
+      "sel": "div.novel-info div.main-head h1.novel-title",
+      "atl_title_sel": {
+        "sel": "div.novel-info div.main-head h2.alternative-title"
+      }
+    },
+    "author_sel": {
+      "sel": "div.novel-info div.main-head div.author a.property-item span"
+    },
+    "stats": {
+        "sel": "div.novel-info div.header-stats span",
+      "latest_chapter_sel": {
+        "sel": "div.novel-info div.header-stats span"
+      }
+
+    },
+    "update_info":{
+        "sel": "div.novel-info div.updinfo strong"
+    },
+    "categories":{
+        "sel": "div.novel-info div.categories ul li a.property-item"
+    },
+    "desc": {
+        "sel": "div.novel-body section#info p.description"
+    },
+    "chapter_list":{
+        "sel": "ul.chapter-list li",
+        "link":{
+            "sel": "a",
+            "attr": "href"
+        },
+        "number":{
+            "sel": "a strong",
+            "update": "a time"
+        }
+    }
+  }
+}

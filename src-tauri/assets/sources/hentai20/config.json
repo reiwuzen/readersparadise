@@ -1,0 +1,10 @@
+{
+    "name": "Hentai20",
+    "url": "https://hentai20.io/",
+    "search_url" : "",
+    "is_selected" : false,
+    "is_nsfw": true,
+    "is_main": false,
+    "is_fav": false,
+    "is_all" : true
+  }

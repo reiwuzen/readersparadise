@@ -4,10 +4,16 @@ import { useEffect, useState } from "react";
 import { useDiscoverStore } from "@/store/useDiscoverStore";
 import BookSearch from "@/components/books/bookSearch/bookSearch";
 import BookInfo from "@/components/books/bookInfo/bookInfo";
+import BookChapter from "@/components/books/bookChapter/bookChapter";
 
 const DiscoverTab = () => {
-  const { searchBook, fetchChapterImages, clearResults, selectedBook } =
-    useDiscoverStore();
+  const {
+    searchBook,
+    fetchChapterImages,
+    clearResults,
+    selectedBook,
+    bookChapter,
+  } = useDiscoverStore();
 
   const [sVal, setSVal] = useState<string>("");
 
@@ -48,7 +54,13 @@ const DiscoverTab = () => {
 
       {/* === Main Content === */}
       <div className="mainDiscoverTab">
-        {selectedBook ? <BookInfo /> : <BookSearch sVal={sVal} />}
+        {bookChapter ? (
+          <BookChapter />
+        ) : selectedBook ? (
+          <BookInfo />
+        ) : (
+          <BookSearch sVal={sVal} />
+        )}
       </div>
     </div>
   );
