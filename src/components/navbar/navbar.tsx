@@ -8,10 +8,8 @@ import { useImport } from "@/hooks/useImport";
 import { toast } from "sonner";
 import { invoke } from "@tauri-apps/api/core";
 import { useActiveTab } from "@/hooks/useActiveTab";
-type NavbarProps = {
-  setImages: React.Dispatch<React.SetStateAction<ImageFile[]>>;
-};
-const Navbar = ({ setImages }: NavbarProps) => {
+
+const Navbar = () => {
   const { importMangaFolder } = useImport();
   const {activeTabId, activeMetaData} = useActiveTab();
   const { changeTab, tabs, addTab } = useTabs();
@@ -23,7 +21,7 @@ const Navbar = ({ setImages }: NavbarProps) => {
         <li
           onClick={() => {
             tabs.length !== 0
-              ? changeTab(activeTabId, "Library","library",)
+              ? changeTab(activeTabId, "Library","library","")
               : addTab("library");
           }}
           onContextMenu={(e) => openContextMenu(e, "library")}
@@ -45,7 +43,7 @@ const Navbar = ({ setImages }: NavbarProps) => {
         <li
           onClick={() => {
             tabs.length !== 0
-              ? changeTab(activeTabId,"Discover","discover",)
+              ? changeTab(activeTabId,"Discover","discover","")
               : addTab("discover");
           }}
           onContextMenu={(e) => openContextMenu(e, "discover")}
@@ -68,7 +66,7 @@ const Navbar = ({ setImages }: NavbarProps) => {
         <li
           onClick={() => {
             tabs.length !== 0
-              ? changeTab(activeTabId, "Settings","settings",)
+              ? changeTab(activeTabId, "Settings","settings","")
               : addTab("settings");
           }}
           onContextMenu={(e) => openContextMenu(e, "settings")}
@@ -154,7 +152,7 @@ const Navbar = ({ setImages }: NavbarProps) => {
         <li
           onContextMenu={(e) => openContextMenu(e, "about")}
           onClick={() =>
-            tabs.length !== 0 ? changeTab(activeTabId, "About","about") : addTab("about")
+            tabs.length !== 0 ? changeTab(activeTabId, "About","about","") : addTab("about")
           }
         >
           <svg
