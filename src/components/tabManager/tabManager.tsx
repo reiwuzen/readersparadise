@@ -4,14 +4,11 @@ import { useActiveTab } from "@/hooks/useActiveTab";
 import { useSearchTabs } from "@/hooks/useSearchTabs";
 import Tab from "./components/tab/tab";
 import InnerSearchTabs from "@/components/InnerSearchTabs/InnerSearchTabs";
-import { ImageFile } from "../../../helper/fs";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 
-type TabManagerProps = {
-  images: ImageFile[];
-};
 
-const TabManager = ({ images }: TabManagerProps) => {
+
+const TabManager = () => {
   const {
     tabs,
     recentTabs,

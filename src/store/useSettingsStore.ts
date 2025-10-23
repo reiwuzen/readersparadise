@@ -1,5 +1,5 @@
 import { create } from "zustand";
-
+import { useTabs } from "@/hooks/useTabs";
 import GeneralSettings from "@/components/tabs/settingsTab/components/GeneralSettings/GeneralSettings";
 import StorageSettings from "@/components/tabs/settingsTab/components/StorageSettings/StorageSettings";
 import SourcesSettings from "@/components/tabs/settingsTab/components/SourcesSettings/SourcesSettings";
@@ -10,6 +10,7 @@ import DeveloperSettings from "@/components/tabs/settingsTab/components/Develope
 import PrivacySettings from "@/components/tabs/settingsTab/components/PrivacySettings/PrivacySettings";
 import BackupSettings from "@/components/tabs/settingsTab/components/BackupSettings/BackupSettings";
 import AdvancedSettings from "@/components/tabs/settingsTab/components/AdvancedSettings/AdvancedSettings";
+import { useData } from "@/hooks/useData";
 
 // ---- Types ---- //
 export type SettingsItemName =
@@ -44,6 +45,9 @@ const colorMap: Record<themeType, readerBGColor> = {
   system: "dark",
 };
 export type SettingsState = {
+
+  appPath: string;
+  setAppPath: (i: string) => void;
   items: SettingsItem[];
   setItemActive: (itemId: ItemId) => void;
 
@@ -88,9 +92,17 @@ const SETTINGS_ITEMS_COMPONENTS: Record<
   "Backup And Restore": BackupSettings,
   Advanced: AdvancedSettings,
 };
-
+const setPath = () => {
+  const {getAppPath} = useData();
+  let path = getAppPath
+  return path
+}
 // ---- Zustand Store ---- //
 export const useSettingsStore = create<SettingsState>((set, get) => ({
+  appPath: ``,
+  setAppPath:(i) => set({
+    appPath:i
+  }),
   items: Object.entries(SETTINGS_ITEMS_COMPONENTS).map(
     ([title, content], index) => ({
       title: title as SettingsItemName,

@@ -1,5 +1,8 @@
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { app } from "@tauri-apps/api";
 export const useSettings = () => {
+    const appPath = useSettingsStore((s)=>s.appPath);
+    const setAppPath =useSettingsStore((s)=>s.setAppPath);
     const items = useSettingsStore((state) => state.items);
     const setItemActive = useSettingsStore((state) => state.setItemActive);
     const theme = useSettingsStore((state) => state.theme);
@@ -21,6 +24,8 @@ export const useSettings = () => {
     const setLibraryPath = useSettingsStore((state) => state.setLibraryPath);
     const activeItem = items.find((item) => item.isItemActive);
     return {
+        appPath,
+        setAppPath,
         items,
         setItemActive,
         theme,
