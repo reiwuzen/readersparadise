@@ -9,6 +9,7 @@ export const useDiscover = () => {
   const bookChapter = useDiscoverStore((s)=>s.bookChapter);
   const getBookChapter =useDiscoverStore((s)=>s.getBookChapter);
   const getSelectedBookInfo = useDiscoverStore((s) => s.getSelectedBookInfo);
+  const setBookChapter = useDiscoverStore((s)=>s.setBookChapter);
   const setSelectedBook = useDiscoverStore((s) => s.setSelectedBook);
   const searchBook = useDiscoverStore((s) => s.searchBook);
   const clearResults = useDiscoverStore((s) => s.clearResults);
@@ -20,6 +21,7 @@ export const useDiscover = () => {
     bookChapter,
     getBookChapter,
     selectedBook,
+    setBookChapter,
     getSelectedBookInfo,
     setSelectedBook,
     searchBook,

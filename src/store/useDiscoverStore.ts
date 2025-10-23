@@ -16,7 +16,7 @@ export type EachChapter = {
   chapter_link: string | null;
 };
 export type BookChapter = {
-  urls:string[];
+  urls: string[];
   ch_no: string;
 };
 export type BookInfo = {
@@ -40,17 +40,18 @@ export interface ChapterImageResult {
 
 interface DiscoverState {
   sVal: string;
-  setSVal: (inp: string)=>void;
+  setSVal: (inp: string) => void;
   searchResults: SearchResult[];
   chapterData: ChapterImageResult | null;
   isLoading: boolean;
   error: string | null;
   selectedBook: BookInfo | null;
   getSelectedBookInfo: (link: string, sourceName: string) => void;
-  setSelectedBook: (inp: BookInfo) => void;
+  setSelectedBook: (inp: BookInfo | null) => void;
 
   bookChapter: BookChapter | null;
-  getBookChapter: (link: string, ch_no:string) => void;
+  getBookChapter: (link: string, ch_no: string) => void;
+  setBookChapter: (inp:BookChapter|null)=>void;
 
   searchBook: (query: string) => Promise<void>;
   // fetchChapterImages: (url: string, source_name: string) => Promise<void>;
@@ -59,9 +60,10 @@ interface DiscoverState {
 
 export const useDiscoverStore = create<DiscoverState>((set) => ({
   sVal: "",
-  setSVal:(inp)=> set({
-    sVal:inp
-  }),
+  setSVal: (inp) =>
+    set({
+      sVal: inp,
+    }),
   searchResults: [],
   chapterData: null,
   isLoading: false,
@@ -77,10 +79,11 @@ export const useDiscoverStore = create<DiscoverState>((set) => ({
       selectedBook: res,
     });
   },
-  setSelectedBook: (inp) =>
+  setSelectedBook: (inp) => {
     set({
       selectedBook: inp,
-    }),
+    });
+  },
 
   // Search across all sources
   searchBook: async (query) => {
@@ -99,15 +102,17 @@ export const useDiscoverStore = create<DiscoverState>((set) => ({
     }
   },
   getBookChapter: async (link, ch_no) => {
-      let res = await invoke<BookChapter["urls"]>("get_book_chapter", {
-        link
-      });
-      set({
-        bookChapter: {urls:res, ch_no}
-      })
+    let res = await invoke<BookChapter["urls"]>("get_book_chapter", {
+      link,
+    });
+    set({
+      bookChapter: { urls: res, ch_no },
+    });
   },
+  setBookChapter:(inp)=> set({
+    bookChapter: inp
+  }),
   // Fetch chapters and cache images locally
-  
 
   // Reset results
   clearResults: () =>

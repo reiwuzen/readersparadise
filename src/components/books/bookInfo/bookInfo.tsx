@@ -1,9 +1,11 @@
 import "./bookInfo.scss";
 
 import { useDiscover } from "@/hooks/useDiscover";
+import { useActiveTab } from "@/hooks/useActiveTab";
 
 const BookInfo = () => {
   const { selectedBook, getBookChapter } = useDiscover();
+  const {activeMetaData} = useActiveTab();
   let book_info = selectedBook;
   if (book_info !== null) {
     console.log(book_info); //debug

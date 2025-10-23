@@ -13,6 +13,7 @@ export type TabMetaData<Props = any> = {
   type: TabType;
   url: string;
   tabContent: React.ComponentType<Props>;
+  data?: object;
   optional?: {
     sVal: string;
     tabSubContent?: React.ComponentType<Props>;
@@ -33,8 +34,15 @@ type TabsState = {
   recentTabs: TabItem[];
   activeTabId: string;
   timelineOfActiveTab: string[];
+  updateActiveMetaData:  (tabId: string, newMeta: Partial<TabMetaData>) => void;
   setTimelineOfActiveTab: (id: string, m: "a" | "r") => void;
-  setNewMetaData: (id: string, name: string, url: string) => void;
+  setNewMetaData: (
+    id: string,
+    name: string,
+    url: string,
+    comp?: React.ComponentType<any>,
+    data?: object
+  ) => void;
   addTab: (type: TabType) => void;
   closeTab: (id: string) => void;
   switchTab: (id: string) => void;
@@ -65,7 +73,39 @@ export const useTabsStore = create<TabsState>((set, get) => ({
       if (m === "r") return { ...s, timelineOfActiveTab: newTimeline };
       return s; // fallback
     }),
-  setNewMetaData: (id, name, url, comp?: React.ComponentType<any>) =>
+  updateActiveMetaData: (tabId: string, newMeta: Partial<TabMetaData>) =>
+    set((s) => ({
+      tabs: s.tabs.map((t) => {
+        if (t.id !== tabId) return t;
+
+        const updatedMeta = {
+          ...t.activeMetaData,
+          ...newMeta,
+          data: {
+            ...t.activeMetaData?.data,
+            ...newMeta.data, // ✅ merge updated book/chapter info
+          },
+        };
+
+        const newMetaDataArr = t.metaData.map((m, i) =>
+          i === t.currentIndex ? updatedMeta : m
+        );
+
+        return {
+          ...t,
+          activeMetaData: updatedMeta,
+          metaData: newMetaDataArr,
+        };
+      }),
+    })),
+
+  setNewMetaData: (
+    id: string,
+    name: string,
+    url: string,
+    comp?: React.ComponentType<any>,
+    data?: object
+  ) =>
     set((s) => {
       const tabs = s.tabs.map((t) => {
         if (t.id !== id) return t;
@@ -83,30 +123,32 @@ export const useTabsStore = create<TabsState>((set, get) => ({
                 sVal: t.activeMetaData.optional.sVal ?? "",
                 tabSubContent: comp,
               },
+              data: data ?? t.activeMetaData.data, // ✅ new
             };
           } else {
             return {
               ...t.activeMetaData,
               name,
               url,
+              data: data ?? t.activeMetaData.data, // ✅ new
             };
           }
         };
-        // Create new metadata object
+
         const newMeta = h();
-        // Append it to the metaData array
         const newMetaDataArr = [...t.metaData, newMeta];
 
         return {
           ...t,
           activeMetaData: newMeta,
           metaData: newMetaDataArr,
-          currentIndex: newMetaDataArr.length - 1, // set newMeta as current
+          currentIndex: newMetaDataArr.length - 1,
         };
       });
 
       return { ...s, tabs };
     }),
+
   addTab: (type) => {
     const tabId = crypto.randomUUID();
 
@@ -254,7 +296,7 @@ export const useTabsStore = create<TabsState>((set, get) => ({
         activeMetaData: tab.metaData[newIndex],
       };
 
-      toast.info(`Went back to "${tab.metaData[newIndex].name}"`);
+      // toast.info(`Went back to "${tab.metaData[newIndex].name}"`);
 
       return {
         ...s,
@@ -280,7 +322,7 @@ export const useTabsStore = create<TabsState>((set, get) => ({
         activeMetaData: tab.metaData[newIndex],
       };
 
-      toast.info(`Went forward to "${tab.metaData[newIndex].name}"`);
+      // toast.info(`Went forward to "${tab.metaData[newIndex].name}"`);
 
       return {
         ...s,

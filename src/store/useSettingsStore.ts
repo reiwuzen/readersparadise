@@ -25,38 +25,38 @@ export type SettingsItemName =
   | "Advanced";
 
 export type ItemId = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
-export type themeType = "light" | "dark" | "system" | "custom" | 'blueGrey' ;
-export type PageLayout = 'single' | 'double';
-export type ScrollDirec= 'ltr'| 'rtl' | 'ttb' | 'btt';
-export type readerBGColor= 'light' | 'grey' | 'dark';
+export type themeType = "light" | "dark" | "system" | "custom" | "blueGrey";
+export type PageLayout = "single" | "double";
+export type ScrollDirec = "ltr" | "rtl" | "ttb" | "btt";
+export type readerBGColor = "light" | "grey" | "dark";
 export type SettingsItem = {
   title: SettingsItemName;
   content: React.ComponentType<any>;
   isItemActive: boolean;
   itemId: ItemId;
 };
-export type mode  = 'init' | 'runtime';
+export type mode = "init" | "runtime";
 const colorMap: Record<themeType, readerBGColor> = {
-  'blueGrey' : 'grey',
-  'light': 'light',
-  'dark' : 'dark',
-  custom : "dark",
-  'system' : 'dark'
-}
+  blueGrey: "grey",
+  light: "light",
+  dark: "dark",
+  custom: "dark",
+  system: "dark",
+};
 export type SettingsState = {
   items: SettingsItem[];
   setItemActive: (itemId: ItemId) => void;
 
   theme: themeType;
   setTheme: (theme: themeType) => void;
-  initTheme: () => {readerBGColor: readerBGColor};
+  initTheme: () => { readerBGColor: readerBGColor };
 
   readerBGColor: readerBGColor;
-  setReaderBGColor: (inp: readerBGColor, mode?:mode)=> void;
+  setReaderBGColor: (inp: readerBGColor, mode?: mode) => void;
   readerBGColorSyncTheme: boolean;
   setReaderBGColorSyncTheme: () => void;
 
-  pageLayout:PageLayout;
+  pageLayout: PageLayout;
   setPageLayout: (pageLayout: PageLayout) => void;
 
   scrollDirection: ScrollDirec;
@@ -90,7 +90,7 @@ const SETTINGS_ITEMS_COMPONENTS: Record<
 };
 
 // ---- Zustand Store ---- //
-export const useSettingsStore = create<SettingsState>((set,get) => ({
+export const useSettingsStore = create<SettingsState>((set, get) => ({
   items: Object.entries(SETTINGS_ITEMS_COMPONENTS).map(
     ([title, content], index) => ({
       title: title as SettingsItemName,
@@ -108,13 +108,14 @@ export const useSettingsStore = create<SettingsState>((set,get) => ({
       })),
     })),
 
-  theme: localStorage.getItem("theme") as themeType || 'dark' ,
-  
+  theme: (localStorage.getItem("theme") as themeType) || "dark",
+
   setTheme: (theme) => {
     // 1. Update the store
     const readerBGColor = colorMap[theme] || get().readerBGColor;
-    get().readerBGColorSyncTheme === true ?
-    set({ theme , readerBGColor}) : set({theme});
+    get().readerBGColorSyncTheme === true
+      ? set({ theme, readerBGColor })
+      : set({ theme });
 
     // 2. Apply theme to the DOM
     document.body.className = ``;
@@ -123,14 +124,16 @@ export const useSettingsStore = create<SettingsState>((set,get) => ({
     // 3. Optionally persist it
     localStorage.setItem("theme", theme);
   },
-    initTheme: () => {
+  initTheme: () => {
     const saved = localStorage.getItem("theme") as themeType | null;
     const preferred: themeType =
-    saved ||
-    (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-     const initReaderBGColor= get().readerBGColorSyncTheme ? 
-     colorMap[preferred] : 'dark';
-
+      saved ||
+      (window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light");
+    const initReaderBGColor = get().readerBGColorSyncTheme
+      ? colorMap[preferred]
+      : "dark";
 
     // Apply the preferred theme
     const applied =
@@ -145,30 +148,29 @@ export const useSettingsStore = create<SettingsState>((set,get) => ({
     document.body.classList.add(applied);
     return { readerBGColor: initReaderBGColor };
   },
-  readerBGColor: 'dark',
+  readerBGColor: "dark",
   setReaderBGColor: (inp, mode) => {
-   set(()=>{
-    if(mode === 'init' ) return{ readerBGColor: inp}
-    else return { readerBGColor: inp, readerBGColorSyncTheme: false}
-   })
-    
+    set(() => {
+      if (mode === "init") return { readerBGColor: inp };
+      else return { readerBGColor: inp, readerBGColorSyncTheme: false };
+    });
   },
   readerBGColorSyncTheme: true,
   setReaderBGColorSyncTheme: () => {
-  set((state) => {
-    const newSync = !state.readerBGColorSyncTheme;
-    const theme = state.theme;
-    return {
-      readerBGColorSyncTheme: newSync,
-      readerBGColor: newSync ? colorMap[theme] : state.readerBGColor,
-    };
-  });
-},
-  pageLayout: 'single',
-  setPageLayout: (pageLayout) => set({pageLayout: pageLayout}),
+    set((state) => {
+      const newSync = !state.readerBGColorSyncTheme;
+      const theme = state.theme;
+      return {
+        readerBGColorSyncTheme: newSync,
+        readerBGColor: newSync ? colorMap[theme] : state.readerBGColor,
+      };
+    });
+  },
+  pageLayout: "single",
+  setPageLayout: (pageLayout) => set({ pageLayout: pageLayout }),
 
-  scrollDirection: 'ltr',
-  setScrollDirection: (sd) => set({scrollDirection: sd}),
+  scrollDirection: "ltr",
+  setScrollDirection: (sd) => set({ scrollDirection: sd }),
 
   defaultViewMode: "contain",
   setDefaultViewMode: (mode) => set({ defaultViewMode: mode }),
