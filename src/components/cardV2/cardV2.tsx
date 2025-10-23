@@ -1,6 +1,8 @@
 import './cardV2.scss';
 import { SearchResult } from '@/store/useDiscoverStore';
 import { useDiscover } from '@/hooks/useDiscover';
+import { useTabs } from '@/hooks/useTabs';
+import { useActiveTab } from '@/hooks/useActiveTab';
 export type CardV2Props = {
     i: number;
     Book: SearchResult;
@@ -8,12 +10,18 @@ export type CardV2Props = {
 }
 
 const CardV2 = ({Book, i}: CardV2Props) => {
+  const {activeTabId} = useActiveTab();
+  const {changeTab} = useTabs();
   const {getSelectedBookInfo} =useDiscover();
     return (
         <div
                 key={i}
                 className="book-card"
-                onClick={()=>getSelectedBookInfo(Book.link, Book.source_name)}
+                onClick={()=>{
+                  changeTab(activeTabId,Book.title,"book");
+                  getSelectedBookInfo(Book.link, Book.source_name)
+
+                }}
               >
                 <img
                   src={Book.cover_image ?? ""}

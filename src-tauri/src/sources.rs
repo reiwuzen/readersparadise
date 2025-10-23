@@ -1,14 +1,15 @@
 use serde_json::Value;
 use std::{fs, path::PathBuf};
+use reqwest::Client;
+use futures::stream::{FuturesUnordered, StreamExt};
 use tokio::fs as tokio_fs;
 use tauri::AppHandle;
 use tauri::Manager;
 use serde::{Deserialize, Serialize};
 use tokio::io::AsyncWriteExt;
-use reqwest;
 
 //crates
-use crate::models::{SearchResults, Selectors, Sources, BookInfo};
+use crate::models::{SearchResults, Selectors, Sources, BookInfo, EachChapter};
 use crate::mgeko::Mgeko;
 use crate::wrap_err;
 
@@ -122,6 +123,21 @@ pub struct Conf {
 }
 ///
 /// 
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct DownloadChapter{
+    chapter_name: Option<String>,
+    chapter_number: Option<String>,
+    chapter_links: Vec<String>,
+}
+/// 
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct DownloadInfo{
+    name: String,
+    chapters: Vec<DownloadChapter>,
+}
+///
+///  
+
 
 
 #[tauri::command]
@@ -131,37 +147,107 @@ pub async fn download_1_chapter(
     ch_urls: Vec<String>,
     app: AppHandle,
 ) -> Result<(), String> {
-    let app_dir = wrap_err!(app.path().app_data_dir(), "Failed to get app data dir")?;
-    let data_download_dir = app_dir.join("data/download"); // <-- semicolon fixed
-
-    // Create folder: data/download/books/<book_name>/<ch_no>/
-    let folder_path = data_download_dir.join(format!("books/{}/{}", book_name, ch_no));
+    let app_dir = app.path().app_data_dir().map_err(|e| format!("Failed to get app dir: {}", e))?;
+    let base_dir = app_dir.join("data/download");
+    let book_dir = base_dir.join(format!("books/{}", book_name));
+    let folder_path = book_dir.join(&ch_no);
+    let json_path = book_dir.join("info.json");
 
     tokio_fs::create_dir_all(&folder_path)
         .await
         .map_err(|e| format!("Failed to create folder {}: {}", folder_path.display(), e))?;
 
-    let total_digits = ch_urls.len().to_string().len().max(3); // dynamic padding, minimum 3 digits
+    let total_digits = ch_urls.len().to_string().len().max(3);
+    let client = Client::new();
+
+    // FuturesUnordered to parallelize downloads (limit concurrency manually)
+    let mut tasks = FuturesUnordered::new();
+    let concurrency_limit = 5; // tune this depending on bandwidth and server limits
+
+    let mut local_links = Vec::with_capacity(ch_urls.len());
 
     for (i, url) in ch_urls.iter().enumerate() {
-        let resp = reqwest::get(url)
-            .await
-            .map_err(|e| format!("Failed to download {}: {}", url, e))?;
-        let bytes = resp
-            .bytes()
-            .await
-            .map_err(|e| format!("Failed to read bytes from {}: {}", url, e))?;
+        let client = client.clone();
+        let folder_path = folder_path.clone();
+        let base_dir = base_dir.clone();
 
-        let file_name = format!("{:0width$}.jpg", i + 1, width = total_digits);
-        let file_path = folder_path.join(file_name);
+        // Push task into the concurrent stream
+        tasks.push(async move {
+            let resp = client.get(url)
+                .send()
+                .await
+                .map_err(|e| format!("Failed to download {}: {}", url, e))?;
 
-        let mut file = tokio_fs::File::create(&file_path)
-            .await
-            .map_err(|e| format!("Failed to create file {}: {}", file_path.display(), e))?;
-        file.write_all(&bytes)
-            .await
-            .map_err(|e| format!("Failed to write to file {}: {}", file_path.display(), e))?;
+            let bytes = resp
+                .bytes()
+                .await
+                .map_err(|e| format!("Failed to read bytes: {}", e))?;
+
+            let file_name = format!("{:0width$}.jpg", i + 1, width = total_digits);
+            let file_path = folder_path.join(&file_name);
+
+            let mut file = tokio_fs::File::create(&file_path)
+                .await
+                .map_err(|e| format!("Failed to create file {}: {}", file_path.display(), e))?;
+            file.write_all(&bytes)
+                .await
+                .map_err(|e| format!("Failed to write file {}: {}", file_path.display(), e))?;
+
+            // Return relative link
+            let rel = file_path
+                .strip_prefix(&base_dir)
+                .unwrap_or(&file_path)
+                .to_string_lossy()
+                .to_string();
+            Ok::<String, String>(rel)
+        });
+
+        // Optional: throttle concurrency manually
+        if tasks.len() >= concurrency_limit {
+            if let Some(result) = tasks.next().await {
+                result?; // propagate errors early
+            }
+        }
     }
+
+    // Drain remaining tasks
+    while let Some(result) = tasks.next().await {
+        local_links.push(result?);
+    }
+
+    // Build / update info.json
+    let mut info = if json_path.exists() {
+        let data = tokio_fs::read_to_string(&json_path)
+            .await
+            .unwrap_or_default();
+        serde_json::from_str::<DownloadInfo>(&data).unwrap_or(DownloadInfo {
+            name: book_name.clone(),
+            chapters: vec![],
+        })
+    } else {
+        DownloadInfo {
+            name: book_name.clone(),
+            chapters: vec![],
+        }
+    };
+
+    let new_chapter = DownloadChapter {
+        chapter_name: Some(format!("Chapter {}", ch_no)),
+        chapter_number: Some(ch_no.clone()),
+        chapter_links: local_links,
+    };
+
+    if let Some(existing) = info.chapters.iter_mut().find(|c| c.chapter_number == Some(ch_no.clone())) {
+        *existing = new_chapter;
+    } else {
+        info.chapters.push(new_chapter);
+    }
+
+    let json_str = serde_json::to_string_pretty(&info)
+        .map_err(|e| format!("Failed to serialize JSON: {}", e))?;
+    tokio_fs::write(&json_path, json_str)
+        .await
+        .map_err(|e| format!("Failed to write JSON file {}: {}", json_path.display(), e))?;
 
     Ok(())
 }

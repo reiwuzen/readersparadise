@@ -38,11 +38,18 @@ export const useActiveTab = () => {
 
     const prevMeta = activeTab.metaData[prevIndex];
     const prevData = prevMeta?.data as any;
+    if (bookChapter) {
 
+      setBookChapterStore(null);
+    } else if(selectedBook){
+      setSelectedBookStore(null);
+      
+    } else {
+      setSelectedBookStore(prevData?.selectedBook ?? null);
+      setBookChapterStore(prevData?.bookChapter ?? null);
+    }
     // Restore previous Discover state
-    setSelectedBookStore(prevData?.selectedBook ?? null);
-    setBookChapterStore(prevData?.bookChapter ?? null);
-
+    console.log(activeTab.metaData);
     goBackStore(activeTab.id);
   };
 
@@ -87,7 +94,13 @@ export const useActiveTab = () => {
       data: data ?? activeMetaData?.data, // ✅ store context
     } as TabMetaData;
 
-    setNewMetaDataStore(activeTab.id, newMeta.name, newMeta.url, comp, newMeta.data);
+    setNewMetaDataStore(
+      activeTab.id,
+      newMeta.name,
+      newMeta.url,
+      comp,
+      newMeta.data
+    );
   };
 
   return {

@@ -3,43 +3,44 @@ import AccessoryMenu from "@/components/accessoryMenu/accessoryMenu";
 import { useEffect, useState } from "react";
 import { useActiveTab } from "@/hooks/useActiveTab";
 import { useDiscoverStore } from "@/store/useDiscoverStore";
-import BookSearch from "@/components/books/bookSearch/bookSearch";
-import BookInfo from "@/components/books/bookInfo/bookInfo";
-import BookChapter from "@/components/books/bookChapter/bookChapter";
+import CardV2 from "@/components/cardV2/cardV2";
+import { useDiscover } from "@/hooks/useDiscover";
 
 const DiscoverTab = () => {
-  const { searchBook, clearResults, selectedBook, bookChapter } = useDiscoverStore();
+  const { searchBook, clearResults, selectedBook, bookChapter } =
+    useDiscoverStore();
+    const { isLoading, error, searchResults } = useDiscover();
   const { activeMetaData, setNewMetaData } = useActiveTab();
 
   // Local state while typing
-  const [localSVal, setLocalSVal] = useState<string>(activeMetaData?.optional?.sVal ?? "");
+  const [localSVal, setLocalSVal] = useState<string>(
+    activeMetaData?.optional?.sVal ?? ""
+  );
 
   // Debounced effect: update metadata and perform search after user stops typing
   useEffect(() => {
-  const timeout = setTimeout(async () => {
-    if (!activeMetaData) return;
-    const x = ():string=>{
-      if(localSVal.length !== 0){
-        return `/discover?search=${localSVal}`
+    const timeout = setTimeout(async () => {
+      if (!activeMetaData) return;
+      const x = (): string => {
+        if (localSVal.length !== 0) {
+          return `/discover?search=${localSVal}`;
+        } else {
+          return `/discover`;
+        }
+      };
+      setNewMetaData(activeMetaData.name ?? "Discover", x(), {
+        sVal: localSVal,
+      });
+
+      if (localSVal.trim()) {
+        await searchBook(localSVal);
       } else {
-        return `/discover`
+        clearResults();
       }
-    }
-    setNewMetaData(
-      activeMetaData.name ?? "Discover",
-      x(),
-      { sVal: localSVal }
-    );
+    }, 300);
 
-    if (localSVal.trim()) {
-      await searchBook(localSVal);
-    } else {
-      clearResults();
-    }
-  }, 300);
-
-  return () => clearTimeout(timeout);
-}, [localSVal]);
+    return () => clearTimeout(timeout);
+  }, [localSVal]);
 
   return (
     <div className="discoverTab">
@@ -64,13 +65,22 @@ const DiscoverTab = () => {
 
       {/* === Main Content === */}
       <div className="mainDiscoverTab">
-        {bookChapter ? (
-          <BookChapter />
-        ) : selectedBook ? (
-          <BookInfo />
-        ) : (
-          <BookSearch sVal={localSVal} />
-        )}
+         <div className="bookSearch">
+      {isLoading && <p className="status-msg">Loading...</p>}
+      {error && <p className="status-msg error">{error}</p>}
+
+      {!isLoading && searchResults.length > 0 && (
+        <div className="discover-grid">
+          {searchResults.map((manga, i) => (
+            <CardV2 key={i} i={i} Book={manga}  />
+          ))}
+        </div>
+      )}
+
+      {!isLoading && !error && !searchResults.length && localSVal && (
+        <p className="status-msg">No results found.</p>
+      )}
+    </div>
       </div>
     </div>
   );

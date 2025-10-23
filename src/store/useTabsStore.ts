@@ -3,10 +3,11 @@ import LibraryTab from "@/components/tabs/libraryTab/libraryTab";
 import DiscoverTab from "@/components/tabs/discoverTab/discoverTab";
 import SettingsTab from "@/components/tabs/settingsTab/settingsTab";
 import Reader from "@/components/reader/Reader";
+import Book from "@/components/book/book";
 import About from "@/components/about/About";
 import { toast } from "sonner";
 
-export type TabType = "library" | "discover" | "settings" | "reader" | "about";
+export type TabType = "library" | "discover" | "settings" | "reader" | "about" | "book";
 
 export type TabMetaData<Props = any> = {
   name: string;
@@ -59,6 +60,7 @@ const TAB_COMPONENTS: Record<TabType, React.ComponentType<any>> = {
   settings: SettingsTab,
   reader: Reader,
   about: About,
+  book: Book,
 };
 
 export const useTabsStore = create<TabsState>((set, get) => ({
