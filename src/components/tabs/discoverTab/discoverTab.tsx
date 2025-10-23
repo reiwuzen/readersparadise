@@ -23,7 +23,7 @@ const DiscoverTab = () => {
       if (!activeMetaData) return;
       const x = (): string => {
         if (localSVal.length !== 0) {
-          return `/discover?search=${localSVal}`;
+          return `/discover?search=${encodeURIComponent(localSVal)}`;
         } else {
           return `/discover`;
         }

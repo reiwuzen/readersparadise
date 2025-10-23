@@ -47,7 +47,7 @@ type TabsState = {
   addTab: (type: TabType) => void;
   closeTab: (id: string) => void;
   switchTab: (id: string) => void;
-  changeTab: (id: string, name: string, type: TabType) => void;
+  changeTab: (id: string, name: string, type: TabType, url:string) => void;
   openRecentTabs: (id: string) => void;
   closeRecentTabs: (id: string) => void;
   goBack: (id: string) => void;
@@ -222,7 +222,7 @@ export const useTabsStore = create<TabsState>((set, get) => ({
       };
     }),
 
-  changeTab: (id, name, type) =>
+  changeTab: (id, name, type, url) =>
     set((s) => {
       const tabs = s.tabs.map((t) =>
         t.id === id
@@ -234,14 +234,14 @@ export const useTabsStore = create<TabsState>((set, get) => ({
                 {
                   name,
                   type,
-                  url: `/${type}`,
+                  url: `/${type}/${url}`,
                   tabContent: TAB_COMPONENTS[type],
                 },
               ],
               activeMetaData: {
                 name,
                 type,
-                url: `/${type}`,
+                url: `/${type}/${url}`,
                 tabContent: TAB_COMPONENTS[type],
               },
             }

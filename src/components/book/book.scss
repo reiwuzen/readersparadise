@@ -51,33 +51,33 @@
       // align-items: center;
       // justify-content: space-between;
       div.metaTags {
-          width: 100%;
-          // margin: 10px 0 0 0;
-          h4 {
-            text-align: start;
-          }
-          ul.tags {
-            margin: 16px 0 0 0;
-            width: 90%;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            row-gap: 16px;
-            li {
-              font-size: 12px;
-              cursor: pointer;
-              list-style: none;
-              padding: 4px 18px;
-              border-radius: 28px;
-              color: var(--muted-text-color);
-              background-color: var(--bg-cover-color);
-              &:hover {
-                background-color: var(--accent-hover-bg-color);
-                color: var(--text-color);
-              }
+        width: 100%;
+        // margin: 10px 0 0 0;
+        h4 {
+          text-align: start;
+        }
+        ul.tags {
+          margin: 16px 0 0 0;
+          width: 90%;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          row-gap: 16px;
+          li {
+            font-size: 12px;
+            cursor: pointer;
+            list-style: none;
+            padding: 4px 18px;
+            border-radius: 28px;
+            color: var(--muted-text-color);
+            background-color: var(--bg-cover-color);
+            &:hover {
+              background-color: var(--accent-hover-bg-color);
+              color: var(--text-color);
             }
           }
         }
+      }
     }
   }
   div.metaOthers {
@@ -91,10 +91,15 @@
         // font-family: sans-serif;
         border-bottom: 1px solid var(--text-color);
         h3 {
+          color: var(--muted-text-color);
           &:hover {
             cursor: pointer;
+            // background-color: color: var(--muted-text-color);;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--accent-hover-bg-color);
           }
           &._tab {
+            color: var(--active-text-color);
             border-bottom: 2px solid var(--accent-bg-color);
           }
           padding: 0 0 8px 0px;
@@ -133,11 +138,12 @@
               list-style: none;
               color: var(--muted-text-color);
               background-color: var(--bg-cover-color);
-              border-radius: 10px;;
-              p{
+              border-radius: 10px;
+              p {
                 text-align: start;
+                white-space: nowrap;
+                overflow: hidden; 
                 text-overflow: ellipsis;
-                
               }
               &:hover {
                 cursor: pointer;

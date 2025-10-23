@@ -1,9 +1,13 @@
 import "./book.scss";
 import { useState } from "react";
 import { useDiscover } from "@/hooks/useDiscover";
+import { useTabs } from "@/hooks/useTabs";
+import { useActiveTab } from "@/hooks/useActiveTab";
 // import { useActiveTab } from "@/hooks/useActiveTab";
 
 const Book = () => {
+  const {activeTabId} =useActiveTab();
+  const {changeTab} =useTabs();
   const { selectedBook, getBookChapter } = useDiscover();
   const [is, setIs] = useState(true);
   // const {activeMetaData} = useActiveTab();
@@ -32,15 +36,15 @@ const Book = () => {
               <strong>{book.status}</strong>
             </aside>
             <div className="metaTags">
-                  <h4>Tags/Categories:</h4>
-                  <ul className="tags">
-                    {book.tags.map((t, i) => (
-                      <li key={i}>
-                        <p>{t}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+              <h4>Tags/Categories:</h4>
+              <ul className="tags">
+                {book.tags.map((t, i) => (
+                  <li key={i}>
+                    <p>{t}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
         <div className="metaOthers">
@@ -55,20 +59,22 @@ const Book = () => {
           <aside className="data">
             {is ? (
               <>
-              <div className="synopsis">
-                <h4>Synopsis</h4>
-                <p>{book.desc}</p>
-              </div>
+                <div className="synopsis">
+                  <h4>Synopsis</h4>
+                  <p>{book.desc}</p>
+                </div>
               </>
             ) : (
               <div className="metaChapters">
                 <h4>Chapters :&nbsp;</h4>
                 <ul className="chapters">
-                  {book.chapters.map((c,i)=>(
-                    <li key={i}><p>
-                      {c.chapter_number}
-                      </p>
-                      </li>
+                  {book.chapters.map((c, i) => (
+                    <li key={i} title={c.chapter_number ?? ""} onClick={()=>{
+                      if(c.chapter_number)
+                      changeTab(activeTabId, `${book.title}`, 'reader', `${book.title}/${c.chapter_number ?? ""}`);
+                      getBookChapter(c.chapter_link ?? "", c.chapter_number ?? "")}}>
+                      <p>{c.chapter_number}</p>
+                    </li>
                   ))}
                 </ul>
               </div>

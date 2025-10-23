@@ -18,7 +18,7 @@ const CardV2 = ({Book, i}: CardV2Props) => {
                 key={i}
                 className="book-card"
                 onClick={()=>{
-                  changeTab(activeTabId,Book.title,"book");
+                  changeTab(activeTabId,Book.title,"book", `${encodeURIComponent(Book.title)}`);
                   getSelectedBookInfo(Book.link, Book.source_name)
 
                 }}
