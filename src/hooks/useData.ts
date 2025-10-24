@@ -6,11 +6,18 @@ export const useData = () => {
     const clearDownloads = async () => await invoke("reset_downloads_dir");
     const clearSource = async() => await invoke("reset_src_dir");
     const clearCache = async() => await invoke("reset_cache_dir");
+    const clearAll = async() => {
+        clearCache;
+        clearData;
+        clearDownloads;
+        clearSource;
+    }
     return{
         getAppPath,
         clearData,
         clearDownloads,
         clearSource,
         clearCache,
+        clearAll,
     }
 };

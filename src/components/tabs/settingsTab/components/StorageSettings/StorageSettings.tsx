@@ -4,7 +4,7 @@ import { useSettings } from "@/hooks/useSettings";
 import { toast } from "sonner";
 const StorageSettings = () => {
   const {appPath} =useSettings();
-  const {clearCache,clearData,clearDownloads,clearSource, getAppPath} = useData();
+  const {clearCache,clearData,clearDownloads,clearSource,  clearAll} = useData();
   return (
     <div className="StorageSettings">
       <h3>Storage</h3>
@@ -83,6 +83,16 @@ const StorageSettings = () => {
             <button onClick={()=>{
               toast.promise(clearDownloads,{
                 loading: 'Clearing Downloads <dir>',
+                success: 'Cleared',
+                error: `Error`
+              })
+            }}>Clear</button>
+          </div>
+          <div className="dms5">
+            <p>Clear All {`<dir>: <appPath>`}</p>
+            <button onClick={()=>{
+              toast.promise(clearAll,{
+                loading: 'Clearing All <dir>',
                 success: 'Cleared',
                 error: `Error`
               })
