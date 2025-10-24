@@ -1,6 +1,9 @@
 import "./cardV2.scss";
 import { SearchResult } from "@/store/useDiscoverStore";
 import { useDiscover } from "@/hooks/useDiscover";
+import { useActiveTab } from "@/hooks/useActiveTab";
+import { createTabState } from "@/store/useTabsStore";
+import { BookData } from "@/types/tabTypes";
 // import { useActiveTab } from "@/hooks/useActiveTab";
 
 export type CardV2Props = {
@@ -9,22 +12,20 @@ export type CardV2Props = {
 };
 
 const CardV2 = ({ Book, i }: CardV2Props) => {
-  // const { pushNewMeta } = useActiveTab();
+  const { changeActiveTabPage } = useActiveTab();
   const { getSelectedBookInfo } = useDiscover();
 
-  const handleClick = () => {
-    if (!Book || !Book.title) return;
+  const handleClick = async () => {
+  if (!Book || !Book.title) return;
 
-    const encodedTitle = encodeURIComponent(Book.title);
+  const encodedTitle = encodeURIComponent(Book.title);
 
-    // ✅ Push new metadata for the Book tab (adds new tab history entry)
-    // pushNewMeta(Book.title, encodedTitle, "book", undefined, {
-    //   selectedBook: Book,
-    // });
+  // Fetch book data properly
+  const bookData = await getSelectedBookInfo(Book.link, Book.source_name);
 
-    // ✅ Fetch full book info
-    getSelectedBookInfo(Book.link, Book.source_name);
-  };
+  // Open a new tab with the resolved book data
+  changeActiveTabPage(createTabState('book', Book.title, `/book/${Book.title}`, bookData));
+};
 
   return (
     <div key={i} className="book-card" onClick={handleClick}>

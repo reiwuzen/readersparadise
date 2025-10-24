@@ -1,10 +1,17 @@
 import { useState } from "react";
 import "./Reader.scss";
 import { useDiscover } from "@/hooks/useDiscover";
+import { useActiveTab } from "@/hooks/useActiveTab";
+import { isReader } from "@/helper/tabCheck";
 const Reader = () => {
-  const { bookChapter, selectedBook } = useDiscover();
-  let book = selectedBook;
-  let chapter = bookChapter;
+  const {activeTabData} = useActiveTab()
+  const chapter = {
+    urls: isReader(activeTabData) ? activeTabData.data.pages : [] as string[],
+    ch_no: isReader(activeTabData)? activeTabData.data.chapterId : 'not-found' ,
+  }
+  const book = {
+    title: isReader(activeTabData) ? activeTabData.data.bookId : 'not-found',
+  }
     const [zoom, setZoom] = useState(1);
 
   const zoomIn = () => setZoom((z) => Math.min(z + 0.1, 3)); // limit to 3x

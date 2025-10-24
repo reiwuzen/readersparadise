@@ -46,14 +46,14 @@ interface DiscoverState {
   isLoading: boolean;
   error: string | null;
   selectedBook: BookInfo | null;
-  getSelectedBookInfo: (link: string, sourceName: string) => void;
+  getSelectedBookInfo: (link: string, sourceName: string) => Promise<BookInfo>;
   setSelectedBook: (inp: BookInfo | null) => void;
 
   bookChapter: BookChapter | null;
-  getBookChapter: (link: string, ch_no: string) => void;
+  getBookChapter: (link: string, ch_no: string) => Promise<BookChapter>;
   setBookChapter: (inp:BookChapter|null)=>void;
 
-  searchBook: (query: string) => Promise<void>;
+  searchBook: (query: string) => Promise<SearchResult[]>;
   // fetchChapterImages: (url: string, source_name: string) => Promise<void>;
   clearResults: () => void;
 }
@@ -75,9 +75,7 @@ export const useDiscoverStore = create<DiscoverState>((set) => ({
       link,
       sourceName,
     });
-    set({
-      selectedBook: res,
-    });
+    return res
   },
   setSelectedBook: (inp) => {
     set({
@@ -87,27 +85,23 @@ export const useDiscoverStore = create<DiscoverState>((set) => ({
 
   // Search across all sources
   searchBook: async (query) => {
-    if (!query.trim()) return;
+    if (!query.trim()) return [];
 
-    set({ isLoading: true, error: null, searchResults: [] });
+   
     try {
       const results = await invoke<SearchResult[]>("search_book", { query });
-      set({ searchResults: results, isLoading: false });
+      return results
     } catch (err: any) {
-      set({
-        error: err?.message || "Search failed",
-        isLoading: false,
-      });
       console.error("searchBook error:", err);
+      
     }
+    return []
   },
   getBookChapter: async (link, ch_no) => {
     let res = await invoke<BookChapter["urls"]>("get_book_chapter", {
       link,
     });
-    set({
-      bookChapter: { urls: res, ch_no },
-    });
+    return {urls: res, ch_no}
   },
   setBookChapter:(inp)=> set({
     bookChapter: inp

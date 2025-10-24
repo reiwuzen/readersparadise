@@ -4,11 +4,9 @@ import "./tabManager.scss";
 import { useSearchTabs } from "@/hooks/useSearchTabs";
 import Tab from "./components/tab/tab";
 import InnerSearchTabs from "@/components/InnerSearchTabs/InnerSearchTabs";
-import { useTabsStore } from "@/store/newtabsstore";
-import { useActiveTab } from "@/hooks/activeTabs";
+import { useTabsStore } from "@/store/useTabsStore";
+import { useActiveTab } from "@/hooks/useActiveTab";
 // import { toast } from "sonner";
-
-
 
 const TabManager = () => {
   // const {
@@ -22,8 +20,17 @@ const TabManager = () => {
   // } = useTabs();
 
   // const { activeTab, activeMetaData, goBack, goForward } = useActiveTab();
-  const {tabs,recentTabs,openRecentTab,closeRecentTab,switchTab,addTab,closeTab} = useTabsStore()
-  const {activeTab, activeTabData, goBackActiveTab, goForwardActiveTab} = useActiveTab();
+  const {
+    tabs,
+    recentTabs,
+    openRecentTab,
+    closeRecentTab,
+    switchTab,
+    addTab,
+    closeTab,
+  } = useTabsStore();
+  const { activeTab, activeTabData, goBackActiveTab, goForwardActiveTab } =
+    useActiveTab();
   const { isOpen, inputRef, dropdownRef, divRef, open, close } =
     useSearchTabs();
 
@@ -71,7 +78,7 @@ const TabManager = () => {
             <div className="inSearchTabs">
               <ul className="openTabs">
                 <h3>Open tabs</h3>
-                {tabs.map((tab) => (
+                {tabs && tabs.map((tab) => (
                   <li key={tab.id}>
                     <InnerSearchTabs
                       tab={{
@@ -87,7 +94,7 @@ const TabManager = () => {
 
               <ul className="recentTabs">
                 <h3>Recent tabs</h3>
-                {recentTabs.map((tab) => (
+                {recentTabs && recentTabs.map((tab) => (
                   <li key={tab.id}>
                     <InnerSearchTabs
                       tab={{
@@ -117,12 +124,12 @@ const TabManager = () => {
           }
         </div>
 
-        <button className="addTabBtn" onClick={() => addTab("library",{})}>
+        <button className="addTabBtn" onClick={() => addTab("library", {})}>
           +
         </button>
 
         <div className="tabs">
-          {tabs.map((tab) => (
+          {tabs && tabs.map((tab) => (
             <Tab
               key={tab.id}
               name={tab.activeData.name}

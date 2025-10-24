@@ -1,293 +1,255 @@
-// import { create } from "zustand";
-// import LibraryTab from "@/components/tabs/libraryTab/libraryTab";
-// import DiscoverTab from "@/components/tabs/discoverTab/discoverTab";
-// import SettingsTab from "@/components/tabs/settingsTab/settingsTab";
-// import Reader from "@/components/reader/Reader";
-// import Book from "@/components/book/book";
-// import About from "@/components/about/About";
-// import { toast } from "sonner";
-// import { SearchResult } from "./useDiscoverStore";
+import { create } from "zustand";
+import { toast } from "sonner";
+import {
+  i_n,
+  TAB_COMPONENTS,
+  tab_id_s,
+  url_s,
+  UseTabsState,
+  Tab,
+  TabDataMap,
+  TabState,
+  TabComponentMap,
+  TabType,
+} from "@/types/tabTypes";
 
-// export type DiscoverData = {
-//   query: string;
-//   searchResults: SearchResult[];
-//   isLoading?: boolean;
-//   error?: string | null;
-// };
+/* --------------------------------
+ * Tab + TabState Factories
+ * -------------------------------- */
+export function createTabState<T extends TabType>(
+  type: T,
+  name: string,
+  url: string,
+  data: TabDataMap[T]
+): TabState {
+  return {
+    name,
+    type,
+    url: url as url_s,
+    data,
+    content: TAB_COMPONENTS[type],
+  };
+}
 
+export function createTab<T extends TabType>(
+  id: string,
+  type: T,
+  name: string,
+  url: string,
+  data: TabDataMap[T]
+): Tab<T> {
+  return {
+    id: id as tab_id_s,
+    index: 0 as i_n,
+    states: [createTabState(type, name, url, data)],
+    get activeData() {
+      return this.states[this.index];
+    },
+  } as Tab<T>;
+}
 
-// export type ReaderData = {
-//   bookId?: string;
-//   chapterId?: string;
-//   pages?: string[];
-//   currentPage?: number;
-// };
+/* --------------------------------
+ * Zustand Store
+ * -------------------------------- */
+const initialTabID = crypto.randomUUID() as tab_id_s;
 
-// export type DownloadsData = {
-//   activeDownloads: string[];
-//   completedDownloads: string[];
-// };
+export const useTabsStore = create<UseTabsState>((set, get) => ({
+  activeTabId: initialTabID,
+  tabs: [createTab(initialTabID, "library", "Library", "/library/", {})],
+  recentTabs: [],
+  timeLineOfActiveTabId: [initialTabID],
 
-// export type TabType =
-//   | "library"
-//   | "discover"
-//   | "settings"
-//   | "reader"
-//   | "about"
-//   | "book"
-//   ;
+  /* --------------------------------
+   * Timeline Management
+   * -------------------------------- */
+  setT_L_O_A_T_ID: (id, mode) =>
+    set((s) => {
+      let list = s.timeLineOfActiveTabId.filter((x) => x !== id);
+      if (mode === "append") list.push(id);
+      return {
+        ...s,
+        timeLineOfActiveTabId: list.slice(-20), // keep last 20 entries
+      };
+    }),
 
-// export type TabDataMap = {
-//   discover: DiscoverData;
-//   reader: ReaderData;
-//   // downloads: DownloadsData;
-//   library?: Record<string, unknown>;
-//   settings?: Record<string, unknown>;
-//   about?: Record<string, unknown>;
-//   book?: Record<string, unknown>;
-// };
+  /* --------------------------------
+   * Tab Lifecycle
+   * -------------------------------- */
+  addTab: (type, data = {}) => {
+    const id = crypto.randomUUID() as tab_id_s;
+    get().setT_L_O_A_T_ID(id, "append");
 
-// export type TabData<T extends TabType = TabType> = {
-//   name: string;
-//   type: T;
-//   url: string;
-//   data: T extends keyof TabDataMap ? TabDataMap[T] : Record<string, unknown>;
-// };
-// export type TabMetaData<Props = any> = {
-//   name: string;
-//   type: TabType;
-//   url: string;
-//   tabContent: React.ComponentType<Props>;
-//   data?: object;
+    const name = type.charAt(0).toUpperCase() + type.slice(1);
+    const newTab: Tab = createTab(id, type, name, `/${type}/`, data);
 
-// };
+    set((s) => ({
+      ...s,
+      activeTabId: id,
+      tabs: [...s.tabs, newTab],
+    }));
+  },
 
-// export type TabItem = {
-//   id: string;
-//   listed: boolean;
-//   activeMetaData: TabMetaData;
-//   currentIndex: number;
-//   metaData: TabMetaData[];
-// };
+  closeTab: (id) => {
+    get().setT_L_O_A_T_ID(id, "remove");
+    set((s) => {
+      const closedTab = s.tabs.find((t) => t.id === id);
+      const filteredTabs = s.tabs.filter((t) => t.id !== id);
+      const filteredRecentTabs = s.recentTabs.filter((rt) => rt.id !== id);
 
-// type TabsState = {
-//   tabs: TabItem[];
-//   recentTabs: TabItem[];
-//   activeTabId: string;
-//   timelineOfActiveTab: string[];
-//   updateActiveMetaData: (tabId: string, newMeta: Partial<TabMetaData>) => void;
-//   setTimelineOfActiveTab: (id: string, m: "a" | "r") => void;
-//   addTab: (type: TabType) => void;
-//   closeTab: (id: string) => void;
-//   switchTab: (id: string) => void;
-//   changeTab: (
-//     id: string,
-//     name: string,
-//     type: TabType,
-//     url: string,
-//     sVal?: string,
-//     data?: object,
-//     comp?: React.ComponentType<any>
-//   ) => void;
-//   openRecentTabs: (id: string) => void;
-//   closeRecentTabs: (id: string) => void;
-//   goBack: (id: string) => void;
-//   goForward: (id: string) => void;
-// };
+      const lastActiveId =
+        s.timeLineOfActiveTabId[s.timeLineOfActiveTabId.length - 1];
 
-// const TAB_COMPONENTS: Record<TabType, React.ComponentType<any>> = {
-//   library: LibraryTab,
-//   discover: DiscoverTab,
-//   settings: SettingsTab,
-//   reader: Reader,
-//   about: About,
-//   book: Book,
-// };
+      return {
+        ...s,
+        tabs: filteredTabs,
+        recentTabs: closedTab
+          ? [...filteredRecentTabs, closedTab]
+          : filteredRecentTabs,
+        activeTabId: lastActiveId ?? filteredTabs.at(-1)?.id ?? "",
+      };
+    });
+  },
 
-// export const useTabsStore = create<TabsState>((set, get) => ({
-//   tabs: [],
-//   recentTabs: [],
-//   activeTabId: "",
-//   timelineOfActiveTab: [],
+  switchTab: (id) => {
+    get().setT_L_O_A_T_ID(id, "append");
+    set(() => ({ activeTabId: id }));
+  },
 
-//   setTimelineOfActiveTab: (id, m) =>
-//     set((s) => {
-//       let newTimeline = s.timelineOfActiveTab.filter((nt) => nt !== id);
-//       if (m === "a") newTimeline = [...newTimeline, id].slice(-20);
-//       return { ...s, timelineOfActiveTab: newTimeline };
-//     }),
+  /* --------------------------------
+   * Recent Tabs
+   * -------------------------------- */
+  openRecentTab: (id) =>
+    set((s) => {
+      const tab = s.recentTabs.find((rt) => rt.id === id);
+      if (!tab) return s;
 
-//   updateActiveMetaData: (tabId, newMeta) =>
-//     set((s) => ({
-//       tabs: s.tabs.map((t) => {
-//         if (t.id !== tabId) return t;
-//         const updatedMeta = {
-//           ...t.activeMetaData,
-//           ...newMeta,
-//           data: {
-//             ...t.activeMetaData.data,
-//             ...newMeta.data,
-//           },
-//         };
-//         const newMetaDataArr = t.metaData.map((m, i) =>
-//           i === t.currentIndex ? updatedMeta : m
-//         );
-//         return { ...t, activeMetaData: updatedMeta, metaData: newMetaDataArr };
-//       }),
-//     })),
+      const filteredRecentTabs = s.recentTabs.filter((rt) => rt.id !== id);
+      get().setT_L_O_A_T_ID(id, "append");
 
-//   addTab: (type) => {
-//     const tabId = crypto.randomUUID();
-//     get().setTimelineOfActiveTab(tabId, "a");
-//     set((s) => {
-//       const initialMeta: TabMetaData = {
-//         name: type.charAt(0).toUpperCase() + type.slice(1),
-//         type,
-//         url: `/${type}/`,
-//         tabContent: TAB_COMPONENTS[type],
-//       };
-//       const tab: TabItem = {
-//         id: tabId,
-//         listed: true,
-//         currentIndex: 0,
-//         activeMetaData: initialMeta,
-//         metaData: [initialMeta],
-//       };
-//       return { ...s, activeTabId: tab.id, tabs: [...s.tabs, tab] };
-//     });
-//   },
+      return {
+        ...s,
+        activeTabId: id,
+        tabs: [...s.tabs, tab],
+        recentTabs: filteredRecentTabs,
+      };
+    }),
 
-//   closeTab: (id) => {
-//     get().setTimelineOfActiveTab(id, "r");
-//     set((s) => {
-//       const tab = s.tabs.find((t) => t.id === id);
-//       if (!tab) return s;
-//       const recentTab = { ...tab, listed: false };
-//       const newTabs = s.tabs.filter((t) => t.id !== id);
-//       const newActive =
-//         s.timelineOfActiveTab.length > 0
-//           ? s.timelineOfActiveTab[s.timelineOfActiveTab.length - 1]
-//           : "";
-//       return {
-//         ...s,
-//         tabs: newTabs,
-//         recentTabs: [...s.recentTabs, recentTab],
-//         activeTabId: newActive,
-//       };
-//     });
-//   },
+  closeRecentTab: (id) =>
+    set((s) => ({
+      ...s,
+      recentTabs: s.recentTabs.filter((rt) => rt.id !== id),
+    })),
 
-//   switchTab: (id) =>
-//     set((s) => {
-//       const tab = s.tabs.find((t) => t.id === id);
-//       if (!tab) {
-//         toast.error("Tab not found");
-//         return s;
-//       }
-//       const timeline = s.timelineOfActiveTab.filter((nt) => nt !== id);
-//       return {
-//         ...s,
-//         activeTabId: id,
-//         timelineOfActiveTab: [...timeline, id].slice(-20),
-//       };
-//     }),
+  /* --------------------------------
+   * Tab Data & Navigation
+   * -------------------------------- */
+  changeTabPage: (id, tabState) => {
+    // console.log("changetab used");
+    get().updateTabData(id, "append", tabState);
+  },
 
-//   // 🔥 Unified changeTab (merged setNewMetaData)
-//   changeTab: (id, name, type, url, sVal,data , comp) =>
-//     set((s) => {
-//       const tabs = s.tabs.map((t) => {
-//         if (t.id !== id) return t;
+  duplicateTab: (id) => {
+    const n_id = crypto.randomUUID() as tab_id_s;
+    get().setT_L_O_A_T_ID(n_id, "append");
 
-//         const baseMeta = t.activeMetaData;
-//         const nextMeta: TabMetaData = {
-//           ...baseMeta,
-//           name,
-//           type,
-//           url: `/${type}/${url ?? ""}`,
-//           tabContent: comp ?? TAB_COMPONENTS[type],
-//           data: { ...baseMeta.data, ...data },
+    set((s) => {
+      const tab = s.tabs.find((t) => t.id === id);
+      if (!tab) return s;
 
+      const duplicateTab: Tab = {
+        ...tab,
+        id: n_id,
+        states: tab.states.map((state) => ({ ...state })),
+      };
+      return {
+        ...s,
+        tabs: [...s.tabs, duplicateTab],
+      };
+    });
+  },
 
+  updateTabData: (id, mode, newState) =>
+    set((s) => {
+      // console.log("updateTabData used");
 
-//         };
+      const updateTab = (tab: Tab): Tab => {
+        let updatedStates = tab.states;
+        let updatedIndex = tab.index;
 
-//         const newMetaDataArr = [
-//           ...t.metaData.slice(0, t.currentIndex + 1),
-//           nextMeta,
-//         ];
+        switch (mode) {
+          case "append":
+            updatedStates = [...tab.states, newState];
+            updatedIndex = tab.states.length as i_n; // move to the newly added state
+            console.log(
+              s.tabs.find((t) => t.id === id)?.index,
+              s.tabs.find((t) => t.id === id)
+            );
+            break;
 
-//         return {
-//           ...t,
-//           currentIndex: newMetaDataArr.length - 1,
-//           activeMetaData: nextMeta,
-//           metaData: newMetaDataArr,
-//         };
-//       });
+          case "replace": {
+            const i = tab.states.length-1 as i_n;
+            const z = tab.states.slice(0, i)
+            updatedStates = [...z, newState]
+            updatedIndex = updatedStates.length - 1 as i_n;
+            console.log(
+             's.tabs.index', s.tabs.find((t) => t.id === id)?.index,
+             's.tabs', s.tabs.find((t) => t.id === id),
+             'updatedi', updatedIndex,
+              'updated states',updatedStates
+            );
+            break;
+          }
 
-//       return { ...s, tabs };
-//     }),
+          case "remove":
+            const i = tab.states.length-1 as i_n; 
+            updatedStates = tab.states.slice(0,i);
+            updatedIndex = Math.min(tab.index, updatedStates.length - 1) as i_n;
+            break;
+        }
+        const activeData = updatedStates[updatedIndex];
+        return {
+          ...tab,
+          states: updatedStates,
+          index: updatedIndex,
+          activeData,
+        } as Tab;
+      };
 
-//   openRecentTabs: (id) =>
-//     set((s) => {
-//       const recentTab = s.recentTabs.find((rt) => rt.id === id);
-//       if (!recentTab) {
-//         toast.error("Recent tab not found");
-//         return s;
-//       }
-//       if (s.tabs.some((t) => t.id === id)) {
-//         toast.info("Tab already open");
-//         return s;
-//       }
-//       const tab = { ...recentTab, listed: true };
-//       const newRecentTabs = s.recentTabs.filter((rt) => rt.id !== id);
-//       const timeline = s.timelineOfActiveTab.filter((nt) => nt !== id);
-//       return {
-//         ...s,
-//         tabs: [...s.tabs, tab],
-//         recentTabs: newRecentTabs,
-//         activeTabId: id,
-//         timelineOfActiveTab: [...timeline, id].slice(-20),
-//       };
-//     }),
+      return {
+        ...s,
+        tabs: s.tabs.map((t) => (t.id === id ? updateTab(t) : t)),
+        recentTabs: s.recentTabs.map((t) => (t.id === id ? updateTab(t) : t)),
+      };
+    }),
 
-//   closeRecentTabs: (id) =>
-//     set((s) => ({
-//       ...s,
-//       recentTabs: s.recentTabs.filter((rt) => rt.id !== id),
-//     })),
+  /* --------------------------------
+   * Navigation
+   * -------------------------------- */
+  goBack: (id) =>
+    set((s) => {
+      const tabs = s.tabs.map((t) => {
+        if (t.id !== id) return t;
+        const newIndex = t.index > 0 ? ((t.index - 1) as i_n) : 0;
+        if (t.index === 0) toast.info("Already at initial state");
+        const activeData = t.states[newIndex];
+        console.log(newIndex)
+        return { ...t, index: newIndex, activeData } as Tab;
+      });
+      return { ...s, tabs };
+    }),
 
-//   goBack: (id) =>
-//     set((s) => {
-//       const tab = s.tabs.find((t) => t.id === id);
-//       if (!tab) return s;
-//       if (tab.currentIndex === 0) {
-//         toast.info("Already at the first state");
-//         return s;
-//       }
-//       const newIndex = tab.currentIndex - 1;
-//       const updatedTab = {
-//         ...tab,
-//         currentIndex: newIndex,
-//         activeMetaData: tab.metaData[newIndex],
-//       };
-//       return { ...s, tabs: s.tabs.map((t) => (t.id === id ? updatedTab : t)) };
-//     }),
-
-//   goForward: (id) =>
-//     set((s) => {
-//       const tab = s.tabs.find((t) => t.id === id);
-//       if (!tab) return s;
-//       const maxIndex = tab.metaData.length - 1;
-//       if (tab.currentIndex >= maxIndex) {
-//         toast.info("Already at the latest state");
-//         return s;
-//       }
-//       const newIndex = tab.currentIndex + 1;
-//       const updatedTab = {
-//         ...tab,
-//         currentIndex: newIndex,
-//         activeMetaData: tab.metaData[newIndex],
-//       };
-//       return { ...s, tabs: s.tabs.map((t) => (t.id === id ? updatedTab : t)) };
-//     }),
-// }));
+  goForward: (id) =>
+    set((s) => {
+      const tabs = s.tabs.map((t) => {
+        if (t.id !== id) return t;
+        const newIndex =
+          t.index < t.states.length - 1 ? ((t.index + 1) as i_n) : t.index;
+        if (t.index >= t.states.length - 1)
+          toast.info("Already at latest state");
+        const activeData = t.states[newIndex];
+        console.log(newIndex)
+        return { ...t, index: newIndex, activeData } as Tab;
+      });
+      return { ...s, tabs };
+    }),
+}));

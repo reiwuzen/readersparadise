@@ -1,15 +1,17 @@
 import "./book.scss";
 import { useState } from "react";
 import { useDiscover } from "@/hooks/useDiscover";
-// import { useActiveTab } from "@/hooks/useActiveTab";
-
+import { useActiveTab } from "@/hooks/useActiveTab";
+import { createTabState } from "@/store/useTabsStore";
+import { isBook } from "@/helper/tabCheck";
+import { BookInfo } from "@/store/useDiscoverStore";
 const Book = () => {
-  const { selectedBook, getBookChapter } = useDiscover();
-  // const { activeTabId, pushNewMeta } = useActiveTab();
+  const {  getBookChapter } = useDiscover();
+  const { changeActiveTabPage, activeTabData } = useActiveTab();
   const [is, setIs] = useState(true);
 
-  const book = selectedBook;
-
+  // const book = selectedBook;
+  const book = isBook(activeTabData)? activeTabData.data  : {} as BookInfo
   if (!book) {
     return (
       <div className="book">
@@ -18,23 +20,21 @@ const Book = () => {
     );
   }
 
-  const handleChapterClick = (chapter: any) => {
+  const handleChapterClick =async (chapter: any) => {
     if (!chapter?.chapter_number) return;
 
     const chapterNumber = chapter.chapter_number ?? "";
     const chapterUrl = `${book.title}/${chapterNumber}`;
 
-    // Push new metadata for Reader tab (new history entry)
-    // pushNewMeta(book.title, chapterUrl, "reader", undefined, {
-    //   selectedBook: book,
-    //   bookChapter: {
-    //     chapter_number: chapterNumber,
-    //     chapter_link: chapter.chapter_link,
-    //   },
-    // });
+    const chap =await getBookChapter(chapter.chapter_link ?? "", chapterNumber);
+    
+    changeActiveTabPage(createTabState('reader',book.title,`/reader/${chapterUrl}`,{
+      pages: chap.urls,
+      chapterId: chap.ch_no,
+      bookId: book.title
+    }))
 
     // Trigger actual chapter loading
-    getBookChapter(chapter.chapter_link ?? "", chapterNumber);
   };
 
   return (

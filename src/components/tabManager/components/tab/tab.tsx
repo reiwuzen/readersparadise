@@ -15,6 +15,7 @@ const Tab = ({ name, isActive = false, onClick, onClose }: TabProps) => {
     <div
       className={`tab ${isActive ? "activeTab" : ""}`}
       aria-label={`${name}`}
+      title={name}
       onClick={onClick}
     >
       <span className="tabName">{name}</span>

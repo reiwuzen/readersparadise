@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { ImageFile } from "../../../../helper/fs";
+import { ImageFile } from "../../../helper/fs";
 import "./homeTab.scss";
 
 const HomeTab = ({ images }: { images: ImageFile[] }) => {
