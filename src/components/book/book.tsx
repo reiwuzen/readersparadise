@@ -1,11 +1,11 @@
 import "./book.scss";
 import { useState } from "react";
 import { useDiscover } from "@/hooks/useDiscover";
-import { useActiveTab } from "@/hooks/useActiveTab";
+// import { useActiveTab } from "@/hooks/useActiveTab";
 
 const Book = () => {
   const { selectedBook, getBookChapter } = useDiscover();
-  const { activeTabId, pushNewMeta } = useActiveTab();
+  // const { activeTabId, pushNewMeta } = useActiveTab();
   const [is, setIs] = useState(true);
 
   const book = selectedBook;
@@ -25,13 +25,13 @@ const Book = () => {
     const chapterUrl = `${book.title}/${chapterNumber}`;
 
     // Push new metadata for Reader tab (new history entry)
-    pushNewMeta(book.title, chapterUrl, "reader", undefined, {
-      selectedBook: book,
-      bookChapter: {
-        chapter_number: chapterNumber,
-        chapter_link: chapter.chapter_link,
-      },
-    });
+    // pushNewMeta(book.title, chapterUrl, "reader", undefined, {
+    //   selectedBook: book,
+    //   bookChapter: {
+    //     chapter_number: chapterNumber,
+    //     chapter_link: chapter.chapter_link,
+    //   },
+    // });
 
     // Trigger actual chapter loading
     getBookChapter(chapter.chapter_link ?? "", chapterNumber);

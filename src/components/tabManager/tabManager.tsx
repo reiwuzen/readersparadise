@@ -1,26 +1,29 @@
 import "./tabManager.scss";
-import { useTabs } from "@/hooks/useTabs";
-import { useActiveTab } from "@/hooks/useActiveTab";
+// import { useTabs } from "@/hooks/useTabs";
+// import { useActiveTab } from "@/hooks/useActiveTab";
 import { useSearchTabs } from "@/hooks/useSearchTabs";
 import Tab from "./components/tab/tab";
 import InnerSearchTabs from "@/components/InnerSearchTabs/InnerSearchTabs";
+import { useTabsStore } from "@/store/newtabsstore";
+import { useActiveTab } from "@/hooks/activeTabs";
 // import { toast } from "sonner";
 
 
 
 const TabManager = () => {
-  const {
-    tabs,
-    recentTabs,
-    openRecentTabs,
-    closeRecentTabs,
-    switchTab,
-    addTab,
-    closeTab,
-  } = useTabs();
+  // const {
+  //   tabs,
+  //   recentTabs,
+  //   openRecentTabs,
+  //   closeRecentTabs,
+  //   switchTab,
+  //   addTab,
+  //   closeTab,
+  // } = useTabs();
 
-  const { activeTab, activeMetaData, goBack, goForward } = useActiveTab();
-
+  // const { activeTab, activeMetaData, goBack, goForward } = useActiveTab();
+  const {tabs,recentTabs,openRecentTab,closeRecentTab,switchTab,addTab,closeTab} = useTabsStore()
+  const {activeTab, activeTabData, goBackActiveTab, goForwardActiveTab} = useActiveTab();
   const { isOpen, inputRef, dropdownRef, divRef, open, close } =
     useSearchTabs();
 
@@ -28,13 +31,13 @@ const TabManager = () => {
     <div className="tabManager">
       <div className="tabBar">
         {/* Back / Forward buttons */}
-        <button className="prevBtn" onClick={goBack}>{`<`}</button>
-        <button className="nextBtn" onClick={goForward}>{`>`}</button>
+        <button className="prevBtn" onClick={goBackActiveTab}>{`<`}</button>
+        <button className="nextBtn" onClick={goForwardActiveTab}>{`>`}</button>
 
         <div id="appUrl">
           Url:
-          {activeMetaData ? (
-            <input type="url" value={activeMetaData.url} readOnly />
+          {activeTabData ? (
+            <input type="url" value={activeTabData.url} readOnly />
           ) : null}
         </div>
 
@@ -72,7 +75,7 @@ const TabManager = () => {
                   <li key={tab.id}>
                     <InnerSearchTabs
                       tab={{
-                        name: tab.activeMetaData.name,
+                        name: tab.activeData.name,
                         isActive: tab.id === activeTab?.id,
                         onClick: () => switchTab(tab.id),
                         onClose: () => closeTab(tab.id),
@@ -88,10 +91,10 @@ const TabManager = () => {
                   <li key={tab.id}>
                     <InnerSearchTabs
                       tab={{
-                        name: tab.activeMetaData.name,
+                        name: tab.activeData.name,
                         isActive: false,
-                        onClick: () => openRecentTabs(tab.id),
-                        onClose: () => closeRecentTabs(tab.id),
+                        onClick: () => openRecentTab(tab.id),
+                        onClose: () => closeRecentTab(tab.id),
                       }}
                       type="recent"
                     />
@@ -114,7 +117,7 @@ const TabManager = () => {
           }
         </div>
 
-        <button className="addTabBtn" onClick={() => addTab("library")}>
+        <button className="addTabBtn" onClick={() => addTab("library",{})}>
           +
         </button>
 
@@ -122,7 +125,7 @@ const TabManager = () => {
           {tabs.map((tab) => (
             <Tab
               key={tab.id}
-              name={tab.activeMetaData.name}
+              name={tab.activeData.name}
               isActive={tab.id === activeTab?.id}
               onClick={() => switchTab(tab.id)}
               onClose={() => closeTab(tab.id)}
@@ -132,9 +135,9 @@ const TabManager = () => {
       </div>
 
       <div className="tabContent">
-        {activeTab && activeMetaData ? (
+        {activeTab && activeTabData ? (
           (() => {
-            const TabComponent = activeMetaData.tabContent;
+            const TabComponent = activeTabData.content;
             return <TabComponent />;
           })()
         ) : (

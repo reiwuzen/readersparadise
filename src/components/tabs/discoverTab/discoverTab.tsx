@@ -1,18 +1,18 @@
 import "./discoverTab.scss";
 import AccessoryMenu from "@/components/accessoryMenu/accessoryMenu";
 import { useEffect, useState } from "react";
-import { useActiveTab } from "@/hooks/useActiveTab";
-import { useTabs } from "@/hooks/useTabs";
+// import { useActiveTab } from "@/hooks/useActiveTab";
+// import { useTabs } from "@/hooks/useTabs";
 import CardV2 from "@/components/cardV2/cardV2";
 import { useDiscover } from "@/hooks/useDiscover";
 
 const DiscoverTab = () => {
   const { isLoading, error, searchResults, searchBook, clearResults } = useDiscover();
-  const { changeTab } = useTabs();
-  const { activeMetaData, activeTabId } = useActiveTab();
+  // const { changeTab } = useTabs();
+  // const { activeMetaData, activeTabId } = useActiveTab();
 
   // Local search state tied to tab metadata
-  const [localSVal, setLocalSVal] = useState<string>(activeMetaData?.sVal ?? "");
+  const [localSVal, setLocalSVal] = useState<string>( "");
 
   useEffect(() => {
     const trim = localSVal.trim();
@@ -21,12 +21,12 @@ const DiscoverTab = () => {
         if (trim.length > 0) {
           const url = `?search=${encodeURIComponent(trim)}`;
           const results = await searchBook(trim);
-          changeTab(activeTabId, `Search: ${trim}`, "discover", url, trim, {
-            searchResults: results,
-          });
+          // changeTab(activeTabId, `Search: ${trim}`, "discover", url, trim, {
+          //   searchResults: results,
+          // });
         } else {
           clearResults();
-          changeTab(activeTabId, "Discover", "discover", "", "", {});
+          // changeTab(activeTabId, "Discover", "discover", "", "", {});
         }
       };
       runSearch();

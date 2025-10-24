@@ -1,7 +1,7 @@
 import "./cardV2.scss";
 import { SearchResult } from "@/store/useDiscoverStore";
 import { useDiscover } from "@/hooks/useDiscover";
-import { useActiveTab } from "@/hooks/useActiveTab";
+// import { useActiveTab } from "@/hooks/useActiveTab";
 
 export type CardV2Props = {
   i: number;
@@ -9,7 +9,7 @@ export type CardV2Props = {
 };
 
 const CardV2 = ({ Book, i }: CardV2Props) => {
-  const { pushNewMeta } = useActiveTab();
+  // const { pushNewMeta } = useActiveTab();
   const { getSelectedBookInfo } = useDiscover();
 
   const handleClick = () => {
@@ -18,9 +18,9 @@ const CardV2 = ({ Book, i }: CardV2Props) => {
     const encodedTitle = encodeURIComponent(Book.title);
 
     // ✅ Push new metadata for the Book tab (adds new tab history entry)
-    pushNewMeta(Book.title, encodedTitle, "book", undefined, {
-      selectedBook: Book,
-    });
+    // pushNewMeta(Book.title, encodedTitle, "book", undefined, {
+    //   selectedBook: Book,
+    // });
 
     // ✅ Fetch full book info
     getSelectedBookInfo(Book.link, Book.source_name);

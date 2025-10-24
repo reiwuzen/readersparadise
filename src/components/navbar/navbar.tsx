@@ -1,18 +1,24 @@
 // import { useState } from "react";
 import "./Navbar.scss";
-import selectAndList, { type ImageFile } from "../../../helper/fs";
+// import selectAndList, { type ImageFile } from "../../../helper/fs";
 import { useState } from "react";
 import { useContextMenu } from "../../hooks/useContextMenu";
-import { useTabs } from "../../hooks/useTabs";
-import { useImport } from "@/hooks/useImport";
-import { toast } from "sonner";
-import { invoke } from "@tauri-apps/api/core";
-import { useActiveTab } from "@/hooks/useActiveTab";
+// import { useTabs } from "../../hooks/useTabs";
+// import { useImport } from "@/hooks/useImport";
+// import { toast } from "sonner";
+// import { invoke } from "@tauri-apps/api/core";
+// import { useActiveTab } from "@/hooks/useActiveTab";
+import { useActiveTab as activeTAB } from "@/hooks/activeTabs";
+import { useTabsStore, createTabState,createTab } from "@/store/newtabsstore";
+import { TAB_COMPONENTS, TabDataMap, url_s } from "@/types/tabTypes";
 
 const Navbar = () => {
-  const { importMangaFolder } = useImport();
-  const {activeTabId, activeMetaData} = useActiveTab();
-  const { changeTab, tabs, addTab } = useTabs();
+  // const { importMangaFolder } = useImport();
+  // const {activeTabId, activeMetaData} = useActiveTab();
+  
+  const {activeTabId, changeActiveTabPage} = activeTAB();
+  const {changeTabPage,tabs,addTab} = useTabsStore();
+  // const { changeTab, tabs, addTab } = useTabs();
   const [loggedIn, setLoggedIn] = useState<Boolean>(false);
   const { openContextMenu, renderContextMenu } = useContextMenu();
   return (
@@ -21,8 +27,8 @@ const Navbar = () => {
         <li
           onClick={() => {
             tabs.length !== 0
-              ? changeTab(activeTabId, "Library","library","")
-              : addTab("library");
+              ? changeActiveTabPage(createTabState('library','Library',`/${'library'}/`,{}))
+              : addTab("library",{});
           }}
           onContextMenu={(e) => openContextMenu(e, "library")}
         >
@@ -43,8 +49,14 @@ const Navbar = () => {
         <li
           onClick={() => {
             tabs.length !== 0
-              ? changeTab(activeTabId,"Discover","discover","")
-              : addTab("discover");
+              ? changeActiveTabPage(createTabState('discover','Discover','/discover/',{
+                query:'',
+                searchResults:[]
+              }))
+              : addTab("discover",{
+                query:'',
+                searchResults:[]
+              });
           }}
           onContextMenu={(e) => openContextMenu(e, "discover")}
         >
@@ -66,8 +78,8 @@ const Navbar = () => {
         <li
           onClick={() => {
             tabs.length !== 0
-              ? changeTab(activeTabId, "Settings","settings","")
-              : addTab("settings");
+              ? changeActiveTabPage(createTabState('settings','Settings','/settings/',{}))
+              : addTab("settings",{});
           }}
           onContextMenu={(e) => openContextMenu(e, "settings")}
         >
@@ -152,7 +164,7 @@ const Navbar = () => {
         <li
           onContextMenu={(e) => openContextMenu(e, "about")}
           onClick={() =>
-            tabs.length !== 0 ? changeTab(activeTabId, "About","about","") : addTab("about")
+            tabs.length !== 0 ? changeActiveTabPage( createTabState('about','About','/about/',{})) : addTab("about",{})
           }
         >
           <svg
