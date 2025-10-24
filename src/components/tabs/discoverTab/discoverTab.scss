@@ -45,10 +45,30 @@
     }
   }
   .mainDiscoverTab {
-    padding: 20px 20px 20px 20px;
+    padding: 20px 0px 20px 0px;
     height: calc(100% - 76px);
-    width: calc(100% - 40px);
-    
+    width: calc(100% - 0px);
+    .bookSearch{
+      margin: 0 8px 0 0;
+      padding: 0 20px 0 40px;
+      width: calc(100% - 68px);
+      height: 100%;
+      overflow-y: auto;
+      &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb-color);
+  }
+      .discover-grid{
+        gap: 40px;
+        display: flex;
+        flex-wrap: wrap;
+      }
+    }
   }
 }
 // @media (max-width: 800px){
