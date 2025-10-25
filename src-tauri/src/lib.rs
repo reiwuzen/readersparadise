@@ -9,6 +9,7 @@ pub mod sources;
 pub mod models;
 pub mod client;
 pub mod helper;
+pub mod user;
 pub mod mgeko;
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -40,6 +41,8 @@ pub fn run() {
             data::reset_data_dir,
             data::get_app_path,
             sources::download_1_chapter,
+            user::get_user_config,
+            user::update_user_config,
             // discover::fetch_chapter_images,
 
             ])

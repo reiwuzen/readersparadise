@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { useTabs } from "@/hooks/useTabs";
+// import { useTabs } from "@/hooks/useTabs";
 import GeneralSettings from "@/components/tabs/settingsTab/components/GeneralSettings/GeneralSettings";
 import StorageSettings from "@/components/tabs/settingsTab/components/StorageSettings/StorageSettings";
 import SourcesSettings from "@/components/tabs/settingsTab/components/SourcesSettings/SourcesSettings";
@@ -17,11 +17,11 @@ export type SettingsItemName =
   | "General"
   | "Storage"
   | "Sources"
-  | "Account/Sync"
+  | "Account & Sync"
   | "Reader"
   | "Network"
   | "Developer"
-  | "Privacy/Security"
+  | "Privacy & Security"
   | "Backup And Restore"
   | "Advanced";
 
@@ -84,11 +84,11 @@ const SETTINGS_ITEMS_COMPONENTS: Record<
   General: GeneralSettings,
   Storage: StorageSettings,
   Sources: SourcesSettings,
-  "Account/Sync": AccountSettings,
+  "Account & Sync": AccountSettings,
   Reader: ReaderSettings,
   Network: NetworkSettings,
   Developer: DeveloperSettings,
-  "Privacy/Security": PrivacySettings,
+  "Privacy & Security": PrivacySettings,
   "Backup And Restore": BackupSettings,
   Advanced: AdvancedSettings,
 };

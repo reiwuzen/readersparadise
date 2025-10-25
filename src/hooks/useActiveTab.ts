@@ -20,18 +20,18 @@ export const useActiveTab = () => {
     useTabsStore.getState().goForward(activeTabId);
   };
 
-  const updateActiveTabData = (mode: Mode, tabData: TabState) => {
+  const updateActiveTabData = (mode: Mode, tabState: TabState) => {
     if (!activeTabId) return;
-    useTabsStore.getState().updateTabData(activeTabId, mode, tabData);
+    useTabsStore.getState().updateTabData(activeTabId, mode, tabState);
   };
 
   const duplicateActiveTab = () => {
     if (!activeTabId) return;
     useTabsStore.getState().duplicateTab(activeTabId);
   };
-  const changeActiveTabPage = (data: TabState) => {
+  const changeActiveTabPage = (tabState: TabState) => {
     if (!activeTabId) return;
-    useTabsStore.getState().changeTabPage(activeTabId, data);
+    useTabsStore.getState().changeTabPage(activeTabId, tabState);
   };
   return {
     activeTabId,

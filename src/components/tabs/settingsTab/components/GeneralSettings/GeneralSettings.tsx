@@ -32,7 +32,9 @@ const GeneralSettings = () => {
           <p className="p2">Current language is English</p>
         </div>
         <div className="d2">
-          <button className="b1">Change</button>
+          <button className="b1" onClick={()=>{
+            toast.info(`'Will be available in Upcoming version's`)
+          }}>Change</button>
         </div>
       </div>
 

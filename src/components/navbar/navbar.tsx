@@ -83,7 +83,7 @@ const Navbar = () => {
           onClick={() => {
             tabs.length !== 0
               ? changeActiveTabPage(
-                  createTabState("settings", "Settings", "/settings/", {})
+                  createTabState("settings", "Settings", "/settings/General", {})
                 )
               : addTab("settings", {});
           }}

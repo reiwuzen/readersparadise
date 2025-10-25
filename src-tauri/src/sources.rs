@@ -11,6 +11,7 @@ use tokio::io::AsyncWriteExt;
 //crates
 use crate::models::{SearchResults, Selectors, Sources, BookInfo, EachChapter};
 use crate::mgeko::Mgeko;
+use crate::helper::{get_app_download_dir,};
 use crate::wrap_err;
 
 //traits
@@ -147,8 +148,8 @@ pub async fn download_1_chapter(
     ch_urls: Vec<String>,
     app: AppHandle,
 ) -> Result<(), String> {
-    let app_dir = app.path().app_data_dir().map_err(|e| format!("Failed to get app dir: {}", e))?;
-    let base_dir = app_dir.join("data/download");
+    
+    let base_dir = get_app_download_dir(app)?;
     let book_dir = base_dir.join(format!("books/{}", book_name));
     let folder_path = book_dir.join(&ch_no);
     let json_path = book_dir.join("info.json");

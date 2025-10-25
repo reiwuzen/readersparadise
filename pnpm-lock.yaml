@@ -21,7 +21,7 @@ importers:
         specifier: ^2.4.2
         version: 2.4.2
       '@tauri-apps/plugin-opener':
-        specifier: ^2
+        specifier: ~2
         version: 2.5.0
       gsap:
         specifier: ^3.13.0

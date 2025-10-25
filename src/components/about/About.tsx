@@ -1,11 +1,11 @@
 import './About.scss';
-
+import { openUrl } from '@tauri-apps/plugin-opener';
 const About = () => {
     return (
         <div className="about">
             <div className="inAbout">
                 <h1>About</h1>
-                <a href="https://github.com/reiwuzen/readersparadise">Github Link</a>
+                <a href='#' onClick={async()=>await openUrl("https://github.com/reiwuzen/readersparadise")}>Github Link</a>
                 <h3>In Production</h3>
                 <ul className="features">
                     <h3>Features</h3>

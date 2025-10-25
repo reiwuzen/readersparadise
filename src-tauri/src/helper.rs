@@ -1,7 +1,10 @@
+use std::path::PathBuf;
+use std::fs;
 use crate::models::{BookInfo, EachChapter};
 use crate::sources::{Conf, Sel};
 use scraper::ElementRef;
 use scraper::{Html, Selector};
+use tauri::{AppHandle,Manager};
 
 pub fn get_val(el: &ElementRef, attr: Option<&str>) -> String {
     if let Some(attribute) = attr {
@@ -55,4 +58,58 @@ macro_rules! get_app {
             .app_data_dir()
             .map_err(|e| format!("Failed to get app data dir: {}", e))?
     };
+}
+
+/// Get (and create) the app's config directory: app_data/config
+pub fn get_app_config_dir(app: AppHandle) -> Result<PathBuf, String> {
+    let base = get_app!(app);
+    let path = base.join("config");
+    fs::create_dir_all(&path)
+        .map_err(|e| format!("Failed to create config dir: {}", e))?;
+    Ok(path)
+}
+
+/// Get (and create) the app's data directory: app_data/data
+pub fn get_app_data_dir(app: AppHandle) -> Result<PathBuf, String> {
+    let base = get_app!(app);
+    let path = base.join("data");
+    fs::create_dir_all(&path)
+        .map_err(|e| format!("Failed to create data dir: {}", e))?;
+    Ok(path)
+}
+
+/// Get (and create) the app's cache directory: app_data/cache
+pub fn get_app_cache_dir(app: AppHandle) -> Result<PathBuf, String> {
+    let base = get_app!(app);
+    let path = base.join("cache");
+    fs::create_dir_all(&path)
+        .map_err(|e| format!("Failed to create cache dir: {}", e))?;
+    Ok(path)
+}
+
+/// Get (and create) the app's internal downloads directory: app_data/downloads
+pub fn get_app_download_dir(app: AppHandle) -> Result<PathBuf, String> {
+    let base = get_app!(app);
+    let path = base.join("downloads");
+    fs::create_dir_all(&path)
+        .map_err(|e| format!("Failed to create downloads dir: {}", e))?;
+    Ok(path)
+}
+
+///
+pub fn get_app_source_dir(app: AppHandle) -> Result<PathBuf, String> {
+    let base = get_app!(app);
+    let path = base.join("source");
+    fs::create_dir_all(&path)
+        .map_err(|e| format!("Failed to create source dir: {}", e))?;
+    Ok(path)
+}
+
+/// Get the system-level user downloads directory (does NOT create)
+pub fn get_user_downloads_dir(app: AppHandle) -> Result<PathBuf, String> {
+    let dir = app
+        .path()
+        .download_dir()
+        .map_err(|e| format!("Failed to get system downloads dir: {}", e))?;
+    Ok(dir)
 }
