@@ -145,7 +145,7 @@ const TabManager = () => {
         {activeTab && activeTabData ? (
           (() => {
             const TabComponent = activeTabData.content;
-            return <TabComponent />;
+            return <TabComponent key={activeTab.id} />;
           })()
         ) : (
           <div>Welcome Screen</div>

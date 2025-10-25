@@ -1,98 +1,131 @@
 import "./discoverTab.scss";
 import AccessoryMenu from "@/components/accessoryMenu/accessoryMenu";
 import { useEffect, useState } from "react";
-import { useActiveTab } from "@/hooks/useActiveTab"; 
-// import { useTabs } from "@/hooks/useTabs";
+import { useActiveTab } from "@/hooks/useActiveTab";
 import CardV2 from "@/components/cardV2/cardV2";
 import { useDiscover } from "@/hooks/useDiscover";
 import { TabState } from "@/types/tabTypes";
 import { createTabState } from "@/store/useTabsStore";
-import { SearchResult } from "@/store/useDiscoverStore";
 
 const DiscoverTab = () => {
-  const { searchBook, clearResults } = useDiscover();
+  const { searchBook } = useDiscover();
+  const { activeTabData, changeActiveTabPage, updateActiveTabData } = useActiveTab();
+
   function isDiscoverTab(tab?: TabState): tab is TabState<"discover"> {
     return tab?.type === "discover";
   }
-  // const { changeTab } = useTabs();
-  const { activeTabData, changeActiveTabPage, updateActiveTabData } =
-    useActiveTab();
-  const z = isDiscoverTab(activeTabData) ? activeTabData.data.query : "";
-  console.log(z);
-  // Local search state tied to tab metadata
-  const [localSVal, setLocalSVal] = useState<string>(z);
-  const searchResults = isDiscoverTab(activeTabData)
-    ? activeTabData.data.searchResults
-    : [];
-  const isLoading = isDiscoverTab(activeTabData)
-    ? activeTabData.data.isLoading
-    : true;
+
+  const tabData = isDiscoverTab(activeTabData)
+    ? activeTabData.data
+    : { query: "", searchResults: [], isLoading: false };
+
+  const [localQuery, setLocalQuery] = useState(tabData.query);
+
+  // === On mount: if query is non-empty and has no results, search ===
   useEffect(() => {
-    const trim = localSVal.trim();
-    const timeout = setTimeout(() => {
-      const runSearch = async () => {
-        if (trim.length > 0) {
-          // Set loading before awaiting
-          changeActiveTabPage(
-            createTabState(
-              "discover",
-              `Search: ${trim}`,
-              `/discover/?search=${encodeURIComponent(trim)}`,
-              {
-                query: trim,
-                searchResults: [],
-                isLoading: true,
-              }
-            )
-          );
+    if (!isDiscoverTab(activeTabData)) return;
+    const initialQuery = activeTabData.data.query.trim();
 
-          const results = await searchBook(trim);
+    if (
+      initialQuery.length > 0 &&
+      tabData.searchResults.length === 0 &&
+      activeTabData.data.searchResults.length === 0
+    ) {
+      (async () => {
+        updateActiveTabData(
+          "replace",
+          createTabState(
+            "discover",
+            `Search: ${initialQuery}`,
+            `/discover/?search=${encodeURIComponent(initialQuery)}`,
+            {
+              query: initialQuery,
+              searchResults: [],
+              isLoading: true,
+            }
+          )
+        );
 
-          updateActiveTabData(
-            "replace",
-            createTabState(
-              "discover",
-              `Search: ${trim}`,
-              `/discover/?search=${encodeURIComponent(trim)}`,
-              {
-                query: trim,
-                searchResults: results,
-                isLoading: false,
-              }
-            )
-          );
-        }
-        else if (trim.length === 0) {
-          updateActiveTabData(
-            "replace",
-            createTabState(
-              "discover",
-              `Discover`,
-              `/discover/
-             
-              `,
-              {
-                query: trim,
-                searchResults: [],
-                isLoading: false,
-              }
-            )
-          );
-        }
-        //  else {
-        //   clearResults();
-        //   changeActiveTabPage(createTabState('discover', `Discover`, `/discover/`, {
-        //     query: `from else?`,
-        //     searchResults: [],
-        //     isLoading: false,
-        //   }));
-        // }
-      };
-      runSearch();
-    }, 300);
+        const results = await searchBook(initialQuery);
+
+        updateActiveTabData(
+          "replace",
+          createTabState(
+            "discover",
+            `Search: ${initialQuery}`,
+            `/discover/?search=${encodeURIComponent(initialQuery)}`,
+            {
+              query: initialQuery,
+              searchResults: results,
+              isLoading: false,
+            }
+          )
+        );
+      })();
+    }
+  }, []);
+
+  // === When typing, trigger new tab + fetch (if no existing results) ===
+  useEffect(() => {
+    if (!isDiscoverTab(activeTabData)) return;
+    const trimmed = localQuery.trim();
+    const oldQuery = activeTabData.data.query;
+    const hasExistingResults = activeTabData.data.searchResults.length > 0;
+
+    // prevent unnecessary search
+    if (trimmed === oldQuery || hasExistingResults) return;
+
+    const timeout = setTimeout(async () => {
+      if (trimmed.length === 0) return;
+
+      changeActiveTabPage(
+        createTabState(
+          "discover",
+          `Search: ${trimmed}`,
+          `/discover/?search=${encodeURIComponent(trimmed)}`,
+          {
+            query: trimmed,
+            searchResults: [],
+            isLoading: true,
+          }
+        )
+      );
+
+      const results = await searchBook(trimmed);
+
+      updateActiveTabData(
+        "replace",
+        createTabState(
+          "discover",
+          `Search: ${trimmed}`,
+          `/discover/?search=${encodeURIComponent(trimmed)}`,
+          {
+            query: trimmed,
+            searchResults: results,
+            isLoading: false,
+          }
+        )
+      );
+    }, 400);
 
     return () => clearTimeout(timeout);
-  }, [localSVal]);
+  }, [localQuery]);
+
+  // === Clear button ===
+  const handleClear = () => {
+    setLocalQuery("");
+    updateActiveTabData(
+      "replace",
+      createTabState("discover", `Discover`, `/discover/`, {
+        query: "",
+        searchResults: [],
+        isLoading: false,
+      })
+    );
+  };
+
+  const isLoading = tabData.isLoading;
+  const searchResults = tabData.searchResults;
 
   return (
     <div className="discoverTab">
@@ -103,11 +136,11 @@ const DiscoverTab = () => {
             type="search"
             id="searchBar"
             placeholder="Search here..."
-            value={localSVal}
-            onInput={(e) => setLocalSVal(e.currentTarget.value.trimStart())}
+            value={localQuery}
+            onInput={(e) => setLocalQuery(e.currentTarget.value.trimStart())}
           />
-          {localSVal && (
-            <button className="clear-btn" onClick={() => setLocalSVal(``)}>
+          {localQuery && (
+            <button className="clear-btn" onClick={handleClear}>
               clear
             </button>
           )}
@@ -119,7 +152,6 @@ const DiscoverTab = () => {
       <div className="mainDiscoverTab">
         <div className="bookSearch">
           {isLoading && <p className="status-msg">Loading...</p>}
-          {/* {error && <p className="status-msg error">{error}</p>} */}
 
           {!isLoading && searchResults.length > 0 && (
             <div className="discover-grid">
@@ -129,10 +161,9 @@ const DiscoverTab = () => {
             </div>
           )}
 
-          {!isLoading &&
-            //  && !error
-            !searchResults.length &&
-            localSVal && <p className="status-msg">No results found.</p>}
+          {!isLoading && !searchResults.length && localQuery && (
+            <p className="status-msg">No results found.</p>
+          )}
         </div>
       </div>
     </div>
