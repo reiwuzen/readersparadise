@@ -9,7 +9,9 @@ pub mod sources;
 pub mod models;
 pub mod client;
 pub mod helper;
+pub mod scraper;
 pub mod user;
+pub mod cache;
 pub mod mgeko;
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -27,20 +29,17 @@ pub fn run() {
             greet,
             cmd::open_folder_and_list_items,
             cmd::read_image_base64,
-            import::register_fs_scope,
-            import::select_and_register_folder,
-            import::import_selected_folder,
-            import::import_book,
+            cache::write_search_res_cache,
             // sources::check_sources,
-            discover::get_book_info,
+            // discover::get_book_info,
             discover::search_book,
-            discover::get_book_chapter,
+            // discover::get_book_chapter,
             data::reset_downloads_dir,
             data::reset_src_dir,
             data::reset_cache_dir,
             data::reset_data_dir,
             data::get_app_path,
-            sources::download_1_chapter,
+        
             user::get_user_config,
             user::update_user_config,
             // discover::fetch_chapter_images,

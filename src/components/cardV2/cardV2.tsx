@@ -1,14 +1,15 @@
 import "./cardV2.scss";
-import { SearchResult } from "@/store/useDiscoverStore";
+// import { SearchResult } from "@/store/useDiscoverStore";
+import { Series } from "@/types/seriesTypes";
 import { useDiscover } from "@/hooks/useDiscover";
 import { useActiveTab } from "@/hooks/useActiveTab";
 import { createTabState } from "@/store/useTabsStore";
-import { BookData } from "@/types/tabTypes";
+// import { BookData } from "@/types/tabTypes";
 // import { useActiveTab } from "@/hooks/useActiveTab";
 
 export type CardV2Props = {
   i: number;
-  Book: SearchResult;
+  Book: Series;
 };
 
 const CardV2 = ({ Book, i }: CardV2Props) => {
@@ -21,16 +22,16 @@ const CardV2 = ({ Book, i }: CardV2Props) => {
   const encodedTitle = encodeURIComponent(Book.title);
 
   // Fetch book data properly
-  const bookData = await getSelectedBookInfo(Book.link, Book.source_name);
+  // const bookData = await getSelectedBookInfo(Book.link, Book.source_name);
 
   // Open a new tab with the resolved book data
-  changeActiveTabPage(createTabState('book', Book.title, `/book/${Book.title}`, bookData));
+  // changeActiveTabPage(createTabState('book', Book.title, `/book/${Book.title}`, bookData));
 };
 
   return (
     <div key={i} className="book-card" onClick={handleClick}>
       <img
-        src={Book.cover_image ?? ""}
+        src={Book.cover_img_url ?? ""}
         alt={Book.title}
         className="cover"
         loading="lazy"
@@ -38,7 +39,7 @@ const CardV2 = ({ Book, i }: CardV2Props) => {
 
       <div className="info">
         <h4 className="title">{Book.title}</h4>
-        <p className="source">{Book.source_name}</p>
+        <p className="source">{Book.site}</p>
 
         {Book.desc && (
           <p className="desc">

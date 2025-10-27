@@ -1,0 +1,54 @@
+{
+  "series_link": {
+    "sel": "ul.novel-list.grid.col.col2 li.novel-item a",
+    "attr": "href"
+  },
+  "cover_img": {
+    "sel": "div.fixed-img figure img",
+    "attr": "data-src"
+  },
+  "title": {
+    "sel": "div.main-head h1.novel-title",
+    "attr": ""
+  },
+  "alt_title": {
+    "sel": "div.main-head h2.alternative-title",
+    "attr": ""
+  },
+  "authors": {
+    "sel": "div.main-head div.author a span",
+    "attr": ""
+  },
+  "latest_chapter": {
+    "sel": "div.header-stats span",
+    "attr": ""
+  },
+  "tags": {
+    "sel": "div.categories ul li a",
+    "attr": ""
+  },
+  "chapters_link": {
+    "sel": "div.intro a#library-push",
+    "attr": "href"
+  },
+  "desc": {
+    "sel": "section#info p.description",
+    "attr": ""
+  },
+  "each_chapter_list_link": {
+    "sel": "ul.chapter-list li a",
+    "attr": "href",
+    "chapter_title": {
+      "sel": "strong",
+      "attr": ""
+    },
+    "time": {
+      "sel": "time",
+      "attr": ""
+    }
+  },
+  "chapter_pages":{
+    "sel":"div.chapter-reader img",
+    "attr": "href"
+  }
+}

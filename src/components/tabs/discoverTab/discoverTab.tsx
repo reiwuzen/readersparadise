@@ -8,7 +8,7 @@ import { TabState } from "@/types/tabTypes";
 import { createTabState } from "@/store/useTabsStore";
 
 const DiscoverTab = () => {
-  const { searchBook } = useDiscover();
+  const { getSearchRes } = useDiscover();
   const { activeTabData, changeActiveTabPage, updateActiveTabData } = useActiveTab();
 
   function isDiscoverTab(tab?: TabState): tab is TabState<"discover"> {
@@ -46,7 +46,7 @@ const DiscoverTab = () => {
           )
         );
 
-        const results = await searchBook(initialQuery);
+        const results = await getSearchRes(initialQuery);
 
         updateActiveTabData(
           "replace",
@@ -91,7 +91,7 @@ const DiscoverTab = () => {
         )
       );
 
-      const results = await searchBook(trimmed);
+      const results = await getSearchRes(trimmed);
 
       updateActiveTabData(
         "replace",

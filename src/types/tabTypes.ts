@@ -4,8 +4,10 @@ import SettingsTab from "@/components/tabs/settingsTab/settingsTab";
 import Reader from "@/components/reader/Reader";
 import Book from "@/components/book/book";
 import About from "@/components/about/About";
-import { BookInfo, SearchResult } from "@/store/useDiscoverStore";
+// import { BookInfo, SearchResult } from "@/store/useDiscoverStore";
+
 import { Mode } from "./globalTypes";
+import { Series } from "./seriesTypes";
 
 /**
  * Tab Components Mapping
@@ -28,7 +30,7 @@ export type TabType = keyof TabComponentMap;
  */
 export type DiscoverData = {
   query: string;
-  searchResults: SearchResult[];
+  searchResults: Series[];
   isLoading?: boolean;
   error?: string | null;
 };
@@ -40,7 +42,7 @@ export type ReaderData = {
   currentPage?: number;
 };
 
-export type BookData = BookInfo;
+// export type BookData = BookInfo;
 
 export type DownloadsData = {
   activeDownloads: string[];

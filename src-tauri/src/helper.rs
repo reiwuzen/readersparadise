@@ -1,11 +1,16 @@
 use std::path::PathBuf;
 use std::fs;
+use crate::book::SeriesStatusEnum;
 use crate::models::{BookInfo, EachChapter};
-use crate::sources::{Conf, Sel};
+// use crate::sources::{Conf, Sel};
 use scraper::ElementRef;
 use scraper::{Html, Selector};
+use tauri::http::status;
 use tauri::{AppHandle,Manager};
 
+
+/// get val from element if Some(attr) then its value
+/// else the text from element
 pub fn get_val(el: &ElementRef, attr: Option<&str>) -> String {
     if let Some(attribute) = attr {
         if let Some(val) = el.value().attr(attribute) {
@@ -58,6 +63,22 @@ macro_rules! get_app {
             .app_data_dir()
             .map_err(|e| format!("Failed to get app data dir: {}", e))?
     };
+}
+
+/// converts to string stringify
+pub fn pls_stringify(i: &str)->String{
+    String::from(i)
+}
+
+/// map to SeriesSites Enum
+pub fn map_series_sites_to_enum(status: String) -> SeriesStatusEnum{
+     match status.to_lowercase().as_str() {
+    "ongoing" => SeriesStatusEnum::Ongoing,
+    "completed" => SeriesStatusEnum::Completed,
+    "stopped" => SeriesStatusEnum::Stopped,
+    "hiatus" => SeriesStatusEnum::Hiatus,
+    _ => SeriesStatusEnum::Ongoing,
+}
 }
 
 /// Get (and create) the app's config directory: app_data/config
@@ -113,3 +134,6 @@ pub fn get_user_downloads_dir(app: AppHandle) -> Result<PathBuf, String> {
         .map_err(|e| format!("Failed to get system downloads dir: {}", e))?;
     Ok(dir)
 }
+
+
+//
