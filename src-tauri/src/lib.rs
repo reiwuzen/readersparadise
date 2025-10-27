@@ -31,9 +31,10 @@ pub fn run() {
             cmd::read_image_base64,
             cache::write_search_res_cache,
             // sources::check_sources,
-            // discover::get_book_info,
+            
+            discover::get_chapter,
             discover::search_book,
-            // discover::get_book_chapter,
+            discover::get_book,
             data::reset_downloads_dir,
             data::reset_src_dir,
             data::reset_cache_dir,

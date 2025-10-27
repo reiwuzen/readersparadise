@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Series } from "@/types/seriesTypes";
+import { PageStruct, Series } from "@/types/seriesTypes";
 import { UseDiscoverState } from "@/types/discoverTypes";
 import { invoke } from "@tauri-apps/api/core";
 
@@ -28,5 +28,18 @@ export const useDiscoverStore = create<UseDiscoverState>((set,get)=>({
       }
 
     })
+  },
+  getBook:async(series)=>{
+      let res = await invoke<Series>("get_book",{
+        series
+      });
+      return res
+  },
+  getChapter: async(series,url)=>{
+    let res = await invoke<Series>("get_chapter",{
+      series,
+      url
+    })
+    return res
   }
 }))

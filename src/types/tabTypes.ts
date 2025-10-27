@@ -38,11 +38,14 @@ export type DiscoverData = {
 export type ReaderData = {
   bookId?: string;
   chapterId?: string;
+  urls?:string[];
   pages?: string[];
   currentPage?: number;
 };
 
-// export type BookData = BookInfo;
+export type BookData = {
+  series: Series
+};
 
 export type DownloadsData = {
   activeDownloads: string[];

@@ -4,14 +4,16 @@ import { useDiscover } from "@/hooks/useDiscover";
 import { useActiveTab } from "@/hooks/useActiveTab";
 import { createTabState } from "@/store/useTabsStore";
 import { isBook } from "@/helper/tabCheck";
-import { BookInfo } from "@/store/useDiscoverStore";
+import { BookData } from "@/types/tabTypes";
+import { AttrItemStruct, ChapterStruct } from "@/types/seriesTypes";
+// import { BookInfo } from "@/store/useDiscoverStore";
 const Book = () => {
-  const {  getBookChapter } = useDiscover();
+  const {  getChapter } = useDiscover();
   const { changeActiveTabPage, activeTabData } = useActiveTab();
   const [is, setIs] = useState(true);
 
   // const book = selectedBook;
-  const book = isBook(activeTabData)? activeTabData.data  : {} as BookInfo
+  const book = isBook(activeTabData)? activeTabData.data  : {} as BookData
   if (!book) {
     return (
       <div className="book">
@@ -20,18 +22,18 @@ const Book = () => {
     );
   }
 
-  const handleChapterClick =async (chapter: any) => {
-    if (!chapter?.chapter_number) return;
+  const handleChapterClick =async (chapter: ChapterStruct) => {
+    if (!chapter?.title) return;
 
-    const chapterNumber = chapter.chapter_number ?? "";
-    const chapterUrl = `${book.title}/${chapterNumber}`;
+    const chapterNumber = chapter.title ?? "";
+    const chapterUrl = `${book.series.title}/${chapterNumber}`;
 
-    const chap =await getBookChapter(chapter.chapter_link ?? "", chapterNumber);
     
-    changeActiveTabPage(createTabState('reader',book.title,`/reader/${chapterUrl}`,{
-      pages: chap.urls,
-      chapterId: chap.ch_no,
-      bookId: book.title
+    const pgs = await getChapter(book.series,chapter.url);
+    changeActiveTabPage(createTabState('reader',book.series.title,`/reader/${chapterUrl}`,{
+      urls: pgs.chapters.find((z)=>z.url === chapter.url)?.pages.map((z)=>z.url) ?? [] as string[],
+      chapterId: chapter.title,
+      bookId: book.series.title
     }))
 
     // Trigger actual chapter loading
@@ -42,33 +44,33 @@ const Book = () => {
       {/* --- Book Metadata --- */}
       <div className="metaData">
         <div className="metaImg">
-          <img src={book.cover_image} alt={book.title} />
+          <img src={book.series.cover_img_url} alt={book.series.title} />
         </div>
 
         <div className="metaInfo">
-          <h2 className="title">{book.title}</h2>
+          <h2 className="title">{book.series.title}</h2>
 
           <aside className="author">
             <strong>Author(s):&nbsp;</strong>
-            <strong>{book.author}</strong>
+            <strong>{book.series.attributes.authors.name}</strong>
           </aside>
 
-          <aside className="bookmarks">
+          {/* <aside className="bookmarks">
             <strong>Bookmarks:&nbsp;</strong>
             <strong>{book.bookmarks}</strong>
-          </aside>
+          </aside> */}
 
           <aside className="status">
             <strong>Status:&nbsp;</strong>
-            <strong>{book.status}</strong>
+            <strong>{book.series.attributes.status}</strong>
           </aside>
 
           <div className="metaTags">
             <h4>Tags / Categories:</h4>
             <ul className="tags">
-              {book.tags.map((t: string, i: number) => (
+              {book.series.attributes.tags.map((t: AttrItemStruct, i: number) => (
                 <li key={i}>
-                  <p>{t}</p>
+                  <p>{t.name}</p>
                 </li>
               ))}
             </ul>
@@ -91,19 +93,19 @@ const Book = () => {
           {is ? (
             <div className="synopsis">
               <h4>Synopsis</h4>
-              <p>{book.desc}</p>
+              <p>{book.series.desc}</p>
             </div>
           ) : (
             <div className="metaChapters">
               <h4>Chapters:&nbsp;</h4>
               <ul className="chapters">
-                {book.chapters.map((c: any, i: number) => (
+                {book.series.chapters.map((t:ChapterStruct, i: number) => (
                   <li
                     key={i}
-                    title={c.chapter_number ?? ""}
-                    onClick={() => handleChapterClick(c)}
+                    title={t.title ?? ""}
+                    onClick={() => handleChapterClick(t)}
                   >
-                    <p>{c.chapter_number}</p>
+                    <p>{t.title}</p>
                   </li>
                 ))}
               </ul>

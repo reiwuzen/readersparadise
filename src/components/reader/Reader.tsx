@@ -1,12 +1,12 @@
 import { useState } from "react";
 import "./Reader.scss";
-import { useDiscover } from "@/hooks/useDiscover";
+// import { useDiscover } from "@/hooks/useDiscover";
 import { useActiveTab } from "@/hooks/useActiveTab";
 import { isReader } from "@/helper/tabCheck";
 const Reader = () => {
   const {activeTabData} = useActiveTab()
   const chapter = {
-    urls: isReader(activeTabData) ? activeTabData.data.pages : [] as string[],
+    urls: isReader(activeTabData) ? activeTabData.data.pages ?? activeTabData.data.urls : [] as string[],
     ch_no: isReader(activeTabData)? activeTabData.data.chapterId : 'not-found' ,
   }
   const book = {

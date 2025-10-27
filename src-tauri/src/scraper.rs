@@ -167,7 +167,7 @@ pub fn get_conf(app: &AppHandle, site: &str) -> Result<ScraperConf, String> {
         let mut res = Vec::new();
 
         let s_url = self.conf.search_url.replace("{query}", &encode(&query));
-        println!("🔍 Searching: {}", s_url);
+        // println!("🔍 Searching: {}", s_url);
 
         let response = HTTP_CLIENT
             .get(&s_url)
@@ -190,8 +190,60 @@ pub fn get_conf(app: &AppHandle, site: &str) -> Result<ScraperConf, String> {
 
         Ok(res)
     }
+    /// returns -> (link,title)
+   pub async fn send_each_chapter_link_0_title(
+    &self,
+    url: String,
+) -> Result<Vec<(String, String)>, String> {
+    // Fetch HTML
+    let response = HTTP_CLIENT
+        .get(&url)
+        .send()
+        .await
+        .map_err(|e| format!("Failed to get response: {}", e))?;
+
+    let html = response.text().await.map_err(|e| e.to_string())?;
+    let doc = Html::parse_document(&html);
+
+    // Parse selectors
+    let chapter_list_sel = Selector::parse(&self.sel.each_chapter_list_link.sel)
+        .map_err(|e| format!("Invalid chapter list selector: {}", e))?;
+    let chapter_title_sel = Selector::parse(&self.sel.each_chapter_list_link.chapter_title.sel)
+        .map_err(|e| format!("Invalid chapter title selector: {}", e))?;
+
+    // ✅ Initialize the result vector
+    let mut results: Vec<(String, String)> = Vec::new();
+
+    // Extract chapters
+    for el in doc.select(&chapter_list_sel) {
+        // Extract raw link
+        let raw_link = el
+            .value()
+            .attr(&self.sel.each_chapter_list_link.attr)
+            .unwrap_or("not-found")
+            .to_string();
+
+        // Format full URL if relative
+        let link = if raw_link.starts_with("https://") {
+            raw_link.to_string()
+        } else {
+            Scraper::format_full_url(&self.conf, raw_link)
+        };
+        // println!("link: from send_enc....: {}",link);
+        // Extract title
+        let title = el
+            .select(&chapter_title_sel)
+            .next()
+            .map(|t| get_val(&t, None))
+            .unwrap_or_else(|| "not-found".to_string());
+
+        results.push((link, title));
+    }
+
+    Ok(results)
+}
     pub async fn send_html_doc(url: String) -> Result<scraper::Html, String> {
-        println!("html_doc url : {}",url);
+        // println!("html_doc url : {}",url);
         let response = HTTP_CLIENT
             .get(&url)
             .send()
@@ -203,7 +255,7 @@ pub fn get_conf(app: &AppHandle, site: &str) -> Result<ScraperConf, String> {
         Ok(doc)
     }
     pub async fn send_html_string(url: String) -> Result<String, String> {
-        println!("html_string url : {}",url);
+        // println!("html_string url : {}",url);
         let response = HTTP_CLIENT
             .get(&url)
             .send()

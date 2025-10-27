@@ -14,18 +14,19 @@ export type CardV2Props = {
 
 const CardV2 = ({ Book, i }: CardV2Props) => {
   const { changeActiveTabPage } = useActiveTab();
-  const { getSelectedBookInfo } = useDiscover();
+  const { getBook } = useDiscover();
 
   const handleClick = async () => {
   if (!Book || !Book.title) return;
 
-  const encodedTitle = encodeURIComponent(Book.title);
+  // const encodedTitle = encodeURIComponent(Book.title);
 
   // Fetch book data properly
-  // const bookData = await getSelectedBookInfo(Book.link, Book.source_name);
+  const bookData = await getBook(Book);
+  console.log("bookdata: from cardv2",bookData);
 
   // Open a new tab with the resolved book data
-  // changeActiveTabPage(createTabState('book', Book.title, `/book/${Book.title}`, bookData));
+  changeActiveTabPage(createTabState('book', Book.title, `/book/${Book.title}`, {series:bookData}));
 };
 
   return (
@@ -41,11 +42,11 @@ const CardV2 = ({ Book, i }: CardV2Props) => {
         <h4 className="title">{Book.title}</h4>
         <p className="source">{Book.site}</p>
 
-        {Book.desc && (
+        {/* {Book.desc && (
           <p className="desc">
             {Book.desc.length > 80 ? `${Book.desc.slice(0, 80)}...` : Book.desc}
           </p>
-        )}
+        )} */}
       </div>
     </div>
   );

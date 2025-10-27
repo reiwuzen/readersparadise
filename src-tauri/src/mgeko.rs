@@ -1,14 +1,21 @@
-use std::ops::{Deref, DerefMut};
-
+///
 use futures::stream::Scan;
+use futures::{stream, StreamExt};
+use rayon::prelude::*;
 use scraper::{Html, Selector};
+use std::ops::{Deref, DerefMut};
+use std::sync::Arc;
+///
+use std::time::Instant;
 use tauri::{http::status, AppHandle};
 use uuid::Uuid;
 
+use crate::book::{ChapterStruct, PageStruct};
 use crate::{
     book::{AttrItemStruct, AttributeStruct, Series},
-    helper::{get_val, map_series_sites_to_enum, pls_stringify, clean_description},
-    scraper::{Scraper, ScraperConf, ScraperSel, SelItem},
+    client::HTTP_CLIENT,
+    helper::{clean_description, get_val, map_series_sites_to_enum, pls_stringify},
+    scraper::{Scraper, ScraperConf, ScraperSel},
 };
 
 #[derive(Clone)]
@@ -43,44 +50,91 @@ impl Mgeko {
         })
     }
 
-   pub async fn search_mgeko(&self, query: String) -> Result<Vec<Series>, String> {
-    let mut vec_series = Vec::new();
-    let links = self.send_search(query.clone()).await?;
+    pub async fn search_mgeko(&self, query: String) -> Result<Vec<Series>, String> {
+        let start = Instant::now();
 
-    for el in links {
-        let html = Scraper::send_html_string(el.clone()).await?;
-        let sel = self.sel.clone();
-        let conf =self.conf.clone();
-        let (mut series, all_chapter_link) = tokio::task::spawn_blocking(move || {
-            Mgeko::parse_each_link_metadata(&sel, &conf, html)
-        }).await.map_err(|e| format!("Join error parsing main page: {}", e))??;
-        
+        // 1️⃣ Get all search links
+        let links = self.send_search(query).await?;
+        // println!("Got {} links", links.len());
 
-        // Async call can use doc safely
-        let chapter_count = self.send_chapter_count(all_chapter_link).await?;
-         series.chapter_count = chapter_count;
-         vec_series.push(series);
-        
+        // 2️⃣ Fetch HTML concurrently
+        let htmls: Vec<_> = stream::iter(links.into_iter())
+            .map(|url| async move {
+                match HTTP_CLIENT.get(&url).send().await {
+                    Ok(resp) if resp.status().is_success() => match resp.text().await {
+                        Ok(text) => Ok((url, text)),
+                        Err(e) => Err(format!("Failed to read body: {}", e)),
+                    },
+                    Ok(resp) => Err(format!("Bad status {} for {}", resp.status(), url)),
+                    Err(e) => Err(format!("Request failed for {}: {}", url, e)),
+                }
+            })
+            .buffer_unordered(20)
+            .filter_map(|res| async move { res.ok() })
+            .collect()
+            .await;
+
+        // println!(
+        //     "Fetched {} HTML pages in {:.2?}",
+        //     htmls.len(),
+        //     start.elapsed()
+        // );
+
+        // 3️⃣ Parse all HTML in parallel
+        let sel = Arc::new(self.sel.clone());
+        let conf = Arc::new(self.conf.clone());
+
+        let parsed: Vec<(Series, String)> = htmls
+            .into_par_iter()
+            .filter_map(|(_, html)| Mgeko::parse_each_link_metadata(&sel, &conf, html).ok())
+            .collect();
+
+        // println!("Parsed {} series", parsed.len());
+
+        // 4️⃣ Fetch chapter counts concurrently (async)
+        let results = stream::iter(parsed.into_iter())
+            .map(|(mut series, chapters_link)| async move {
+                match self.send_chapter_count(chapters_link).await {
+                    Ok(count) => series.chapter_count = count,
+                    Err(e) => eprintln!("Chapter count failed: {}", e),
+                }
+                series
+            })
+            .buffer_unordered(10)
+            .collect::<Vec<_>>()
+            .await;
+
+        // println!(
+        //     "Total finished in {:.2?} with {} series",
+        //     start.elapsed(),
+        //     results.len()
+        // );
+
+        Ok(results)
     }
 
-    Ok(vec_series)
-}
+    pub fn parse_each_link_metadata(
+        sel: &ScraperSel,
+        conf: &ScraperConf,
+        html: String,
+    ) -> Result<(Series, String), String> {
+        let doc = Html::parse_document(&html);
+        let title = Scraper::extract_text(&doc, &sel.title).unwrap_or_else(|_| "not-found".into());
+        let alt_title =
+            Scraper::extract_text(&doc, &sel.alt_title).unwrap_or_else(|_| "not-found".into());
+        let cover_img_raw =
+            Scraper::extract_attr(&doc, &sel.cover_img).unwrap_or_else(|_| "not-found".into());
 
-pub fn parse_each_link_metadata(sel : &ScraperSel, _conf: &ScraperConf ,html:String)->Result<(Series,String),String>{
-    let doc = Html::parse_document(&html);
-    let title = Scraper::extract_text(&doc, &sel.title)
-            .unwrap_or_else(|_| "not-found".into());
-        let alt_title = Scraper::extract_text(&doc, &sel.alt_title)
-            .unwrap_or_else(|_| "not-found".into());
-        let cover_img_raw = Scraper::extract_attr(&doc, &sel.cover_img)
-            .unwrap_or_else(|_| "not-found".into());
-        
-        let desc = clean_description(&Scraper::extract_text(&doc, &sel.desc)
-            .unwrap_or( "not-found".into()), None);
-        println!("desc: {:#?},  desc_str: {}", &sel.desc, desc);
-        let attrs = Mgeko::send_attr(&sel,&doc).unwrap_or_default();
-    let all_chapter_link =
-            Scraper::extract_attr(&doc, &sel.chapters_link).unwrap_or(pls_stringify(""));
+        let desc = clean_description(
+            &Scraper::extract_text(&doc, &sel.desc).unwrap_or("not-found".into()),
+            None,
+        );
+        // println!("desc: {:#?},  desc_str: {}", &sel.desc, desc);
+        let attrs = Mgeko::send_attr(&sel, &doc).unwrap_or_default();
+        let all_chapter_link = Scraper::format_full_url(
+            &conf,
+            Scraper::extract_attr(&doc, &sel.chapters_link).unwrap_or(pls_stringify("")),
+        );
         let series = Series {
             id: Uuid::new_v4().to_string(),
             site: crate::book::SitesEnum::Mgeko,
@@ -90,11 +144,11 @@ pub fn parse_each_link_metadata(sel : &ScraperSel, _conf: &ScraperConf ,html:Str
             desc,
             favorite: false,
             attributes: attrs,
+            all_chapters_url: all_chapter_link.clone(),
             ..Default::default()
-
         };
-        Ok((series,all_chapter_link))
-}
+        Ok((series, all_chapter_link))
+    }
     pub fn send_status(sel: &ScraperSel, doc: &scraper::Html) -> Result<String, String> {
         let sel_ = Selector::parse(&sel.latest_chapter.sel)
             .map_err(|e| format!("failed to parse latest_chapter selector: {}", e))?;
@@ -129,8 +183,8 @@ pub fn parse_each_link_metadata(sel : &ScraperSel, _conf: &ScraperConf ,html:Str
         Ok(status)
     }
 
-    pub fn send_attr(sel : &ScraperSel, doc: &scraper::Html) -> Result<AttributeStruct, String> {
-        let status = map_series_sites_to_enum(Self::send_status(&sel,&doc).unwrap_or_default());
+    pub fn send_attr(sel: &ScraperSel, doc: &scraper::Html) -> Result<AttributeStruct, String> {
+        let status = map_series_sites_to_enum(Self::send_status(&sel, &doc).unwrap_or_default());
         let tags: Vec<AttrItemStruct> = Scraper::extract_list(&doc, &sel.tags)
             .into_iter()
             .map(|el| AttrItemStruct {
@@ -158,8 +212,7 @@ pub fn parse_each_link_metadata(sel : &ScraperSel, _conf: &ScraperConf ,html:Str
                 path: pls_stringify(""),
             });
         let authors = AttrItemStruct {
-            name: Scraper::extract_text(&doc, &sel.authors)
-                .unwrap_or(pls_stringify("not-found")),
+            name: Scraper::extract_text(&doc, &sel.authors).unwrap_or(pls_stringify("not-found")),
             url: pls_stringify(""),
             path: pls_stringify(""),
         };
@@ -182,9 +235,81 @@ pub fn parse_each_link_metadata(sel : &ScraperSel, _conf: &ScraperConf ,html:Str
         drop(new_doc);
         Ok(int)
     }
-    pub async fn get_book(&self, url: String) -> Result<Series, String> {
-        // Mgeko-specific parsing logic
-        println!("Fetching Mgeko series: {}", url);
-        todo!()
+    pub async fn get_book(&self, series: Series) -> Result<Series, String> {
+        
+
+        let chapters_meta: Vec<(String, String)> = self
+            .send_each_chapter_link_0_title(series.all_chapters_url.clone())
+            .await
+            .unwrap_or_default();
+
+       
+        let chapters: Vec<ChapterStruct> = chapters_meta
+            .into_par_iter() 
+            .enumerate()
+            .filter_map(|(i, (url, title))| {
+               
+                Some(ChapterStruct {
+                    order: (i+1) as u64,
+                    title: title,
+                    url,
+                    ..Default::default()
+                })
+            })
+            .collect();
+
+        let mut updated_series = series.clone();
+        updated_series.chapters = chapters;
+
+        Ok(updated_series)
+    }
+   pub async fn get_chapter(&self,series: Series, url: String) -> Result<Series, String> {
+    // Step 1: Fetch HTML from the given chapter URL
+    let html = Scraper::send_html_string(url.clone()).await?;
+
+    // Step 2: Extract image URLs (assuming this returns Vec<String>)
+    let vec_pages = Mgeko::send_chapter_images(&self.sel, &self.conf, html)
+        .map_err(|e| format!("Failed to extract images: {}", e))?;
+
+    // Step 3: Convert image URLs into PageStructs
+    let pages: Vec<PageStruct> = vec_pages
+        .into_iter()
+        .enumerate()
+        .map(|(j, el)| PageStruct {
+            order: (j+1) as u64,
+            url: el,
+            ..Default::default()
+        })
+        .collect();
+        let mut new_series = series.clone();
+    if let Some(chapter) = new_series.chapters.iter_mut().find(|c| c.url == url) {
+        chapter.pages = pages;
+        Ok(new_series)
+    } else {
+        Err(format!("Chapter with URL '{}' not found in series", url))
+    }
+}
+    pub fn send_chapter_images(
+        sel: &ScraperSel,
+        conf: &ScraperConf,
+        html: String,
+    ) -> Result<Vec<String>, String> {
+        let doc = Html::parse_document(&html);
+        // println!("doc:: {:#?}",doc);
+        let selector = Selector::parse(&sel.chapter_pages.sel)
+            .map_err(|e| format!("Failed to parse send_chapter_images: {}", e))?;
+        // println!("sel: {:#?}",selector);
+        let mut res = Vec::new();
+        for img in doc.select(&selector) {
+            let i = img
+                .value()
+                .attr(&sel.chapter_pages.attr)
+                .unwrap_or("not-found")
+                .to_string();
+            // println!("i: {}", i);
+            res.push(i);
+        }
+        // println!("res: {:#?}",res);
+        Ok(res)
     }
 }

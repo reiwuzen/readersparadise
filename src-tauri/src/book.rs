@@ -28,7 +28,7 @@ pub enum AvailabilityStatus {
 ///
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ChapterStruct {
-    pub order: i32,
+    pub order: u64,
     pub title: String,
     pub url: String,
     pub path: String,
@@ -38,7 +38,7 @@ pub struct ChapterStruct {
 ///
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct PageStruct {
-    pub order: i32,
+    pub order: u64,
     pub url: String,
     pub path: String,
     pub availability: AvailabilityStatus,
@@ -82,11 +82,34 @@ pub struct Series {
     pub chapter_count: usize,
     pub desc: String,
     pub favorite: bool,
-    pub reads: i32,
+    pub reads: u64,
+    pub all_chapters_url: String,
     pub availability: AvailabilityStatus,
     pub chapters: Vec<ChapterStruct>,
     pub attributes: AttributeStruct,
 }
+
+///
+impl Default for PageStruct {
+    fn default() -> Self {
+        Self {
+            order: 0,
+            url: String::new(),
+            path: String::new(),
+            availability: AvailabilityStatus::Online,
+            is_read: false,
+        }
+    }
+}
+
+///
+impl Default for ChapterStruct {
+    fn default() -> Self {
+        Self { order: 0, title: String::new(), url: String::new(), path: String::new(), pages: Vec::new() }
+    }
+}
+
+
 
 ///default for the AttributeStruct
 impl Default for AttributeStruct {
@@ -122,6 +145,7 @@ impl Default for Series {
             favorite: false,
             reads: 0,
             availability: AvailabilityStatus::Online,
+            all_chapters_url: String::new(),
             chapters: Vec::new(),
             attributes: AttributeStruct {
                 status: SeriesStatusEnum::Ongoing,

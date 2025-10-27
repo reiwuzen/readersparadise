@@ -64,6 +64,7 @@ export interface Series {
   desc: string;
   favorite: boolean;
   reads: number;
+  all_chapters_url: string,
   availability: AvailabilityStatus;
   chapters: ChapterStruct[];
   attributes: AttributeStruct;

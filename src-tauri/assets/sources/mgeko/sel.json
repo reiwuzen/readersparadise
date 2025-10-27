@@ -48,7 +48,7 @@
     }
   },
   "chapter_pages":{
-    "sel":"div.chapter-reader img",
-    "attr": "href"
+    "sel":"div#chapter-reader img",
+    "attr": "src"
   }
 }
