@@ -67,9 +67,12 @@ export type TabDataMap = {
 /**
  * A single tab’s data payload
  */
-export type url_s = string & { __brand: "full or partial url" };
-export type tab_id_s = string & { __brand: "crypto_id" };
-export type i_n = number & { __brand: "index_number" };
+export type url_s = string;
+//  & { __brand: "full or partial url" };
+export type tab_id_s = string 
+// & { __brand: "crypto_id" };
+export type i_n = number 
+// & { __brand: "index_number" };
 export type TabState<T extends TabType = TabType> = {
   name: string;
   type: T;

@@ -5,7 +5,7 @@ import { useDownload } from "@/hooks/useDownload";
 import { useDiscover } from "@/hooks/useDiscover";
 const AccessoryMenu = () => {
   const { download1Chapter } = useDownload();
-  const {bookChapter, selectedBook} = useDiscover();
+  // const {bookChapter, selectedBook} = useDiscover();
   const AMBM = useRef<HTMLSpanElement>(null);
   const AMBP = useRef<HTMLSpanElement>(null);
   const aMenu = useRef<HTMLDivElement>(null);
@@ -70,7 +70,7 @@ const AccessoryMenu = () => {
         <div ref={SaMenu} className="SaMenu"></div>
         <div ref={TaMenu} className="TaMenu">
           Ta
-          <button
+          {/*<button
             onClick={() => {
               if(selectedBook && bookChapter){
 
@@ -79,7 +79,7 @@ const AccessoryMenu = () => {
             }}
           >
             Download this chapter
-          </button>
+          </button>*/}
         </div>
       </div>
     </div>
