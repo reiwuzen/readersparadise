@@ -2,7 +2,7 @@ use std::{fs, path::PathBuf};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tauri::{App, AppHandle, Manager};
-use crate::{get_app, helper::{get_app_config_dir, get_app_data_dir, get_app_download_dir}};
+use crate::{get_app, helper::{get_app_config_dir, get_app_data_dir, get_app_download_dir, get_user_downloads_dir}};
 
 // --- your enums and structs ---
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -44,8 +44,8 @@ pub struct ReaderConf {
 pub struct UserConf {
     pub is_nsfw: bool,
     pub theme: Theme,
-    pub app_path: PathBuf,
-    pub download: DownloadConf,
+    pub download_path: PathBuf,
+    pub concurrent_download_limit: u64,
     pub reader: ReaderConf,
 }
 
@@ -76,8 +76,9 @@ pub struct UserConf {
     let user_conf = UserConf {
         is_nsfw: false,
         theme: Theme::Dark,
-        app_path: get_app!(app),
-        download,
+        download_path: get_user_downloads_dir(app.clone()).unwrap_or_default(),
+        concurrent_download_limit: 10,
+
         reader,
     };
 

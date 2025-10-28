@@ -1,6 +1,6 @@
 ///
 use futures::stream::Scan;
-use futures::{stream, StreamExt};
+use futures::{stream, StreamExt, TryStreamExt};
 use rayon::prelude::*;
 use scraper::{Html, Selector};
 use std::ops::{Deref, DerefMut};
@@ -236,21 +236,17 @@ impl Mgeko {
         Ok(int)
     }
     pub async fn get_book(&self, series: Series) -> Result<Series, String> {
-        
-
         let chapters_meta: Vec<(String, String)> = self
             .send_each_chapter_link_0_title(series.all_chapters_url.clone())
             .await
             .unwrap_or_default();
 
-       
         let chapters: Vec<ChapterStruct> = chapters_meta
-            .into_par_iter() 
+            .into_par_iter()
             .enumerate()
             .filter_map(|(i, (url, title))| {
-               
                 Some(ChapterStruct {
-                    order: (i+1) as u64,
+                    order: (i + 1) as u64,
                     title: title,
                     url,
                     ..Default::default()
@@ -263,32 +259,32 @@ impl Mgeko {
 
         Ok(updated_series)
     }
-   pub async fn get_chapter(&self,series: Series, url: String) -> Result<Series, String> {
-    // Step 1: Fetch HTML from the given chapter URL
-    let html = Scraper::send_html_string(url.clone()).await?;
+    pub async fn get_chapter(&self, series: Series, url: String) -> Result<Series, String> {
+        // Step 1: Fetch HTML from the given chapter URL
+        let html = Scraper::send_html_string(url.clone()).await?;
 
-    // Step 2: Extract image URLs (assuming this returns Vec<String>)
-    let vec_pages = Mgeko::send_chapter_images(&self.sel, &self.conf, html)
-        .map_err(|e| format!("Failed to extract images: {}", e))?;
+        // Step 2: Extract image URLs (assuming this returns Vec<String>)
+        let vec_pages = Mgeko::send_chapter_images(&self.sel, &self.conf, html)
+            .map_err(|e| format!("Failed to extract images: {}", e))?;
 
-    // Step 3: Convert image URLs into PageStructs
-    let pages: Vec<PageStruct> = vec_pages
-        .into_iter()
-        .enumerate()
-        .map(|(j, el)| PageStruct {
-            order: (j+1) as u64,
-            url: el,
-            ..Default::default()
-        })
-        .collect();
+        // Step 3: Convert image URLs into PageStructs
+        let pages: Vec<PageStruct> = vec_pages
+            .into_iter()
+            .enumerate()
+            .map(|(j, el)| PageStruct {
+                order: (j + 1) as u64,
+                url: el,
+                ..Default::default()
+            })
+            .collect();
         let mut new_series = series.clone();
-    if let Some(chapter) = new_series.chapters.iter_mut().find(|c| c.url == url) {
-        chapter.pages = pages;
-        Ok(new_series)
-    } else {
-        Err(format!("Chapter with URL '{}' not found in series", url))
+        if let Some(chapter) = new_series.chapters.iter_mut().find(|c| c.url == url) {
+            chapter.pages = pages;
+            Ok(new_series)
+        } else {
+            Err(format!("Chapter with URL '{}' not found in series", url))
+        }
     }
-}
     pub fn send_chapter_images(
         sel: &ScraperSel,
         conf: &ScraperConf,
@@ -311,5 +307,43 @@ impl Mgeko {
         }
         // println!("res: {:#?}",res);
         Ok(res)
+    }
+    pub async fn download_all_chapters_helper(&self, series: Series) -> Result<Series, String> {
+        let sel = self.sel.clone();
+        let conf = self.conf.clone();
+        let concurrency_limit = 5;
+
+        // ✅ Step 1: take ownership of chapters
+        let mut new_chapters = series.chapters.into_iter().map(|mut chapter| {
+            let sel = sel.clone();
+            let conf = conf.clone();
+
+            async move {
+                let html = Scraper::send_html_string(chapter.url.clone()).await?;
+                let img_urls = Mgeko::send_chapter_images(&sel, &conf, html).unwrap_or_default();
+
+                let pages: Vec<PageStruct> = img_urls
+                    .into_iter()
+                    .enumerate()
+                    .map(|(i, url)| PageStruct {
+                        order: i as u64,
+                        url,
+                        ..Default::default()
+                    })
+                    .collect();
+
+                chapter.pages = pages;
+                Ok::<ChapterStruct, String>(chapter)
+            }
+        });
+
+        // ✅ Step 2: run tasks concurrently
+        let chapters: Vec<ChapterStruct> = stream::iter(&mut new_chapters)
+            .buffer_unordered(concurrency_limit)
+            .try_collect()
+            .await?;
+
+        // ✅ Step 3: rebuild series
+        Ok(Series { chapters, ..series })
     }
 }
