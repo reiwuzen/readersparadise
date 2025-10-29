@@ -1,13 +1,15 @@
 ///
-use futures::stream::Scan;
+// use futures::stream::Scan;
 use futures::{stream, StreamExt, TryStreamExt};
 use rayon::prelude::*;
 use scraper::{Html, Selector};
 use std::ops::{Deref, DerefMut};
 use std::sync::Arc;
 ///
-use std::time::Instant;
-use tauri::{http::status, AppHandle};
+// use std::time::Instant;
+use tauri::{
+    // http::status,
+     AppHandle};
 use uuid::Uuid;
 
 use crate::book::{ChapterStruct, PageStruct};
@@ -51,7 +53,7 @@ impl Mgeko {
     }
 
     pub async fn search_mgeko(&self, query: String) -> Result<Vec<Series>, String> {
-        let start = Instant::now();
+        // let start = Instant::now();
 
         // 1️⃣ Get all search links
         let links = self.send_search(query).await?;
@@ -287,7 +289,7 @@ impl Mgeko {
     }
     pub fn send_chapter_images(
         sel: &ScraperSel,
-        conf: &ScraperConf,
+        _conf: &ScraperConf,
         html: String,
     ) -> Result<Vec<String>, String> {
         let doc = Html::parse_document(&html);

@@ -20,7 +20,8 @@ export const useContextMenu = () => {
   // const { addTab } = useTabs();
   const [menu, setMenu] = useState<MenuState>(null);
   // call this to open a menu
-  const preDef = (tab?: TabType): MenuItem[] => {
+  const preDef = (
+    tab?: TabType): MenuItem[] => {
     const items: MenuItem[] = [];
     
     // if (tab !== undefined) {
@@ -29,6 +30,7 @@ export const useContextMenu = () => {
     //     action: () => addTab(tab),
     //   });
     // }
+    tab;
 
     items.push(
       { label: "Rename", action: () => console.log("Rename") },

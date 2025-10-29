@@ -1,5 +1,7 @@
 import { create } from "zustand";
-import { PageStruct, Series } from "@/types/seriesTypes";
+import { 
+  // PageStruct,
+   Series } from "@/types/seriesTypes";
 import { UseDiscoverState } from "@/types/discoverTypes";
 import { invoke } from "@tauri-apps/api/core";
 

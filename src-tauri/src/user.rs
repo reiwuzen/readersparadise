@@ -1,8 +1,16 @@
 use std::{fs, path::PathBuf};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use tauri::{App, AppHandle, Manager};
-use crate::{get_app, helper::{get_app_config_dir, get_app_data_dir, get_app_download_dir, get_user_downloads_dir}};
+use tauri::{
+    // App,
+     AppHandle,
+    //   Manager
+    };
+use crate::{
+    // get_app,
+     helper::{get_app_config_dir,
+    //  get_app_data_dir, get_app_download_dir, 
+     get_user_downloads_dir}};
 
 // --- your enums and structs ---
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -68,10 +76,10 @@ pub struct UserConf {
         keyboard_shortcuts: true,
     };
 
-    let download = DownloadConf {
-        path: get_app_download_dir(app.clone())?,
-        concurrent_limit: 3,
-    };
+    // let download = DownloadConf {
+    //     path: get_app_download_dir(app.clone())?,
+    //     concurrent_limit: 3,
+    // };
 
     let user_conf = UserConf {
         is_nsfw: false,

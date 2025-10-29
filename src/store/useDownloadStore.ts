@@ -7,7 +7,9 @@ export type DownloadState = {
     ch_urls: string[]
   ) => void;
 };
-export const useDownloadStore = create<DownloadState>((set) => ({
+export const useDownloadStore = create<DownloadState>((
+  // set
+) => ({
   download1Chapter: async(book_name,ch_no,ch_urls) => {
      await invoke("download_1_chapter",{
         bookName:book_name,

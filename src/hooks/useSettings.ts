@@ -1,5 +1,5 @@
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { app } from "@tauri-apps/api";
+// import { app } from "@tauri-apps/api";
 export const useSettings = () => {
     const appPath = useSettingsStore((s)=>s.appPath);
     const setAppPath =useSettingsStore((s)=>s.setAppPath);

@@ -2,11 +2,13 @@
 import "./App.scss";
 // import Welcome from "./pages/welcome/welcome";
 // import SourceSelect from "./pages/sourceSelect/sourceSelect";
-import { invoke } from "@tauri-apps/api/core";
-import sources from '@/data/sources.json'
+// import { invoke } from "@tauri-apps/api/core";
+// import sources from '@/data/sources.json'
 import { useSettings } from "./hooks/useSettings";
 import Home from "./pages/home/home";
-import {  useEffect, useState } from "react";
+import {  useEffect,
+  //  useState 
+  } from "react";
 // const steps = [
   // { key: "welcome", Component: Welcome },
   // { key: "sources", Component: SourceSelect },
@@ -17,16 +19,16 @@ function App() {const {initTheme, setReaderBGColor}  = useSettings();
   useEffect(()=>{
     setReaderBGColor(readerBGColor, 'init');
   },[])
-  const [index, setIndex] = useState(0);
-  const [finished, setFinished] = useState(true);
+  // const [index, setIndex] = useState(0);
+  // const [finished, setFinished] = useState(true);
 
-  if (finished) {
-    return (
-      <main className="container">
-        <Home />
-      </main>
-    );
-  }
+  // if (finished) {
+  //   return (
+  //     <main className="container">
+  //       <Home />
+  //     </main>
+  //   );
+  // }
   // const Current = steps[index].Component;
 
   // const goNext = () => {
@@ -45,8 +47,8 @@ function App() {const {initTheme, setReaderBGColor}  = useSettings();
 
   return (
     <main className="container">
-      {/* <Current onNext={goNext} onBack={goBack} /> */}
-    </main>
+        <Home />
+      </main>
   );
 }
 

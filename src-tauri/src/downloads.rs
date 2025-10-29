@@ -1,4 +1,8 @@
-use crate::{book::{Series, SitesEnum}, downloads, mgeko::{self, Mgeko}, user::get_user_config};
+use crate::{book::{Series, SitesEnum},
+//  downloads,
+  mgeko::{
+    // self,
+     Mgeko}, user::get_user_config};
 use tokio::fs as tokio_fs;
 use futures::stream::{self, StreamExt};
 use reqwest;

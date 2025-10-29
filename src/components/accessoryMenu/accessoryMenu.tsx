@@ -1,10 +1,10 @@
 import "./accessoryMenu.scss";
 import { useRef, useState } from "react";
 import gsap from "gsap";
-import { useDownload } from "@/hooks/useDownload";
-import { useDiscover } from "@/hooks/useDiscover";
+// import { useDownload } from "@/hooks/useDownload";
+// import { useDiscover } from "@/hooks/useDiscover";
 const AccessoryMenu = () => {
-  const { download1Chapter } = useDownload();
+  // const { download1Chapter } = useDownload();
   // const {bookChapter, selectedBook} = useDiscover();
   const AMBM = useRef<HTMLSpanElement>(null);
   const AMBP = useRef<HTMLSpanElement>(null);

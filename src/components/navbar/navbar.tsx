@@ -9,17 +9,25 @@ import { useContextMenu } from "../../hooks/useContextMenu";
 // import { invoke } from "@tauri-apps/api/core";
 // import { useActiveTab } from "@/hooks/useActiveTab";
 import { useActiveTab } from "@/hooks/useActiveTab";
-import { useTabsStore, createTabState, createTab } from "@/store/useTabsStore";
-import { TAB_COMPONENTS, TabDataMap, url_s } from "@/types/tabTypes";
+import { useTabsStore, createTabState, 
+  // createTab
+ } from "@/store/useTabsStore";
+// import { TAB_COMPONENTS, TabDataMap, url_s } from "@/types/tabTypes";
 
 const Navbar = () => {
   // const { importMangaFolder } = useImport();
   // const {activeTabId, activeMetaData} = useActiveTab();
 
-  const { activeTabId, changeActiveTabPage } = useActiveTab();
-  const { changeTabPage, tabs, addTab } = useTabsStore();
+  const { 
+    // activeTabId,
+     changeActiveTabPage } = useActiveTab();
+  const { 
+    // changeTabPage,
+     tabs, addTab } = useTabsStore();
   // const { changeTab, tabs, addTab } = useTabs();
-  const [loggedIn, setLoggedIn] = useState<Boolean>(false);
+  const [loggedIn,
+     setLoggedIn
+    ] = useState<Boolean>(false);
   const { openContextMenu, renderContextMenu } = useContextMenu();
   return (
     <nav className="navbar">
@@ -198,7 +206,7 @@ const Navbar = () => {
       </ul>
       <ul className="menubarDown">
         <li>
-          <div className="profileIcon"></div>
+          <div className="profileIcon" onClick={()=>setLoggedIn(!loggedIn)}></div>
           <h3>{loggedIn ? `UserName` : `Profile`}</h3>
         </li>
       </ul>

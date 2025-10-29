@@ -3,6 +3,7 @@
   "productName": "ReadersParadise",
   "version": "0.1.0",
   "identifier": "com.rei.readersparadise",
+  
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -45,6 +46,7 @@
     }
   },
   "bundle": {
+    "publisher": "Rei WuZen",
     "active": true,
     "targets": "all",
     "resources": [

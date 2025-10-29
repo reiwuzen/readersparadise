@@ -1,6 +1,8 @@
 import { useTabsStore } from "@/store/useTabsStore";
 import { Mode } from "@/types/globalTypes";
-import { Tab, TabState, TabType } from "@/types/tabTypes";
+import { Tab, TabState,
+  //  TabType
+   } from "@/types/tabTypes";
 
 export const useActiveTab = () => {
   const activeTabId = useTabsStore((s) => s.activeTabId);

@@ -9,7 +9,7 @@ import {
   Tab,
   TabDataMap,
   TabState,
-  TabComponentMap,
+  // TabComponentMap,
   TabType,
 } from "@/types/tabTypes";
 

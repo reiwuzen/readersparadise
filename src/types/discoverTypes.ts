@@ -1,4 +1,6 @@
-import { PageStruct, Series } from "./seriesTypes"
+import {
+    //  PageStruct, 
+    Series } from "./seriesTypes"
 
 export type UseDiscoverState = {
     getSearchRes: (query: String)=> Promise<Series[]>

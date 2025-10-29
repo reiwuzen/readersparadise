@@ -4,14 +4,17 @@ use std::fs;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager};
 use urlencoding::encode;
-use uuid::Uuid;
+// use uuid::Uuid;
 
-use crate::book::{AttrItemStruct, AttributeStruct, Series, SitesEnum};
+use crate::book::{
+    // AttrItemStruct, AttributeStruct, Series, 
+    SitesEnum};
 use crate::client::HTTP_CLIENT;
 use crate::helper::{
-    format_join, get_app_source_dir, get_val, map_series_sites_to_enum, pls_stringify,
+    format_join, get_app_source_dir, get_val,
+    //  map_series_sites_to_enum, pls_stringify,
 };
-use crate::wrap_err;
+// use crate::wrap_err;
 
 
 ///
