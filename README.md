@@ -4,7 +4,7 @@
 
 Built with **[Tauri](https://tauri.app) + [React](https://react.dev) + [TypeScript](https://www.typescriptlang.org/)**
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/reiwuzen/readersparadise)
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/reiwuzen/readersparadise/releases/tag/v0.1.0)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
 [![Tauri](https://img.shields.io/badge/Tauri-2.0-orange.svg)](https://tauri.app)
 [![React](https://img.shields.io/badge/React-19.1-blue.svg)](https://react.dev)
