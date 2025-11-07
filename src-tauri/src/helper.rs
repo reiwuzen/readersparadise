@@ -49,6 +49,20 @@ pub fn clean_description(s: &str, unwanted: Option<&str>) -> String {
     s.replace(unwanted, "").trim().to_string()
 }
 
+/// function to clean images vec
+pub fn clean_chapter_images(images: Vec<String>, unwanted: Option<&str>) -> Vec<String> {
+    let unwanted = unwanted.unwrap_or("").trim();
+    images
+        .into_iter()
+        .filter(|img| {
+            let trimmed = img.trim();
+            !trimmed.is_empty() && (unwanted.is_empty() || trimmed != unwanted)
+        })
+        .map(|img| img.trim().to_string())
+        .collect()
+}
+
+
 #[macro_export]
 macro_rules! wrap_err {
     ($e:expr, $msg:expr) => {
@@ -136,4 +150,12 @@ pub fn get_user_downloads_dir(app: AppHandle) -> Result<PathBuf, String> {
 }
 
 
+/// Get (and create) the app's internal temp directory: app_data/temp
+pub fn get_app_temp_dir(app: AppHandle) -> Result<PathBuf, String> {
+    let base = get_app!(app);
+    let path = base.join("temp");
+    fs::create_dir_all(&path)
+        .map_err(|e| format!("Failed to create temp dir: {}", e))?;
+    Ok(path)
+}
 //

@@ -180,7 +180,9 @@ pub fn get_conf(app: &AppHandle, site: &str) -> Result<ScraperConf, String> {
 
         let html = response.text().await.map_err(|e| e.to_string())?;
         let doc = Html::parse_document(&html);
+        // println!("🔍 Search HTML fetched.: {}", html);
 
+         // Parse series link selector
         let series_link_sel = Selector::parse(&self.sel.series_link.sel)
             .map_err(|e| format!("Invalid series_link_sel: {}", e))?;
 
@@ -189,6 +191,7 @@ pub fn get_conf(app: &AppHandle, site: &str) -> Result<ScraperConf, String> {
                 let full_link = Scraper::format_full_url(&&self.conf, link.to_string());
                 res.push(full_link);
             }
+            // println!("Found link: {:?}", res.last());
         }
 
         Ok(res)

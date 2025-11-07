@@ -25,7 +25,7 @@ use crate::mgeko::{
 pub async fn search_book(app:AppHandle, query: String) -> Result<Vec<Series>,String>{
     let mgkeo = Mgeko::load_all(&app)?;
     let mut res=Vec::new();
-    let z =mgkeo.search_mgeko(query).await?;
+    let z =mgkeo.search_mgeko(app.clone(),query).await?;
     res.extend(z);
 
     Ok(res)

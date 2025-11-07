@@ -1,18 +1,22 @@
-///
-// use futures::stream::Scan;
 use futures::{stream, StreamExt, TryStreamExt};
 use rayon::prelude::*;
 use scraper::{Html, Selector};
 use std::ops::{Deref, DerefMut};
-use std::sync::Arc;
+use std::{fs::OpenOptions, io::Write, sync::Arc};
+///
+// use futures::stream::Scan;
+use tokio::sync::Mutex;
+// use std::sync::Arc;
 ///
 // use std::time::Instant;
 use tauri::{
     // http::status,
-     AppHandle};
+    AppHandle,
+};
 use uuid::Uuid;
 
 use crate::book::{ChapterStruct, PageStruct};
+use crate::helper::{clean_chapter_images, get_app_temp_dir};
 use crate::{
     book::{AttrItemStruct, AttributeStruct, Series},
     client::HTTP_CLIENT,
@@ -52,66 +56,129 @@ impl Mgeko {
         })
     }
 
-    pub async fn search_mgeko(&self, query: String) -> Result<Vec<Series>, String> {
-        // let start = Instant::now();
+    pub async fn search_mgeko(&self, app: AppHandle, query: String) -> Result<Vec<Series>, String> {
+        use futures::stream;
+        use tokio::io::{AsyncSeekExt, AsyncWriteExt, SeekFrom};
+        // 1) prepare temp dir
+        let temp_dir = get_app_temp_dir(app)?.join("search_result");
+        tokio::fs::create_dir_all(&temp_dir)
+            .await
+            .map_err(|e| format!("Failed to create temp dir: {}", e))?;
 
-        // 1️⃣ Get all search links
+        let temp_path = temp_dir.join("temp-search_result.json");
+
+        // 2) Initialize file with empty JSON array "[]"
+        tokio::fs::write(&temp_path, b"[]")
+            .await
+            .map_err(|e| format!("Failed to initialize temp file: {}", e))?;
+
+        // 3) Open file as tokio::fs::File (async) and wrap in Arc<tokio::sync::Mutex<_>>
+        //    Note: we open it here (await) so we get a tokio::fs::File
+        let tokio_file = tokio::fs::OpenOptions::new()
+            .create(true)
+            .read(true)
+            .write(true)
+            .open(&temp_path)
+            .await
+            .map_err(|e| format!("Failed to open temp file: {}", e))?;
+
+        let file = Arc::new(Mutex::new(tokio_file));
+
+        // 4) do search
         let links = self.send_search(query).await?;
-        // println!("Got {} links", links.len());
-
-        // 2️⃣ Fetch HTML concurrently
-        let htmls: Vec<_> = stream::iter(links.into_iter())
-            .map(|url| async move {
-                match HTTP_CLIENT.get(&url).send().await {
-                    Ok(resp) if resp.status().is_success() => match resp.text().await {
-                        Ok(text) => Ok((url, text)),
-                        Err(e) => Err(format!("Failed to read body: {}", e)),
-                    },
-                    Ok(resp) => Err(format!("Bad status {} for {}", resp.status(), url)),
-                    Err(e) => Err(format!("Request failed for {}: {}", url, e)),
-                }
-            })
-            .buffer_unordered(20)
-            .filter_map(|res| async move { res.ok() })
-            .collect()
-            .await;
-
-        // println!(
-        //     "Fetched {} HTML pages in {:.2?}",
-        //     htmls.len(),
-        //     start.elapsed()
-        // );
-
-        // 3️⃣ Parse all HTML in parallel
         let sel = Arc::new(self.sel.clone());
         let conf = Arc::new(self.conf.clone());
 
-        let parsed: Vec<(Series, String)> = htmls
-            .into_par_iter()
-            .filter_map(|(_, html)| Mgeko::parse_each_link_metadata(&sel, &conf, html).ok())
-            .collect();
+        let results = stream::iter(links.into_iter().enumerate())
+            .map(|(_i, url)| {
+                let sel = sel.clone();
+                let conf = conf.clone();
+                let file = file.clone();
+                let _temp_path = temp_path.clone();
 
-        // println!("Parsed {} series", parsed.len());
+                async move {
+                    // Fetch HTML
+                    let html = match HTTP_CLIENT.get(&url).send().await {
+                        Ok(resp) if resp.status().is_success() => {
+                            resp.text().await.map_err(|e| e.to_string())?
+                        }
+                        Ok(resp) => {
+                            return Err(format!("Bad status {} for {}", resp.status(), url))
+                        }
+                        Err(e) => return Err(format!("Request failed for {}: {}", url, e)),
+                    };
 
-        // 4️⃣ Fetch chapter counts concurrently (async)
-        let results = stream::iter(parsed.into_iter())
-            .map(|(mut series, chapters_link)| async move {
-                match self.send_chapter_count(chapters_link).await {
-                    Ok(count) => series.chapter_count = count,
-                    Err(e) => eprintln!("Chapter count failed: {}", e),
+                    // Parse metadata
+                    let (mut series, chapters_link) =
+                        Mgeko::parse_each_link_metadata(&sel, &conf, html)
+                            .map_err(|e| e.to_string())?;
+
+                    // chapter count
+                    if let Ok(count) = self.send_chapter_count(chapters_link).await {
+                        series.chapter_count = count;
+                    }
+
+                    // Convert to JSON string
+                    let json_line = serde_json::to_string(&series).unwrap();
+
+                    // Acquire lock and perform seek-write before last ']'
+                    {
+                        // lock gives tokio::sync::MutexGuard<'_, tokio::fs::File>
+                        let mut f = file.lock().await;
+
+                        // get current length
+                        let len = f
+                            .metadata()
+                            .await
+                            .map_err(|e| format!("metadata error: {}", e))?
+                            .len();
+
+                        // Seek to one byte before end (before closing ']')
+                        // For "[]", len == 2
+                        if len > 2 {
+                            // file contains at least "[x]"
+                            f.seek(SeekFrom::End(-1))
+                                .await
+                                .map_err(|e| format!("seek error: {}", e))?;
+                            // write comma + item + closing bracket
+                            let to_write = format!(",{}]", json_line);
+                            f.write_all(to_write.as_bytes())
+                                .await
+                                .map_err(|e| format!("write error: {}", e))?;
+                            // ensure inner buffer flushed to OS
+                            f.flush().await.map_err(|e| format!("flush error: {}", e))?;
+                        } else {
+                            // file is "[]", replace with "[item]"
+                            f.seek(SeekFrom::End(-1))
+                                .await
+                                .map_err(|e| format!("seek error: {}", e))?;
+                            let to_write = format!("{}]", json_line);
+                            f.write_all(to_write.as_bytes())
+                                .await
+                                .map_err(|e| format!("write error: {}", e))?;
+                            f.flush().await.map_err(|e| format!("flush error: {}", e))?;
+                        }
+                    }
+
+                    Ok(series)
                 }
-                series
             })
             .buffer_unordered(10)
+            .filter_map(|res| async move { res.ok() })
             .collect::<Vec<_>>()
             .await;
 
-        // println!(
-        //     "Total finished in {:.2?} with {} series",
-        //     start.elapsed(),
-        //     results.len()
-        // );
-
+        #[cfg(debug_assertions)]
+        {
+            use serde_json::Value;
+            if let Ok(raw) = tokio::fs::read_to_string(&temp_path).await {
+                if let Ok(json_val) = serde_json::from_str::<Value>(&raw) {
+                    let pretty =
+                        serde_json::to_string_pretty(&json_val).unwrap_or_else(|_| raw.clone());
+                    let _ = tokio::fs::write(&temp_path, pretty).await;
+                }
+            }
+        }
         Ok(results)
     }
 
@@ -227,14 +294,19 @@ impl Mgeko {
         Ok(attributes)
     }
     async fn send_chapter_count(&self, url: String) -> Result<usize, String> {
-        let link = Scraper::format_full_url(&self.conf, url);
-        let new_doc = Scraper::send_html_doc(link)
+        // let link = Scraper::format_full_url(&self.conf, url);
+        let new_doc = Scraper::send_html_doc(url)
             .await
             .map_err(|el| format!("failed : {}", el))?;
         let int_sel = Selector::parse(&self.sel.each_chapter_list_link.sel)
             .map_err(|e| format!("Invalid main_selectors: {}", e))?;
         let int = new_doc.select(&int_sel).count();
         drop(new_doc);
+        #[cfg(debug_assertions)]
+        {
+            // println!("link: {}", link);
+            println!("chapter count: {}", int);
+        }
         Ok(int)
     }
     pub async fn get_book(&self, series: Series) -> Result<Series, String> {
@@ -270,7 +342,7 @@ impl Mgeko {
             .map_err(|e| format!("Failed to extract images: {}", e))?;
 
         // Step 3: Convert image URLs into PageStructs
-        let pages: Vec<PageStruct> = vec_pages
+        let pages: Vec<PageStruct> = clean_chapter_images(vec_pages, Some("https://imgsrv4.com/credits-mgeko.png"))
             .into_iter()
             .enumerate()
             .map(|(j, el)| PageStruct {
